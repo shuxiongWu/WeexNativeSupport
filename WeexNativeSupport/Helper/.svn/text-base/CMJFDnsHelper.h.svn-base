@@ -1,0 +1,17 @@
+//
+//  CMJFDnsHelper.h
+//  CMfspay
+//
+//  Created by fuguoguo on 2018/4/2.
+//  Copyright © 2018年 mrchabao. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import <HappyDNS/HappyDNS.h>
+@interface CMJFDnsHelper : NSObject
+
++ (NSArray *)queryAllIpsWithUrl:(NSString *)url;
+
++ (NSString *)urlReplaceByIp:(NSString *)urlStr;
+
+@end

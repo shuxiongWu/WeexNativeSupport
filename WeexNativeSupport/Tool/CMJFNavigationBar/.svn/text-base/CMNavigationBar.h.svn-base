@@ -1,0 +1,117 @@
+//
+//  CMNavigationBar.h
+//  WeexDemo
+//
+//  Created by 超盟 on 2018/8/24.
+//  Copyright © 2018年 wushuxiong. All rights reserved.
+//
+
+
+#import <UIKit/UIKit.h>
+@class CMNavigationBar;
+
+@interface CMNavigationBar : UIView
++ (BOOL)isIphoneX;
++ (CGFloat)navBarBottom;
++ (CGFloat)tabBarHeight;
++ (CGFloat)screenWidth;
++ (CGFloat)screenHeight;
+@end
+
+
+#pragma mark - Default
+@interface CMNavigationBar (CMDefault)
+
+/// 局部使用该库       待开发
+//+ (void)cm_local;
+/// 广泛使用该库       default 暂时是默认， cm_local 完成后，cm_local就会变成默认
++ (void)cm_widely;
+
+/// 局部使用该库时，设置需要用到的控制器      待开发
+//+ (void)cm_setWhitelist:(NSArray<NSString *> *)list;
+/// 广泛使用该库时，设置需要屏蔽的控制器
++ (void)cm_setBlacklist:(NSArray<NSString *> *)list;
+
+/** set default barTintColor of UINavigationBar */
++ (void)cm_setDefaultNavBarBarTintColor:(UIColor *)color;
+
+/** set default barBackgroundImage of UINavigationBar */
+/** warning: cm_setDefaultNavBarBackgroundImage is deprecated! place use cmCustomNavigationBar */
+//+ (void)cm_setDefaultNavBarBackgroundImage:(UIImage *)image;
+
+/** set default tintColor of UINavigationBar */
++ (void)cm_setDefaultNavBarTintColor:(UIColor *)color;
+
+/** set default titleColor of UINavigationBar */
++ (void)cm_setDefaultNavBarTitleColor:(UIColor *)color;
+
+/** set default statusBarStyle of UIStatusBar */
++ (void)cm_setDefaultStatusBarStyle:(UIStatusBarStyle)style;
+
+/** set default shadowImage isHidden of UINavigationBar */
++ (void)cm_setDefaultNavBarShadowImageHidden:(BOOL)hidden;
+
+@end
+
+
+
+#pragma mark - UINavigationBar
+@interface UINavigationBar (cmAddition) <UINavigationBarDelegate>
+
+/** 设置导航栏所有BarButtonItem的透明度 */
+- (void)cm_setBarButtonItemsAlpha:(CGFloat)alpha hasSystemBackIndicator:(BOOL)hasSystemBackIndicator;
+
+/** 设置导航栏在垂直方向上平移多少距离 */
+- (void)cm_setTranslationY:(CGFloat)translationY;
+
+/** 获取当前导航栏在垂直方向上偏移了多少 */
+- (CGFloat)cm_getTranslationY;
+
+@end
+
+
+
+
+#pragma mark - UIViewController
+@interface UIViewController (cmAddition)
+
+/** record current ViewController navigationBar backgroundImage */
+/** warning: cm_setDefaultNavBarBackgroundImage is deprecated! place use cmCustomNavigationBar */
+//- (void)cm_setNavBarBackgroundImage:(UIImage *)image;
+- (UIImage *)cm_navBarBackgroundImage;
+
+/** record current ViewController navigationBar barTintColor */
+- (void)cm_setNavBarBarTintColor:(UIColor *)color;
+- (UIColor *)cm_navBarBarTintColor;
+
+/** record current ViewController navigationBar backgroundAlpha */
+- (void)cm_setNavBarBackgroundAlpha:(CGFloat)alpha;
+- (CGFloat)cm_navBarBackgroundAlpha;
+
+/** record current ViewController navigationBar tintColor */
+- (void)cm_setNavBarTintColor:(UIColor *)color;
+- (UIColor *)cm_navBarTintColor;
+
+/** record current ViewController titleColor */
+- (void)cm_setNavBarTitleColor:(UIColor *)color;
+- (UIColor *)cm_navBarTitleColor;
+
+/** record current ViewController statusBarStyle */
+- (void)cm_setStatusBarStyle:(UIStatusBarStyle)style;
+- (UIStatusBarStyle)cm_statusBarStyle;
+
+/** record current ViewController navigationBar shadowImage hidden */
+- (void)cm_setNavBarShadowImageHidden:(BOOL)hidden;
+- (BOOL)cm_navBarShadowImageHidden;
+
+/** record current ViewController custom navigationBar */
+/** warning: cm_setDefaultNavBarBackgroundImage is deprecated! place use cmCustomNavigationBar */
+//- (void)cm_setCustomNavBar:(cmCustomNavigationBar *)navBar;
+
+@end
+
+
+
+
+
+

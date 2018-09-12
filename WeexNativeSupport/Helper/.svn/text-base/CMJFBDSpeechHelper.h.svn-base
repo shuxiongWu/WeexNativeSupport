@@ -1,0 +1,43 @@
+//
+//  CMJFBDSpeechHelper.h
+//  CMfspay
+//
+//  Created by fuguoguo on 2018/4/8.
+//  Copyright © 2018年 mrchabao. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "BDSSpeechSynthesizer.h"
+#import <UIKit/UIKit.h>
+
+@interface CMJFBDSpeechHelper : NSObject<BDSSpeechSynthesizerDelegate>
+
+//播放控制
+//语音开关
+@property (nonatomic, assign) BOOL voiceStatus;//0 关闭 1开启
+
+@property (nonatomic, assign) BOOL hasError;
+
+//语速，声音等配置
+@property (nonatomic,strong) NSNumber *speed;
+@property (nonatomic) NSString *volume;
+@property (nonatomic) NSString *pitch;
+@property (nonatomic) NSString *sampleRate;
+@property (nonatomic) NSString *vcnName;
+@property (nonatomic) NSString *engineType;
+
++ (instancetype)shareHelper;
+
+//播放
+- (void)play:(NSString *)text;
+
+//取消
+- (void)cancel;
+
+//暂停恢复
+- (void)pauseOrResume;
+
+- (void)releaseBD;
+
+
+@end

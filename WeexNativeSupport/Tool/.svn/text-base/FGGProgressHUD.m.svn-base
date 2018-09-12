@@ -1,0 +1,104 @@
+//
+//  FGGProgressHUD.m
+//  Test
+//
+//  Created by fuguoguo on 2017/3/14.
+//  Copyright © 2017年 fuguoguo. All rights reserved.
+//
+
+#import "FGGProgressHUD.h"
+#import "AppDelegate.h"
+
+@implementation FGGProgressHUD
++ (void)load {
+    [SVProgressHUD setMinimumDismissTimeInterval:1];
+}
+
++ (void)setProgressContainer {
+    [self dismiss];
+//    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+//    [SVProgressHUD setContainerView:appDelegate.window.rootViewController.selectedViewController.view];
+}
+
++ (void)setAllowMask:(BOOL)allowMask {
+//    [SVProgressHUD setDefaultMaskType:allowMask ? SVProgressHUDMaskTypeBlack : SVProgressHUDMaskTypeNone];
+    [SVProgressHUD setDefaultStyle:SVProgressHUDStyleCustom];
+    [SVProgressHUD setForegroundColor:allowMask?kBtnSelectedColor:[UIColor blackColor]];//字体颜色
+    [SVProgressHUD setBackgroundColor:[UIColor whiteColor]];//背景色
+    [SVProgressHUD  setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+}
+
++ (void)show {
+//    [self setProgressContainer];
+    [self setAllowMask:YES];
+    [SVProgressHUD show];
+}
+
++ (void)showWithStatus:(NSString*)status {
+//    [self setProgressContainer];
+//    [self setAllowMask:YES];
+    [SVProgressHUD showWithStatus:status];
+}
+
++ (void)showProgress:(float)progress {
+//    [self setProgressContainer];
+//    [self setAllowMask:YES];
+    [SVProgressHUD showProgress:progress];
+}
+
++ (void)showProgress:(float)progress status:(NSString*)status {
+//    [self setProgressContainer];
+//    [self setAllowMask:YES];
+    [SVProgressHUD showProgress:progress status:status];
+}
+
++ (void)setStatus:(NSString*)status {
+    [SVProgressHUD setStatus:status];
+}
+
+// stops the activity indicator, shows a glyph + status, and dismisses the HUD a little bit later
++ (void)showInfoWithStatus:(NSString*)status {
+//    [self setProgressContainer];
+    [self setAllowMask:NO];
+    if ([status isKindOfClass:[NSString class]]) {
+        if (status.length > 0) {
+            [SVProgressHUD showInfoWithStatus:status];
+        }
+        else{
+            [SVProgressHUD dismiss];
+        }
+    }
+    else{
+        [SVProgressHUD dismiss];
+    }
+}
+
++ (void)showSuccessWithStatus:(NSString*)status {
+//    [self setProgressContainer];
+    [self setAllowMask:NO];
+    [SVProgressHUD showSuccessWithStatus:status];
+}
+
++ (void)showErrorWithStatus:(NSString*)status {
+//    [self setProgressContainer];
+    [self setAllowMask:NO];
+    [SVProgressHUD showErrorWithStatus:status];
+}
+
+// shows a image + status, use 28x28 white PNGs
++ (void)showImage:(UIImage*)image status:(NSString*)status {
+    [SVProgressHUD showImage:image status:status];
+}
+
++ (void)dismiss {
+    [SVProgressHUD dismiss];
+}
+
++ (void)dismissWithDelay:(NSTimeInterval)delay {
+    [SVProgressHUD dismissWithDelay:delay];
+}
+
++ (BOOL)isVisible {
+    return [SVProgressHUD isVisible];
+}
+@end

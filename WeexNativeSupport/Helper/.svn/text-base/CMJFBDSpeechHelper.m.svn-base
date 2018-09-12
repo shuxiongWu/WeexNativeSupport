@@ -1,0 +1,210 @@
+//
+//  CMJFBDSpeechHelper.m
+//  CMfspay
+//
+//  Created by fuguoguo on 2018/4/8.
+//  Copyright © 2018年 mrchabao. All rights reserved.
+//
+
+#import "CMJFBDSpeechHelper.h"
+#import "TTDFileReader.h"
+#import <AVFoundation/AVFoundation.h>
+
+#define READ_SYNTHESIS_TEXT_FROM_FILE (NO)
+static BOOL isSpeak = YES;
+static BOOL textFromFile = READ_SYNTHESIS_TEXT_FROM_FILE;
+static BOOL displayAllSentences = !READ_SYNTHESIS_TEXT_FROM_FILE;
+
+NSString* CMJF_APP_ID = @"11276792";
+NSString* CMJF_API_KEY = @"epAiYQM35IgulRE47WXMkgB9";
+NSString* CMJF_SECRET_KEY = @"uOX28FuA8zDXSUTqeUhlucVLcgFqWiRH";
+
+NSString* const EDIT_PROPERTY_ID_PLAYER_VOLUME = @"PLAYER_VOLUME";
+NSString* const EDIT_PROPERTY_ID_VOLUME = @"VOL";
+NSString* const EDIT_PROPERTY_ID_SPEED = @"SPEED";
+NSString* const EDIT_PROPERTY_ID_PITCH = @"PITC";
+NSString* const EDIT_PROPERTY_ID_ENABLE_SPEAK = @"SPEAK";
+NSString* const EDIT_PROPERTY_ID_ENABLE_FILE_SYNTH = @"READ_FROM_FILE";
+NSString* const EDIT_PROPERTY_ID_ENABLE_AUDIO_SESSION_MANAGEMENT = @"ENABLE_AV_MANAGEMENT";
+NSString* const EDIT_PROPERTY_ID_ONLINE_TTS_XML = @"ONLINE_TTS_XML";
+NSString* const EDIT_PROPERTY_ID_OFFLINE_TTS_XML = @"OFFLINE_TTS_XML";
+NSString* const EDIT_PROPERTY_ID_TTS_ONLINE_TIMEOUT = @"ONLINE_TTS_TIMEOUT";
+NSString* const EDIT_PROPERTY_ID_OFFLINE_TTS_APPID = @"OFFLINE_ENGINE_APP_ID";
+
+enum SettingRows_SynthesisGeneral{
+    SettingRow_SynthesisGeneral_SynthVolume = 0,
+    SettingRow_SynthesisGeneral_SynthSpeed,
+    SettingRow_SynthesisGeneral_SynthPitch,
+    SettingRow_SynthesisGeneral_EnableSpeak,
+    SettingRow_SynthesisGeneral_ReadTextFromFile,
+    SettingRow_SynthesisGeneral_OnlineThreshold,
+    SettingRow_SynthesisGeneralCount
+};
+
+@implementation CMJFBDSpeechHelper
+
++ (BOOL)isFileSynthesisEnabled{
+    return textFromFile;
+}
++ (BOOL)isSpeakEnabled{
+    return isSpeak;
+}
++ (void)setFileSynthesisEnabled:(BOOL)isEnabled{
+    textFromFile = isEnabled;
+    displayAllSentences = !textFromFile;
+}
++ (void)setSpeakEnabled:(BOOL)isEnabled{
+    isSpeak = isEnabled;
+}
+
++ (instancetype)shareHelper{
+    static CMJFBDSpeechHelper *manager = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        manager = [[CMJFBDSpeechHelper alloc] init];
+    });
+    return manager;
+}
+
+- (instancetype)init{
+    if (self = [super init]) {
+        NSNumber *status = getUserDefaults(kVoiceStatus);
+        _voiceStatus = [status boolValue];
+        [self configureSDK];
+    }
+    return self;
+}
+
+-(void)configureSDK{
+    NSLog(@"TTS version info: %@", [BDSSpeechSynthesizer version]);
+    [BDSSpeechSynthesizer setLogLevel:BDS_PUBLIC_LOG_VERBOSE];
+    [[BDSSpeechSynthesizer sharedInstance] setSynthesizerDelegate:self];
+    
+    [[BDSSpeechSynthesizer sharedInstance] setPlayerVolume:1];
+    [[BDSSpeechSynthesizer sharedInstance] setSynthParam:@(5) forKey:BDS_SYNTHESIZER_PARAM_SPEED];
+    
+    [self configureOnlineTTS];
+    [self configureOfflineTTS];
+}
+
+-(void)configureOnlineTTS{
+    [[BDSSpeechSynthesizer sharedInstance] setApiKey:CMJF_API_KEY withSecretKey:CMJF_SECRET_KEY];
+    [[AVAudioSession sharedInstance]setCategory:AVAudioSessionCategoryPlayback error:nil];
+}
+
+-(void)configureOfflineTTS{
+    
+    NSError *err = nil;
+    // 在这里选择不同的离线音库（请在XCode中Add相应的资源文件），同一时间只能load一个离线音库。根据网络状况和配置，SDK可能会自动切换到离线合成。
+    NSString* offlineEngineSpeechData = [[NSBundle mainBundle] pathForResource:@"Chinese_And_English_Speech_Female" ofType:@"dat"];
+    
+    NSString* offlineChineseAndEnglishTextData = [[NSBundle mainBundle] pathForResource:@"Chinese_And_English_Text" ofType:@"dat"];
+//    NSString * offlineEngineLicenseFile = [[NSBundle mainBundle] pathForResource:@"temp_license_2018-04-03" ofType:@"dms"];
+    
+    err = [[BDSSpeechSynthesizer sharedInstance] loadOfflineEngine:offlineChineseAndEnglishTextData speechDataPath:offlineEngineSpeechData licenseFilePath:nil withAppCode:CMJF_APP_ID];
+    if(err){
+        [self displayError:err withTitle:@"Offline TTS init failed"];
+        return;
+    }
+}
+
+- (void)displayError:(NSError*)error withTitle:(NSString*)title{
+    NSString* errMessage = error.localizedDescription;
+    [FGGProgressHUD showInfoWithStatus:errMessage];
+}
+
+//播放
+- (void)play:(NSString *)text{
+//    if ([[BDSSpeechSynthesizer sharedInstance] synthesizerStatus] == BDS_SYNTHESIZER_STATUS_WORKING) {
+//        [[BDSSpeechSynthesizer sharedInstance] cancel];
+//    }
+    NSInteger sentenceID;
+    NSError* err = nil;
+    if(isSpeak)
+        sentenceID = [[BDSSpeechSynthesizer sharedInstance] speakSentence:text withError:&err];
+    else
+        sentenceID = [[BDSSpeechSynthesizer sharedInstance] synthesizeSentence:text withError:&err];
+    if (err) {
+        [self displayError:err withTitle:@"语音合成失败"];
+        self.hasError = YES;
+    }
+    else{
+        self.hasError = NO;
+    }
+}
+
+//取消
+- (void)cancel{
+    [[BDSSpeechSynthesizer sharedInstance] cancel];
+}
+
+//暂停恢复
+- (void)pauseOrResume{
+//    if([[BDSSpeechSynthesizer sharedInstance] synthesizerStatus] == BDS_SYNTHESIZER_STATUS_PAUSED){
+//        [[BDSSpeechSynthesizer sharedInstance] resume];
+//    }else if([[BDSSpeechSynthesizer sharedInstance] synthesizerStatus] == BDS_SYNTHESIZER_STATUS_WORKING){
+//        [[BDSSpeechSynthesizer sharedInstance] pause];
+//    }
+}
+
+- (void)setSpeed:(NSNumber *)speed{
+    [[BDSSpeechSynthesizer sharedInstance] setSynthParam:speed forKey:BDS_SYNTHESIZER_PARAM_SPEED];
+}
+
+- (void)setVoiceStatus:(BOOL)voiceStatus{
+    _voiceStatus = voiceStatus;
+}
+
+- (void)releaseBD{
+    [BDSSpeechSynthesizer releaseInstance];
+}
+
+#pragma mark - implement BDSSpeechSynthesizerDelegate
+- (void)synthesizerStartWorkingSentence:(NSInteger)SynthesizeSentence{
+    NSLog(@"Did start synth %ld", (long)SynthesizeSentence);
+}
+
+- (void)synthesizerFinishWorkingSentence:(NSInteger)SynthesizeSentence{
+    NSLog(@"Did finish synth, %ld", (long)SynthesizeSentence);
+}
+
+- (void)synthesizerSpeechStartSentence:(NSInteger)SpeakSentence{
+    NSLog(@"Did start speak %ld", (long)SpeakSentence);
+}
+
+- (void)synthesizerSpeechEndSentence:(NSInteger)SpeakSentence{
+    NSLog(@"Did end speak %ld", (long)SpeakSentence);
+}
+
+- (void)synthesizerNewDataArrived:(NSData *)newData
+                       DataFormat:(BDSAudioFormat)fmt
+                   characterCount:(int)newLength
+                   sentenceNumber:(NSInteger)SynthesizeSentence{
+}
+
+- (void)synthesizerTextSpeakLengthChanged:(int)newLength
+                           sentenceNumber:(NSInteger)SpeakSentence{
+    NSLog(@"SpeakLen %ld, %d", (long)SpeakSentence, newLength);
+}
+
+- (void)synthesizerdidPause{
+}
+
+- (void)synthesizerResumed{
+    NSLog(@"Did resume");
+}
+
+- (void)synthesizerCanceled{
+    NSLog(@"Did cancel");
+}
+
+- (void)synthesizerErrorOccurred:(NSError *)error
+                        speaking:(NSInteger)SpeakSentence
+                    synthesizing:(NSInteger)SynthesizeSentence{
+    NSLog(@"Did error %ld, %ld", (long)SpeakSentence, (long)SynthesizeSentence);
+    [[BDSSpeechSynthesizer sharedInstance] cancel];
+    self.hasError = YES;
+    [self displayError:error withTitle:@"Synthesis failed"];
+}
+
+@end

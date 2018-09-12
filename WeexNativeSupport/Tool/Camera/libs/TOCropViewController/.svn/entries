@@ -1,0 +1,85 @@
+10
+
+dir
+580
+svn://wusx@192.168.0.2/chaomeng_linkfood/iOS/trunk/platforms/ios/WeexDemo/Tool/Camera/libs/TOCropViewController
+svn://wusx@192.168.0.2/chaomeng_linkfood
+
+
+
+2018-06-29T06:38:03.915489Z
+352
+weisy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+e072226a-6201-0010-8799-4f6641364503
+
+ja.lproj
+dir
+
+id.lproj
+dir
+
+en.lproj
+dir
+
+ar.lproj
+dir
+
+fr.lproj
+dir
+
+es.lproj
+dir
+
+zh-Hans.lproj
+dir
+
+zh-Hant.lproj
+dir
+
+ko.lproj
+dir
+
+nl.lproj
+dir
+
+Base.lproj
+dir
+
+pl.lproj
+dir
+
+it.lproj
+dir
+
+vi.lproj
+dir
+
+pt.lproj
+dir
+
+da.lproj
+dir
+
+tr.lproj
+dir
+
+ru.lproj
+dir
+
+de.lproj
+dir
+
