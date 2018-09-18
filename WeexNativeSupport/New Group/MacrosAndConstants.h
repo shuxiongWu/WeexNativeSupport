@@ -46,4 +46,7 @@ static const DDLogLevel ddLogLevel = DDLogLevelVerbose;
 static const DDLogLevel ddLogLevel = DDLogLevelError;
 #endif
 
+
+#define CMJFlocalVersion [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
+#define ios_version [[UIDevice currentDevice].systemVersion floatValue]
 #endif /* MacrosAndConstants_h */

@@ -13,4 +13,6 @@
 #import <SVProgressHUD.h>
 #import <AFNetworking.h>
 #import <CocoaLumberjack/CocoaLumberjack.h>
+#import "WeexNativeSupport.h"
+#import "WeexNativeSupportManage.h"
 #endif /* WeexNativeSupport_h */

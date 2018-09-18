@@ -5,6 +5,7 @@
 //  Created by cm on 2018/6/23.
 //  Copyright © 2018年 taobao. All rights reserved.
 //
+#import "DemoDefine.h"
 #import "WXCustomEventModule.h"
 #import <WeexSDK/WXModuleProtocol.h>
 #import <WeexSDK/WXExceptionUtils.h>
@@ -20,6 +21,7 @@
 #import <MJExtension.h>
 #import "WeexNativeSupport.h"
 #import "CMDateHelper.h"
+#import "WeexNativeSupportManage.h"
 static NSString * const WXStorageDirectory            = @"wxstorage";
 static NSString * const WXStorageFileName             = @"wxstorage.plist";
 #define scanMaxNumber 3                //扫描蓝牙最大次数
@@ -39,6 +41,7 @@ static NSString * const WXStorageFileName             = @"wxstorage.plist";
 @property (nonatomic, copy) WXModuleKeepAliveCallback autoConnectLastPeripheralHandler;             //自动连接的回调
 @property (nonatomic, copy) WXModuleKeepAliveCallback connectSuccessHandler;                        //手动连接的回调
 @property (nonatomic, copy) WXModuleKeepAliveCallback SSIDHandler;                                  //Wifi SSID
+    @property (nonatomic, copy) WXModuleKeepAliveCallback getVersionHandler;                            //版本号回调
 @property (nonatomic, copy) WXModuleKeepAliveCallback bluetoothPrinteStatusHandler;                 //打印状态回调
 
 @property (nonatomic, strong) NSMutableArray *buletoothDataArray;                                   //已扫描蓝牙设备集合
@@ -61,7 +64,7 @@ WX_EXPORT_METHOD(@selector(scanQR2:))
 WX_EXPORT_METHOD(@selector(beginScanPerpheral:))            //扫描
 WX_EXPORT_METHOD(@selector(autoConnectLastPeripheral:))     //自动连接
 WX_EXPORT_METHOD(@selector(connectPeripheral:callBack:))    //手动连接
-WX_EXPORT_METHOD(@selector(bluetoothPrinte:callBack:))               //蓝牙打印
+WX_EXPORT_METHOD(@selector(bluetoothPrinte:callBack:))      //蓝牙打印
 
 //WIFI相关api
 WX_EXPORT_METHOD(@selector(getSSIDInfo:))            //获取SSID
@@ -69,6 +72,16 @@ WX_EXPORT_METHOD(@selector(getSSIDInfo:))            //获取SSID
 //日志上传
 WX_EXPORT_METHOD(@selector(upLoadLogInfo:))          //上传日志
 WX_EXPORT_METHOD(@selector(printeLogInfoWithLog:callBack:))          //打印日志
+    
+//版本更新
+WX_EXPORT_METHOD(@selector(checkVersion:callBack:))          //去商店更新
+WX_EXPORT_METHOD(@selector(getVersion:))                     //获取版本号
+
+//打开淘宝领优惠券
+WX_EXPORT_METHOD(@selector(getCoupon:callBack:))      //打开淘宝
+
+//分享
+WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:))      //纯图片分享
 
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
@@ -684,6 +697,23 @@ WX_EXPORT_METHOD(@selector(printeLogInfoWithLog:callBack:))          //打印日
         }
     }];
 }
+    
+#pragma mark --检查更新
+- (void)checkVersion:(NSString *)appId callBack:(WXModuleKeepAliveCallback)callBack{
+    [[WeexNativeSupportManage shareManage] checkVersionToUpdateWithUrl:nil appId:appId isShowLatestVersionTips:YES];
+}
+    
+- (void)getVersion:(WXModuleKeepAliveCallback)callBack{
+    self.getVersionHandler = callBack;
+    if (self.getVersionHandler) {
+        self.getVersionHandler([[[NSBundle mainBundle]infoDictionary] objectForKey:@"CFBundleShortVersionString"], YES);
+    }
+}
+
+#pragma mark -- 淘宝优惠券
+- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:string]];
+}
 
 #pragma mark--获取ssid信息
 - (void)getSSIDInfo:(WXModuleKeepAliveCallback)callBack {
@@ -741,8 +771,15 @@ WX_EXPORT_METHOD(@selector(printeLogInfoWithLog:callBack:))          //打印日
     }
 }
 
+
+#pragma mark -- 日志打印
 - (void)printeLogInfoWithLog:(id)log callBack:(WXModuleKeepAliveCallback)callBack{
     DDLogDebug(@"%@",log);
+}
+
+#pragma mark -- 上传纯图片
+- (void)activityShareWithImageUrlArray:(NSArray *)urlArray{
+    [[WeexNativeSupportManage shareManage] activityShareWithImageUrlArray:urlArray];
 }
 
 #pragma mark --setter\getter
