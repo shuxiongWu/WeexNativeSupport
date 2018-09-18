@@ -55,7 +55,7 @@ WX_EXPORT_METHOD(@selector(call:))
 WX_EXPORT_METHOD(@selector(addImgs:))
 WX_EXPORT_METHOD(@selector(mapName:))
 WX_EXPORT_METHOD(@selector(scanQR:))
-WX_EXPORT_METHOD(@selector(addphoto:))
+WX_EXPORT_METHOD(@selector(addphoto:callBack:))
 WX_EXPORT_METHOD(@selector(jumptocmshop:))
 WX_EXPORT_METHOD(@selector(deviceToken:))// 添加获取方法给js
 WX_EXPORT_METHOD(@selector(scanQR2:))
@@ -81,7 +81,7 @@ WX_EXPORT_METHOD(@selector(getVersion:))                     //获取版本号
 WX_EXPORT_METHOD(@selector(getCoupon:callBack:))      //打开淘宝
 
 //分享
-WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:))      //纯图片分享
+WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:callBack:))      //纯图片分享
 
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
@@ -89,15 +89,16 @@ WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:))      //纯图片分
 
 - (HXPhotoManager *)manager {
     if (!_manager) {
-        _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhotoAndVideo];
-        _manager.configuration.singleSelected = YES;
+        _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
+        //_manager.configuration.singleSelected = YES;
         _manager.configuration.albumListTableView = ^(UITableView *tableView) {
             //            NSSLog(@"%@",tableView);
         };
-        _manager.configuration.singleJumpEdit = YES;
-        _manager.configuration.movableCropBox = YES;
-        _manager.configuration.movableCropBoxEditSize = YES;
-        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
+        
+        //_manager.configuration.singleJumpEdit = YES;
+        //        _manager.configuration.movableCropBox = YES;
+        //        _manager.configuration.movableCropBoxEditSize = YES;
+        //        _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
     }
     return _manager;
 }
@@ -165,11 +166,20 @@ WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:))      //纯图片分
     }
 }
 
-- (void)addphoto:(WXModuleKeepAliveCallback)callBack
+- (void)addphoto:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack
 {
     self.imageCallBack = callBack;
     self.manager.configuration.saveSystemAblum = YES;
-    
+    if (num > 0) {
+        self.manager.configuration.photoMaxNum = num;
+        if (num == 1) {//单选时设置裁剪
+            _manager.configuration.singleSelected = YES;
+            _manager.configuration.singleJumpEdit = YES;
+            _manager.configuration.movableCropBox = YES;
+            _manager.configuration.movableCropBoxEditSize = YES;
+            _manager.configuration.movableCropBoxCustomRatio = CGPointMake(1, 1);
+        }
+    }
     __weak typeof(self) weakSelf = self;
     [[self getCurrentVC] hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList,NSArray<UIImage *> *imageList , NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
         if (photoList.count > 0) {
@@ -177,7 +187,6 @@ WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:))      //纯图片分
             [weakSelf.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
              
                 UIImage *image = imageList.firstObject;
-
                 NSData *data = [image zec_compress];
                 NSString *base64String = [CMJFEncriptionHelper encodeBase64WithData:data];
                 
@@ -777,8 +786,8 @@ WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:))      //纯图片分
     DDLogDebug(@"%@",log);
 }
 
-#pragma mark -- 上传纯图片
-- (void)activityShareWithImageUrlArray:(NSArray *)urlArray{
+#pragma mark -- 分享纯图片
+- (void)activityShareWithImageUrlArray:(NSArray *)urlArray callBack:(WXModuleKeepAliveCallback)callBack{
     [[WeexNativeSupportManage shareManage] activityShareWithImageUrlArray:urlArray];
 }
 
