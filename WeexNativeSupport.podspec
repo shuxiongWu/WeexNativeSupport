@@ -16,6 +16,7 @@ s.dependency 'CocoaLumberjack'
 s.dependency 'WeexSDK'
 s.dependency 'SocketRocket'
 s.dependency 'WeexPluginLoader'
+s.dependency 'SDWebImage'
 s.requires_arc = true
 
 end
