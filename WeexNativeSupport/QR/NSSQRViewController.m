@@ -5,7 +5,7 @@
 //  Created by 超盟 on 2017/12/5.
 //  Copyright © 2017年 超盟. All rights reserved.
 //
-#import "DemoDefine.h"
+
 #import "NSSQRViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import "WeexNativeSupport.h"

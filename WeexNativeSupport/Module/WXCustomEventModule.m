@@ -5,7 +5,6 @@
 //  Created by cm on 2018/6/23.
 //  Copyright © 2018年 taobao. All rights reserved.
 //
-#import "DemoDefine.h"
 #import "WXCustomEventModule.h"
 #import <WeexSDK/WXModuleProtocol.h>
 #import <WeexSDK/WXExceptionUtils.h>
