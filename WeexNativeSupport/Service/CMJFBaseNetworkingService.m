@@ -9,7 +9,6 @@
 #import "CMJFBaseNetworkingService.h"
 #import <MJExtension.h>
 //#import "CMJFUUID.h"
-#import "AppDelegate.h"
 //#import "CMJFManager.h"
 //#import "CMJFLoginVO.h"
 //#import "XGPush.h"
