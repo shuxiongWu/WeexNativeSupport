@@ -11,6 +11,6 @@
 #import "NSSQRViewController.h"
 
 @interface WXCustomEventModule : NSObject<WXModuleProtocol>
-- (NSString*)getItem:(NSString *)key;
+
 
 @end
