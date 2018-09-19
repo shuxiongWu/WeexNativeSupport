@@ -10,8 +10,12 @@
 #import "CMBaseService.h"
 #import "MJShareItem.h"
 #import "UIImage+ScaleImage.h"
-#import <SDWebImageManager.h>
 #import <SVProgressHUD.h>
+#if __has_include(<SDWebImage/SDWebImageManager.h>)
+#import <SDWebImage/SDWebImageManager.h>
+#elif __has_include("SDWebImageManager.h")
+#import "SDWebImageManager.h"
+#endif
 @interface WeexNativeSupportManage ()
 
 @property (nonatomic, copy) NSString *url;  //存储域名
@@ -68,7 +72,7 @@ static WeexNativeSupportManage *manager = nil;
 
 #pragma mark --分享图片
 - (void)activityShareWithImageUrlArray:(NSArray *)urlArray{
-    
+#if __has_include(<SDWebImage/SDWebImageManager.h>) || __has_include("SDWebImageManager.h")
     NSMutableArray *mArray = [[NSMutableArray alloc] init];
     [SVProgressHUD show];
     
@@ -126,9 +130,10 @@ static WeexNativeSupportManage *manager = nil;
                 }
             }
         }];
-        
-        
     }
+#else
+    NSAssert(NO, @"请导入SDWebImage后再使用网络图片功能");
+#endif
 }
 
 @end
