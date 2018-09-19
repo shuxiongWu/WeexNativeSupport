@@ -17,7 +17,7 @@
 #endif
 
 @implementation UIImageView (HXExtension)
-- (void)hx_setImageWithModel:(HXPhotoModel *)model progress:(void (^)(CGFloat progress, HXPhotoModel *model))progressBlock completed:(void (^)(UIImage * image, NSError * error, HXPhotoModel * model))completedBlock {
+- (void)hx_setImageWithModel:(HXPhotoModel *)model progress:(void (^)(CGFloat progress, HXPhotoModel *model))progresBlock completed:(void (^)(UIImage * image, NSError * error, HXPhotoModel * model))completedBlock {
 #if __has_include(<SDWebImage/UIImageView+WebCache.h>) || __has_include("UIImageView+WebCache.h")
     __weak typeof(self) weakSelf = self;
     // 崩溃在这里说明SDWebImage版本过低
@@ -26,8 +26,8 @@
         model.expectedSize = expectedSize;
         CGFloat progress = (CGFloat)receivedSize / expectedSize;
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (progressBlock) {
-                progressBlock(progress, model);
+            if (progresBlock) {
+                progresBlock(progress, model);
             }
         });
     } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
