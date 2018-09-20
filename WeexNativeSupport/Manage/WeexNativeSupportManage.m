@@ -104,7 +104,9 @@ static WeexNativeSupportManage *manager = nil;
     
     __block int i = 0;
     for (NSString *urlString  in urlArray) {
-
+        if (urlString.length == 0) {
+            continue;
+        }
         SDWebImageManager *manager = [SDWebImageManager sharedManager] ;
         [manager downloadImageWithURL:[NSURL URLWithString:urlString] options:0 progress:^(NSInteger   receivedSize, NSInteger expectedSize) {
             // progression tracking code
@@ -518,7 +520,7 @@ static WeexNativeSupportManage *manager = nil;
 }
 
 #pragma mark -- 地图定位
-- (void)mapName:(WXModuleKeepAliveCallback)callBack{
+- (void)getLocation:(WXModuleKeepAliveCallback)callBack{
     self.locationCallBack = callBack;
     [[self getCurrentVC].navigationController pushViewController:self.mapCtl animated:YES];
     [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];

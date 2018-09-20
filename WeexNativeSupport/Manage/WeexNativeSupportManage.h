@@ -106,7 +106,7 @@
 
  @param callBack 回调
  */
-- (void)mapName:(WXModuleKeepAliveCallback)callBack;
+- (void)getLocation:(WXModuleKeepAliveCallback)callBack;
 
 
 /**

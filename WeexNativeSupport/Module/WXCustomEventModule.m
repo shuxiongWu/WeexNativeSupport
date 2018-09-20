@@ -30,7 +30,7 @@ WX_EXPORT_METHOD(@selector(addImgs:))
 WX_EXPORT_METHOD(@selector(addphoto:callBack:))
 
 //地图定位页面
-WX_EXPORT_METHOD(@selector(mapName:))
+WX_EXPORT_METHOD(@selector(getLocation:))
 
 //链接到超盟商家
 WX_EXPORT_METHOD(@selector(jumpTocmshop:))
@@ -85,8 +85,8 @@ WX_EXPORT_METHOD(@selector(getValueForKey:callBack:))
     [self.nativeManage photograph:callBack];
 }
 #pragma mark -- 地图定位
-- (void)mapName:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage mapName:callBack];
+- (void)getLocation:(WXModuleKeepAliveCallback)callBack{
+    [self.nativeManage getLocation:callBack];
 }
 
 #pragma mark -- 链接到超盟商家
