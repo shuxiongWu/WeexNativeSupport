@@ -57,6 +57,7 @@ WX_EXPORT_METHOD(@selector(printeLogInfoWithLog:callBack:))
 //版本更新
 WX_EXPORT_METHOD(@selector(checkVersion:callBack:))
 WX_EXPORT_METHOD(@selector(getVersion:))
+WX_EXPORT_METHOD(@selector(updateApp:))
 
 //打开淘宝领优惠券
 WX_EXPORT_METHOD(@selector(getCoupon:callBack:))
@@ -70,6 +71,11 @@ WX_EXPORT_METHOD(@selector(captureImageFromViewAndSavePhoto:))
 //数据存储
 WX_EXPORT_METHOD(@selector(saveDataWithObject:callBack:))
 WX_EXPORT_METHOD(@selector(getValueForKey:callBack:))
+
+//路由跳转
+WX_EXPORT_METHOD(@selector(popToAppointControllerForAcount:callBack:))
+WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
+
 
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
@@ -150,6 +156,12 @@ WX_EXPORT_METHOD(@selector(getValueForKey:callBack:))
     callBack([[[NSBundle mainBundle]infoDictionary] objectForKey:@"CFBundleShortVersionString"], YES);
 }
 
+#pragma mark -- 去商店更新
+- (void)updateApp:(NSString *)appId{
+    NSString *itunsStr = [NSString stringWithFormat:@"https://itunes.apple.com/cn/app/us/id%@?mt=8",appId];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:itunsStr]];
+}
+
 #pragma mark -- 淘宝优惠券
 - (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:string]];
@@ -180,6 +192,31 @@ WX_EXPORT_METHOD(@selector(getValueForKey:callBack:))
 #pragma mark -- 截屏并保存图片
 - (void)captureImageFromViewAndSavePhoto:(WXModuleKeepAliveCallback)callBack{
     [self.nativeManage captureImageFromViewAndSavePhotoWithCurrentView:weexInstance.viewController.view];
+}
+
+#pragma mark -- 导航跳转之页面回退
+- (void)popToAppointControllerForAcount:(NSInteger)count callBack:(WXModuleKeepAliveCallback)callBack{
+    if (count < 1) {
+        return;
+    }
+    NSMutableArray *arr = [NSMutableArray arrayWithArray:weexInstance.viewController.navigationController.viewControllers];
+    if (count > arr.count) {
+        return;
+    }
+    for (NSInteger i = 0; i < count; i ++) {
+        [arr removeObjectAtIndex:arr.count - 1];
+    }
+    weexInstance.viewController.navigationController.viewControllers = arr;
+    [weexInstance.viewController.navigationController popViewControllerAnimated:YES];
+}
+
+#pragma mark -- 导航跳转之销毁页面区间
+- (void)deleteNavigatorTrackAtLocation:(NSInteger)loc andLength:(NSInteger)length callBack:(WXModuleKeepAliveCallback)callBack{
+    NSMutableArray *arr = [NSMutableArray arrayWithArray:weexInstance.viewController.navigationController.viewControllers];
+    if (loc + length >= arr.count) {
+        return;
+    }
+    [arr removeObjectsInRange:NSMakeRange(loc, length)];
 }
 
 #pragma mark -- setter\getter
