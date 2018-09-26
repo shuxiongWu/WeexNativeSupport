@@ -13,6 +13,7 @@
 #import <WeexSDK/WXUtility.h>
 #import "WeexNativeSupport.h"
 #import "WeexNativeSupportManage.h"
+#import "CMLocationManage.h"
 
 @interface WXCustomEventModule ()
 
@@ -29,8 +30,10 @@ WX_EXPORT_METHOD(@selector(addImgs:))
 //从相册中选取照片
 WX_EXPORT_METHOD(@selector(addphoto:callBack:))
 
-//地图定位页面
+//定位（不需要地图）
 WX_EXPORT_METHOD(@selector(getLocation:))
+//地图定位页面
+WX_EXPORT_METHOD(@selector(pushToCtrlGetLocation:))
 
 //链接到超盟商家
 WX_EXPORT_METHOD(@selector(jumpTocmshop:))
@@ -90,9 +93,15 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 - (void)addImgs:(WXModuleKeepAliveCallback)callBack{
     [self.nativeManage photograph:callBack];
 }
-#pragma mark -- 地图定位
+#pragma mark -- 定位(不通过地图)
 - (void)getLocation:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage getLocation:callBack];
+    [[CMLocationManage shareManage] startLocation];
+    [[CMLocationManage shareManage] setLocationCallBack:callBack];
+}
+
+#pragma mark -- 地图定位
+- (void)pushToCtrlGetLocation:(WXModuleKeepAliveCallback)callBack{
+    [self.nativeManage pushToCtrlGetLocation:callBack];
 }
 
 #pragma mark -- 链接到超盟商家

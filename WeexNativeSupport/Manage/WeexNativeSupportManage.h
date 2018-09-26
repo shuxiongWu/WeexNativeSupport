@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <WeexSDK/WeexSDK.h>
-@interface WeexNativeSupportManage : NSObject
+@interface WeexNativeSupportManage : NSObject<WXModuleProtocol>
 //初始化管理类
 + (instancetype)shareManage;
 
@@ -106,7 +106,7 @@
 
  @param callBack 回调
  */
-- (void)getLocation:(WXModuleKeepAliveCallback)callBack;
+- (void)pushToCtrlGetLocation:(WXModuleKeepAliveCallback)callBack;
 
 
 /**
