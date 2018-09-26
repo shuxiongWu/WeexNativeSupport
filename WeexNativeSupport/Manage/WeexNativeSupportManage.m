@@ -35,7 +35,7 @@
 
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
-    
+
 @property (nonatomic, copy) NSString *url;  //存储域名
 @property (nonatomic, strong) JWBluetoothManage * bluetoothManage;                                  //蓝牙管理类
 @property (nonatomic, strong) NSMutableArray *buletoothDataArray;                                   //已扫描蓝牙设备集合
@@ -50,7 +50,6 @@
 @end
 
 @implementation WeexNativeSupportManage
-@synthesize weexInstance;
 static WeexNativeSupportManage *manager = nil;
 + (instancetype)shareManage {
     static dispatch_once_t oneToken;
@@ -185,7 +184,7 @@ static WeexNativeSupportManage *manager = nil;
             [SVProgressHUD showSuccessWithStatus:@"保存成功"];
         }
     }];
-
+    
 }
 
 #pragma mark --上传日志
@@ -496,9 +495,10 @@ static WeexNativeSupportManage *manager = nil;
 #pragma mark -- 二维码扫描
 - (void)scanQR:(WXModuleKeepAliveCallback)callBack
 {
+    
     self.sanqrCallBack = callBack;
-    [weexInstance.viewController.navigationController pushViewController:self.scanQRCtl animated:YES];
-    [weexInstance.viewController.navigationController setNavigationBarHidden:NO animated:YES];
+    [[self getCurrentVC].navigationController pushViewController:self.scanQRCtl animated:YES];
+    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 #pragma mark -- 链接到超盟商家
@@ -517,15 +517,15 @@ static WeexNativeSupportManage *manager = nil;
         [alert addAction:[UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             
         }]];
-        [weexInstance.viewController presentViewController:alert animated:YES completion:nil];
+        [[self getCurrentVC] presentViewController:alert animated:YES completion:nil];
     }
 }
 
 #pragma mark -- 地图定位
 - (void)pushToCtrlGetLocation:(WXModuleKeepAliveCallback)callBack{
     self.locationCallBack = callBack;
-    [weexInstance.viewController.navigationController pushViewController:self.mapCtl animated:YES];
-    [weexInstance.viewController.navigationController setNavigationBarHidden:NO animated:YES];
+    [[self getCurrentVC].navigationController pushViewController:self.mapCtl animated:YES];
+    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 #pragma mark -- 拍照
@@ -538,7 +538,7 @@ static WeexNativeSupportManage *manager = nil;
 {
     self.imagePickerCtl.sourceType = UIImagePickerControllerSourceTypeCamera;
     self.imagePickerCtl.delegate = self;
-    [weexInstance.viewController presentViewController:self.imagePickerCtl animated:YES completion:nil];
+    [[self getCurrentVC] presentViewController:self.imagePickerCtl animated:YES completion:nil];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
@@ -549,12 +549,12 @@ static WeexNativeSupportManage *manager = nil;
     
     self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
     
-    [weexInstance.viewController dismissViewControllerAnimated:YES completion:nil];
+    [[self getCurrentVC] dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
-    [weexInstance.viewController dismissViewControllerAnimated:YES completion:nil];
+    [[self getCurrentVC] dismissViewControllerAnimated:YES completion:nil];
 }
 
 
@@ -567,7 +567,7 @@ static WeexNativeSupportManage *manager = nil;
         self.manager.configuration.photoMaxNum = num;
     }
     __weak typeof(self) weakSelf = self;
-    [weexInstance.viewController hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList,NSArray<UIImage *> *imageList , NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
+    [[self getCurrentVC] hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList,NSArray<UIImage *> *imageList , NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
         if (photoList.count > 0) {
             [weakSelf.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
                 NSMutableArray *base64StringArr = [NSMutableArray array];
@@ -578,7 +578,7 @@ static WeexNativeSupportManage *manager = nil;
                 }
                 
                 self.imageCallBack ? self.imageCallBack([base64StringArr mj_JSONString], YES) : nil;
-                [weexInstance.viewController dismissViewControllerAnimated:YES completion:nil];
+                [[self getCurrentVC] dismissViewControllerAnimated:YES completion:nil];
             } failed:^{
                 
             }];
