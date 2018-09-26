@@ -16,6 +16,12 @@
 #elif __has_include("SDWebImageManager.h")
 #import "SDWebImageManager.h"
 #endif
+
+#if __has_include(<AlibcTradeSDK/AlibcTradeSDK.h>)
+#import <AlibcTradeSDK/AlibcTradeSDK.h>
+#elif __has_include("AlibcTradeSDK.h")
+#import "AlibcTradeSDK.h"
+#endif
 #import "UIImage+Capture.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "WeexNativeSupport.h"
@@ -35,7 +41,7 @@
 
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
-
+    
 @property (nonatomic, copy) NSString *url;  //存储域名
 @property (nonatomic, strong) JWBluetoothManage * bluetoothManage;                                  //蓝牙管理类
 @property (nonatomic, strong) NSMutableArray *buletoothDataArray;                                   //已扫描蓝牙设备集合
@@ -184,7 +190,7 @@ static WeexNativeSupportManage *manager = nil;
             [SVProgressHUD showSuccessWithStatus:@"保存成功"];
         }
     }];
-    
+
 }
 
 #pragma mark --上传日志
@@ -526,6 +532,29 @@ static WeexNativeSupportManage *manager = nil;
     self.locationCallBack = callBack;
     [[self getCurrentVC].navigationController pushViewController:self.mapCtl animated:YES];
     [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
+}
+
+#pragma mark -- 淘宝优惠券
+- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
+#if __has_include(<AlibcTradeSDK/AlibcTradeSDK.h>) || __has_include("AlibcTradeSDK.h")
+    id<AlibcTradePage> page = [AlibcTradePageFactory page: string];
+    //淘客信息
+    AlibcTradeTaokeParams *taoKeParams=[[AlibcTradeTaokeParams alloc] init];
+    taoKeParams.pid=nil; //
+    //打开方式
+    AlibcTradeShowParams* showParam = [[AlibcTradeShowParams alloc] init];
+    showParam.openType = AlibcOpenTypeNative;
+    showParam.backUrl = @"tbopen25053480://";
+    showParam.isNeedPush = YES;
+    
+    [[AlibcTradeSDK sharedInstance].tradeService show:self.window.rootViewController page:page showParams:showParam taoKeParams:nil trackParam:nil tradeProcessSuccessCallback:^(AlibcTradeResult * _Nullable result) {
+        
+    } tradeProcessFailedCallback:^(NSError * _Nullable error) {
+        
+    }];
+#else
+    NSAssert(NO, @"请导入AlibcTradeSDK后再使用百川功能");
+#endif
 }
 
 #pragma mark -- 拍照

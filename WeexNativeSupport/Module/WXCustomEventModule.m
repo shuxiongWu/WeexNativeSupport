@@ -173,7 +173,7 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 
 #pragma mark -- 淘宝优惠券
 - (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:string]];
+    [self.nativeManage getCoupon:string callBack:callBack];
 }
 
 #pragma mark--获取ssid信息

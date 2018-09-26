@@ -125,4 +125,13 @@
  */
 - (void)selectPhotoFromPhotoAlbumOfNum:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack;
 
+
+/**
+ 打开淘宝链接
+
+ @param string 地址
+ @param callBack 回调
+ */
+- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack;
+
 @end
