@@ -63,7 +63,7 @@ WX_EXPORT_METHOD(@selector(getVersion:))
 WX_EXPORT_METHOD(@selector(updateApp:))
 
 //打开淘宝领优惠券
-WX_EXPORT_METHOD(@selector(getCoupon:callBack:))
+//WX_EXPORT_METHOD(@selector(getCoupon:callBack:))
 
 //分享
 WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:callBack:))
@@ -172,9 +172,9 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 }
 
 #pragma mark -- 淘宝优惠券
-- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage getCoupon:string callBack:callBack];
-}
+//- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
+//    [self.nativeManage getCoupon:string callBack:callBack];
+//}
 
 #pragma mark--获取ssid信息
 - (void)getSSIDInfo:(WXModuleKeepAliveCallback)callBack {

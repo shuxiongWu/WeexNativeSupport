@@ -132,6 +132,6 @@
  @param string 地址
  @param callBack 回调
  */
-- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack;
+//- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack;
 
 @end
