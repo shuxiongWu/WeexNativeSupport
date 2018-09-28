@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.1.13'
+s.version      = '1.1.14'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -16,6 +16,7 @@ s.dependency 'CocoaLumberjack'
 s.dependency 'WeexSDK'
 s.dependency 'SocketRocket'
 s.dependency 'WeexPluginLoader'
+s.dependency 'MJRefresh'
 s.requires_arc = true
 
 end
