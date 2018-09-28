@@ -66,7 +66,7 @@ WX_EXPORT_METHOD(@selector(updateApp:))
 //WX_EXPORT_METHOD(@selector(getCoupon:callBack:))
 
 //分享
-WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:callBack:))
+//WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:callBack:))
 
 //截屏保存图片
 WX_EXPORT_METHOD(@selector(captureImageFromViewAndSavePhoto:))
@@ -194,9 +194,9 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 }
 
 #pragma mark -- 分享纯图片
-- (void)activityShareWithImageUrlArray:(NSArray *)urlArray callBack:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage activityShareWithImageUrlArray:urlArray];
-}
+//- (void)activityShareWithImageUrlArray:(NSArray *)urlArray callBack:(WXModuleKeepAliveCallback)callBack{
+//    [self.nativeManage activityShareWithImageUrlArray:urlArray];
+//}
 
 #pragma mark -- 截屏并保存图片
 - (void)captureImageFromViewAndSavePhoto:(WXModuleKeepAliveCallback)callBack{
