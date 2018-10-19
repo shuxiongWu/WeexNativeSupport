@@ -26,6 +26,7 @@
 
 //拍照
 WX_EXPORT_METHOD(@selector(addImgs:))
+WX_EXPORT_METHOD(@selector(photographWithParameter:callBack:))
 
 //从相册中选取照片
 WX_EXPORT_METHOD(@selector(addphoto:callBack:))
@@ -93,6 +94,11 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 - (void)addImgs:(WXModuleKeepAliveCallback)callBack{
     [self.nativeManage photograph:callBack];
 }
+
+- (void)photographWithParameter:(NSDictionary *)parame callBack:(WXModuleKeepAliveCallback)callBack{
+    //[self.nativeManage photographWithParameter:parame callBack:callBack];
+}
+
 #pragma mark -- 定位(不通过地图)
 - (void)getLocation:(WXModuleKeepAliveCallback)callBack{
     [[CMLocationManage shareManage] startLocation];

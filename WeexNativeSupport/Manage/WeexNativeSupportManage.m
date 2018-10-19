@@ -41,7 +41,7 @@
 
 @property (strong, nonatomic) HXPhotoManager *manager;
 @property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
-    
+
 @property (nonatomic, copy) NSString *url;  //存储域名
 @property (nonatomic, strong) JWBluetoothManage * bluetoothManage;                                  //蓝牙管理类
 @property (nonatomic, strong) NSMutableArray *buletoothDataArray;                                   //已扫描蓝牙设备集合
@@ -190,7 +190,7 @@ static WeexNativeSupportManage *manager = nil;
             [SVProgressHUD showSuccessWithStatus:@"保存成功"];
         }
     }];
-
+    
 }
 
 #pragma mark --上传日志
@@ -565,9 +565,24 @@ static WeexNativeSupportManage *manager = nil;
 
 - (void)takePhoto
 {
-    self.imagePickerCtl.sourceType = UIImagePickerControllerSourceTypeCamera;
-    self.imagePickerCtl.delegate = self;
-    [[self getCurrentVC] presentViewController:self.imagePickerCtl animated:YES completion:nil];
+//    self.imagePickerCtl.sourceType = UIImagePickerControllerSourceTypeCamera;
+//    self.imagePickerCtl.allowsEditing = YES;
+//    self.imagePickerCtl.delegate = self;
+//    [[self getCurrentVC] presentViewController:self.imagePickerCtl animated:YES completion:nil];
+    self.manager.configuration.singleJumpEdit = YES;
+    self.manager.configuration.singleSelected = YES;
+    [[self getCurrentVC] hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
+        [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
+            UIImage *image = [imageList firstObject];
+            NSData *data = [image zec_compress];
+            NSString *base64String = [CMJFEncriptionHelper encodeBase64WithData:data];
+            self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
+        } failed:^{
+            
+        }];
+    } cancel:^(HXCustomCameraViewController *viewController) {
+
+    }];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
@@ -590,15 +605,18 @@ static WeexNativeSupportManage *manager = nil;
 #pragma mark -- 相册选取照片
 - (void)selectPhotoFromPhotoAlbumOfNum:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack
 {
+    num = 1;
     self.imageCallBack = callBack;
     self.manager.configuration.saveSystemAblum = YES;
-    if (num > 0) {
+    if (num > 1) {
         self.manager.configuration.photoMaxNum = num;
+    }else{
+        _manager.configuration.singleSelected = YES;
+        _manager.configuration.singleJumpEdit = YES;
     }
-    __weak typeof(self) weakSelf = self;
-    [[self getCurrentVC] hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList,NSArray<UIImage *> *imageList , NSArray<HXPhotoModel *> *videoList, BOOL original, HXAlbumListViewController *viewController) {
+    [[self getCurrentVC] hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
         if (photoList.count > 0) {
-            [weakSelf.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
+            [self.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
                 NSMutableArray *base64StringArr = [NSMutableArray array];
                 for (UIImage *image in imageList) {
                     NSData *data = [image zec_compress];
@@ -614,9 +632,19 @@ static WeexNativeSupportManage *manager = nil;
             NSSLog(@"%lu张图片",(unsigned long)photoList.count);
         }
     } cancel:^(HXAlbumListViewController *viewController) {
-        NSSLog(@"取消了");
+        
     }];
+    
 }
+
+#pragma mark -- delegate
+//- (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model {
+//    HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
+//    vc.model = model;
+//    vc.manager = self.manager;
+//    [[UIApplication sharedApplication].keyWindow.rootViewController.navigationController pushViewController:vc animated:NO];
+//    //[[self getCurrentVC].navigationController pushViewController:vc animated:NO];
+//}
 
 #pragma mark -- setter\getter
 - (JWBluetoothManage *)bluetoothManage{
@@ -658,6 +686,9 @@ static WeexNativeSupportManage *manager = nil;
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
+        _manager.configuration.openCamera = YES;
+        _manager.configuration.saveSystemAblum = NO;
+        _manager.configuration.themeColor = [UIColor blackColor];
     }
     return _manager;
 }
