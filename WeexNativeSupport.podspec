@@ -1,12 +1,13 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.1.16'
+s.version      = '1.1.17'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }
 s.authors      = {'wushuxiong' => '18779884209@163.com'}
 s.platform     = :ios, '8.0'
 s.source       = {:git => 'https://github.com/shuxiongWu/WeexNativeSupport.git', :tag => s.version}
+s.resources    = "WeexNativeSupport/HXPhotoPicker/HXPhotoPicker.bundle"
 s.source_files = 'WeexNativeSupport/**/*.{h,m}'
 
 s.dependency 'SVProgressHUD'
