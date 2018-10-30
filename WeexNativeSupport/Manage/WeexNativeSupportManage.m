@@ -690,7 +690,6 @@ static WeexNativeSupportManage *manager = nil;
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
-        _manager.configuration.openCamera = YES;
         _manager.configuration.saveSystemAblum = NO;
         _manager.configuration.themeColor = [UIColor blackColor];
     }
