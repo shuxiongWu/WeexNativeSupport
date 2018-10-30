@@ -30,6 +30,7 @@ WX_EXPORT_METHOD(@selector(photographWithParameter:callBack:))
 
 //从相册中选取照片
 WX_EXPORT_METHOD(@selector(addphoto:callBack:))
+WX_EXPORT_METHOD(@selector(selectPhotoFromPhotoAlbum:callBack:))
 
 //定位（不需要地图）
 WX_EXPORT_METHOD(@selector(getLocation:))
@@ -63,12 +64,6 @@ WX_EXPORT_METHOD(@selector(checkVersion:callBack:))
 WX_EXPORT_METHOD(@selector(getVersion:))
 WX_EXPORT_METHOD(@selector(updateApp:))
 
-//打开淘宝领优惠券
-//WX_EXPORT_METHOD(@selector(getCoupon:callBack:))
-
-//分享
-//WX_EXPORT_METHOD(@selector(activityShareWithImageUrlArray:callBack:))
-
 //截屏保存图片
 WX_EXPORT_METHOD(@selector(captureImageFromViewAndSavePhoto:))
 
@@ -89,14 +84,18 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 - (void)addphoto:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack{
     [self.nativeManage selectPhotoFromPhotoAlbumOfNum:num callBack:callBack];
 }
+//建议使用新的api
+- (void)selectPhotoFromPhotoAlbum:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack {
+    [self.nativeManage selectPhotoFromPhotoAlbum:params callBack:callBack];
+}
 
 #pragma mark -- 拍照
 - (void)addImgs:(WXModuleKeepAliveCallback)callBack{
     [self.nativeManage photograph:callBack];
 }
-
+//建议使用新的api
 - (void)photographWithParameter:(NSDictionary *)parame callBack:(WXModuleKeepAliveCallback)callBack{
-    //[self.nativeManage photographWithParameter:parame callBack:callBack];
+    [self.nativeManage photographWithParameter:parame callBack:callBack];
 }
 
 #pragma mark -- 定位(不通过地图)
@@ -177,11 +176,6 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:itunsStr]];
 }
 
-#pragma mark -- 淘宝优惠券
-//- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
-//    [self.nativeManage getCoupon:string callBack:callBack];
-//}
-
 #pragma mark--获取ssid信息
 - (void)getSSIDInfo:(WXModuleKeepAliveCallback)callBack {
     [self.nativeManage getSSIDInfo:callBack];
@@ -198,11 +192,6 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 - (void)printeLogInfoWithLog:(id)log callBack:(WXModuleKeepAliveCallback)callBack{
     DDLogDebug(@"%@",log);
 }
-
-#pragma mark -- 分享纯图片
-//- (void)activityShareWithImageUrlArray:(NSArray *)urlArray callBack:(WXModuleKeepAliveCallback)callBack{
-//    [self.nativeManage activityShareWithImageUrlArray:urlArray];
-//}
 
 #pragma mark -- 截屏并保存图片
 - (void)captureImageFromViewAndSavePhoto:(WXModuleKeepAliveCallback)callBack{

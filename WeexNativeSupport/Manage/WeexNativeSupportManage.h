@@ -118,12 +118,29 @@
 
 
 /**
+ 拍照
+
+ @param parame 传入参数（是否需要裁剪，裁剪比例,是否可移动裁剪框）
+ @param callBack 回调
+ */
+- (void)photographWithParameter:(NSDictionary *)parame callBack:(WXModuleKeepAliveCallback)callBack;
+
+/**
  从相册选取照片
 
  @param num 需要照片数量
  @param callBack 回调
  */
 - (void)selectPhotoFromPhotoAlbumOfNum:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack;
+
+
+/**
+ 从相册选取照片
+ 
+ @param num 传入参数（是否需要裁剪，裁剪比例,是否可移动裁剪框）
+ @param callBack 回调
+ */
+- (void)selectPhotoFromPhotoAlbum:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack;
 
 
 /**

@@ -560,17 +560,24 @@ static WeexNativeSupportManage *manager = nil;
 #pragma mark -- 拍照
 - (void)photograph:(WXModuleKeepAliveCallback)callBack{
     self.imageCallBack = callBack;
+    self.manager.configuration.singleJumpEdit = YES;
+    self.manager.configuration.singleSelected = YES;
+    [self takePhoto];
+}
+//新api
+- (void)photographWithParameter:(NSDictionary *)parame callBack:(WXModuleKeepAliveCallback)callBack{
+    self.imageCallBack = callBack;
+    self.manager.configuration.singleJumpEdit = [parame[@"edit"] boolValue];            //是否可以裁剪
+    if([parame[@"edit"] boolValue]){
+        self.manager.configuration.movableCropBox = [parame[@"movableCropBox"] boolValue];  //是否可移动的裁剪框
+        self.manager.configuration.movableCropBoxEditSize = [parame[@"movableCropBoxEditSize"] boolValue];;  //可移动的裁剪框是否可以编辑大小
+        self.manager.configuration.movableCropBoxCustomRatio = CGPointMake([parame[@"movableCropBoxCustomRatio"] floatValue], 1);
+    }
     [self takePhoto];
 }
 
 - (void)takePhoto
 {
-//    self.imagePickerCtl.sourceType = UIImagePickerControllerSourceTypeCamera;
-//    self.imagePickerCtl.allowsEditing = YES;
-//    self.imagePickerCtl.delegate = self;
-//    [[self getCurrentVC] presentViewController:self.imagePickerCtl animated:YES completion:nil];
-    self.manager.configuration.singleJumpEdit = YES;
-    self.manager.configuration.singleSelected = YES;
     [[self getCurrentVC] hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
@@ -585,27 +592,9 @@ static WeexNativeSupportManage *manager = nil;
     }];
 }
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
-{
-    UIImage *image = info[UIImagePickerControllerOriginalImage];
-    NSData *data = [image zec_compress];
-    NSString *base64String = [CMJFEncriptionHelper encodeBase64WithData:data];
-    
-    self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
-    
-    [[self getCurrentVC] dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-{
-    [[self getCurrentVC] dismissViewControllerAnimated:YES completion:nil];
-}
-
-
 #pragma mark -- 相册选取照片
 - (void)selectPhotoFromPhotoAlbumOfNum:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack
 {
-    num = 1;
     self.imageCallBack = callBack;
     self.manager.configuration.saveSystemAblum = YES;
     if (num > 1) {
@@ -614,6 +603,28 @@ static WeexNativeSupportManage *manager = nil;
         _manager.configuration.singleSelected = YES;
         _manager.configuration.singleJumpEdit = YES;
     }
+    [self selectPhoto];
+}
+
+//建议使用新的api
+- (void)selectPhotoFromPhotoAlbum:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack {
+    
+    self.imageCallBack = callBack;
+    if([params[@"num"] integerValue] > 1){
+        self.manager.configuration.photoMaxNum = [params[@"num"] integerValue];
+    }else{
+        self.manager.configuration.singleSelected = YES;
+        self.manager.configuration.singleJumpEdit = [params[@"edit"] boolValue];            //是否可以裁剪
+        if([params[@"edit"] boolValue]){
+            self.manager.configuration.movableCropBox = [params[@"movableCropBox"] boolValue];  //是否可移动的裁剪框
+            self.manager.configuration.movableCropBoxEditSize = [params[@"movableCropBoxEditSize"] boolValue];  //可移动的裁剪框是否可以编辑大小
+            self.manager.configuration.movableCropBoxCustomRatio = CGPointMake([params[@"movableCropBoxCustomRatio"] floatValue], 1);  // 可移动裁剪框的比例 (w,h)
+        }
+    }
+    [self selectPhoto];
+}
+
+- (void)selectPhoto{
     [[self getCurrentVC] hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
         if (photoList.count > 0) {
             [self.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
@@ -634,17 +645,10 @@ static WeexNativeSupportManage *manager = nil;
     } cancel:^(HXAlbumListViewController *viewController) {
         
     }];
-    
 }
 
 #pragma mark -- delegate
-//- (void)customCameraViewController:(HXCustomCameraViewController *)viewController didDone:(HXPhotoModel *)model {
-//    HXDatePhotoEditViewController *vc = [[HXDatePhotoEditViewController alloc] init];
-//    vc.model = model;
-//    vc.manager = self.manager;
-//    [[UIApplication sharedApplication].keyWindow.rootViewController.navigationController pushViewController:vc animated:NO];
-//    //[[self getCurrentVC].navigationController pushViewController:vc animated:NO];
-//}
+
 
 #pragma mark -- setter\getter
 - (JWBluetoothManage *)bluetoothManage{
