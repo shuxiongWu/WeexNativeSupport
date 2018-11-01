@@ -596,7 +596,6 @@ static WeexNativeSupportManage *manager = nil;
 - (void)selectPhotoFromPhotoAlbumOfNum:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack
 {
     self.imageCallBack = callBack;
-    self.manager.configuration.saveSystemAblum = YES;
     if (num > 1) {
         self.manager.configuration.photoMaxNum = num;
     }else{
@@ -691,6 +690,7 @@ static WeexNativeSupportManage *manager = nil;
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
         _manager.configuration.saveSystemAblum = NO;
+        _manager.configuration.openCamera = NO;
         _manager.configuration.themeColor = [UIColor blackColor];
     }
     return _manager;

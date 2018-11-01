@@ -77,34 +77,23 @@ static CMJFBaseNetworkingService *manager;
         [manager.requestSerializer setValue:host forHTTPHeaderField:@"host"];
     }
     
-    [pdic setObject:@"IOS" forKey:@"versions"];
-    [pdic setObject:@"110" forKey:@"vertype"];
-    [pdic setObject:CMJFlocalVersion forKey:@"ver"];
-    
     
     NSString *jsonString = [pdic mj_JSONString];
     jsonString = [CMJFEncriptionHelper HloveyRC4:jsonString key:CKJFEncriptionSecurityKey];
     
-    //    NSDictionary *bodyDic = @{@"iOS_key":jsonString};
-    //
-    //    if (contentType) {
-    //        bodyDic = [NSDictionary dictionaryWithDictionary:pdic];
-    //    }
-    //    else{
-    //        NSString *jsonString = [NSString convertToJsonData:pdic];
-    //        NSLog(@"----%@",jsonString);
-    //        jsonString = [CMJFEncriptionHelper HloveyRC4:jsonString key:CKJFEncriptionSecurityKey];
-    //        NSLog(@"--%@",jsonString);
-    //        bodyDic = @{@"iOS_key":jsonString};
-    //    }
+    [pdic setObject:@"IOS" forKey:@"versions"];
+    [pdic setObject:@"110" forKey:@"vertype"];
+    if (![pdic objectForKey:@"ver"]) {
+        [pdic setObject:CMJFlocalVersion forKey:@"ver"];
+    }
     
-    
-    [manager POST:httpPath parameters:jsonString progress:^(NSProgress * _Nonnull uploadProgress) {
+    NSDictionary *bodyDic = @{@"iOS_key":jsonString};
+    [manager POST:httpPath parameters:bodyDic progress:^(NSProgress * _Nonnull uploadProgress) {
         
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         
         if (responseDecode) {
-            NSString *messageInfo = [[NSString alloc]initWithData:responseObject encoding:NSUTF8StringEncoding];
+            NSString *messageInfo = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
             NSLog(@"----%@",messageInfo);
             NSString *base64Decoded = [[NSString alloc] initWithData:[[NSData alloc] initWithBase64EncodedString:messageInfo options:0] encoding:NSUTF8StringEncoding];
             NSLog(@"Decoded: %@", base64Decoded);

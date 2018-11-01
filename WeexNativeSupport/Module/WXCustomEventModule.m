@@ -131,7 +131,10 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 #pragma mark -- 存储数据
 - (void)saveDataWithObject:(NSDictionary *)dict callBack:(WXModuleKeepAliveCallback)callBack{
     [[NSUserDefaults standardUserDefaults] setValue:dict[@"value"] forKey:dict[@"key"]];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    BOOL bol = [[NSUserDefaults standardUserDefaults] synchronize];
+    if (callBack) {
+        callBack(@(bol),YES);
+    }
 }
 
 #pragma mark -- 拿取数据
