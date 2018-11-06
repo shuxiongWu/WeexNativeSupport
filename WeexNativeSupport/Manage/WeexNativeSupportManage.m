@@ -365,6 +365,12 @@ static WeexNativeSupportManage *manager = nil;
             [self smallPrintWith:[printer getFinalData]];
         }
         
+        if (params[@"discount"] && [params[@"discount"] length] > 0) {
+            printer = [[JWPrinter alloc] init];
+            [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
+            [self smallPrintWith:[printer getFinalData]];
+        }
+        
         printer = [[JWPrinter alloc] init];
         [printer appendTitle:@"总金额:" value:params[@"total_amount"] ? params[@"total_amount"] : @""];
         [self smallPrintWith:[printer getFinalData]];
@@ -427,6 +433,12 @@ static WeexNativeSupportManage *manager = nil;
             [self smallPrintWith:[printer getFinalData]];
         }
         
+        if (params[@"discount"] && [params[@"discount"] length] > 0) {
+            printer = [[JWPrinter alloc] init];
+            [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
+            [self smallPrintWith:[printer getFinalData]];
+        }
+        
         printer = [[JWPrinter alloc] init];
         [printer appendNewLine];
         [self smallPrintWith:[printer getFinalData]];
@@ -453,6 +465,11 @@ static WeexNativeSupportManage *manager = nil;
         printer = [[JWPrinter alloc] init];
         [printer appendTitle:@"订 单 号：" value:params[@"order_id"] ? params[@"order_id"] : @""];
         [self smallPrintWith:[printer getFinalData]];
+        if (params[@"discount"] && [params[@"discount"] length] > 0) {
+            printer = [[JWPrinter alloc] init];
+            [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
+            [self smallPrintWith:[printer getFinalData]];
+        }
         printer = [[JWPrinter alloc] init];
         [printer appendTitle:@"交易时间:" value:[CMDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
         [self smallPrintWith:[printer getFinalData]];
@@ -517,13 +534,9 @@ static WeexNativeSupportManage *manager = nil;
         //打开url
         [[UIApplication sharedApplication] openURL:url];
     }else {
-        //给个提示或者做点别的事情
-        NSLog(@"U四不四洒，没安装WXApp，怎么打开啊！");
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"确保您已经安装了超盟商+" message:@"" preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            
-        }]];
-        [[self getCurrentVC] presentViewController:alert animated:YES completion:nil];
+        if (callBack) {
+            callBack(@"fail",YES);
+        }
     }
 }
 

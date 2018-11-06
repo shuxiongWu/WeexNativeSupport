@@ -14,7 +14,7 @@
 #import "WeexNativeSupport.h"
 #import "WeexNativeSupportManage.h"
 #import "CMLocationManage.h"
-
+#import <AudioToolbox/AudioServices.h>
 @interface WXCustomEventModule ()
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
@@ -75,6 +75,11 @@ WX_EXPORT_METHOD(@selector(getValueForKey:callBack:))
 WX_EXPORT_METHOD(@selector(popToAppointControllerForAcount:callBack:))
 WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
 
+//短震（类似3D touch）
+WX_EXPORT_METHOD(@selector(transientVibration))
+
+//调节屏幕亮度
+WX_EXPORT_METHOD(@selector(setBrightness:))
 
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
@@ -224,6 +229,17 @@ WX_EXPORT_METHOD(@selector(deleteNavigatorTrackAtLocation:andLength:callBack:))
         return;
     }
     [arr removeObjectsInRange:NSMakeRange(loc, length)];
+}
+
+#pragma mark -- 短震（类似3D touch）
+- (void)transientVibration{
+    AudioServicesPlaySystemSound(1520);
+}
+
+#pragma mark -- 调节屏幕亮度
+- (void)setBrightness:(CGFloat)brightness {
+    //设置亮度
+    [[UIScreen mainScreen] setBrightness:brightness];
 }
 
 #pragma mark -- setter\getter
