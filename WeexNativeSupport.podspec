@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.2.12'
+s.version      = '1.2.13'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }

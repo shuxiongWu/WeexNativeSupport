@@ -15,7 +15,7 @@
 #import "WeexNativeSupportManage.h"
 #import "CMLocationManage.h"
 #import <AudioToolbox/AudioServices.h>
-static const DDLogLevel ddLogLevel = DDLogLevelVerbose;
+
 @interface WXCustomEventModule ()
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
@@ -192,7 +192,7 @@ WX_EXPORT_METHOD(@selector(setBrightness:))
 
 #pragma mark -- 日志打印
 - (void)printeLogInfoWithLog:(id)log callBack:(WXModuleKeepAliveCallback)callBack{
-    DDLogDebug(@"%@",log);
+   // DDLogDebug(@"%@",log);
 }
 
 #pragma mark -- 截屏并保存图片
