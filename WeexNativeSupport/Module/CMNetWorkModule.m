@@ -24,7 +24,7 @@ WX_EXPORT_METHOD(@selector(postNetworkRequestWithParams:callBack:))
     if (![params isKindOfClass:[NSDictionary class]]) return;
     NSMutableDictionary *tempDict = [NSMutableDictionary dictionaryWithDictionary:params];
     [tempDict removeObjectsForKeys:@[@"host",@"url",@"isDecode"]];
-    [CMJFBaseNetworkingService parameters:tempDict func:params[@"host"] baseUrl:params[@"url"] accessToken:nil contentType:nil responseDecode:params[@"isDecode"] success:^(NSURLSessionDataTask *operation, id result) {
+    [CMJFBaseNetworkingService parameters:tempDict func:params[@"host"] baseUrl:params[@"url"] accessToken:nil contentType:nil responseDecode:[params[@"isDecode"] boolValue] success:^(NSURLSessionDataTask *operation, id result) {
         if (callBack) {
             callBack(result,YES);
         }
