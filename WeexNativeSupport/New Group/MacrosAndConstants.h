@@ -58,7 +58,7 @@
 #define Font(size)    [UIFont systemFontOfSize:size*PXSCALE]
 
 //通过DEBUG模式设置全局日志等级，DEBUG时为Verbose，所有日志信息都可以打印，否则Error，只打印
-static const DDLogLevel ddLogLevel = DDLogLevelVerbose;
+
 //#ifdef DEBUG
 //static const DDLogLevel ddLogLevel = DDLogLevelVerbose;
 //#else
