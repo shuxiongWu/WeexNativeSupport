@@ -257,7 +257,8 @@
 
 
 - (void)back:(UIButton *)btn{
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)lightClick:(UIButton *)btn{

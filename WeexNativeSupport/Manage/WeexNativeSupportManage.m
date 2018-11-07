@@ -520,8 +520,11 @@ static WeexNativeSupportManage *manager = nil;
 {
     
     self.sanqrCallBack = callBack;
-    [[self getCurrentVC].navigationController pushViewController:self.scanQRCtl animated:YES];
-    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
+    [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.scanQRCtl animated:YES completion:nil];
+
+    
+ //   [[self getCurrentVC].navigationController pushViewController:self.scanQRCtl animated:YES];
+//    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 #pragma mark -- 链接到超盟商家
@@ -543,8 +546,9 @@ static WeexNativeSupportManage *manager = nil;
 #pragma mark -- 地图定位
 - (void)pushToCtrlGetLocation:(WXModuleKeepAliveCallback)callBack{
     self.locationCallBack = callBack;
-    [[self getCurrentVC].navigationController pushViewController:self.mapCtl animated:YES];
-    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
+    [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.mapCtl animated:YES completion:nil];
+//    [[self getCurrentVC].navigationController pushViewController:self.mapCtl animated:YES];
+//    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 //#pragma mark -- 淘宝优惠券

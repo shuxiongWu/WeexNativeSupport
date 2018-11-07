@@ -103,7 +103,8 @@
     
     
     self.locationAddressBlk ? self.locationAddressBlk(self.currentCoordinate.longitude, self.currentCoordinate.latitude, address, self.addressTfd.text) : nil;
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    //[self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)locationBtnEvent:(id)sender {

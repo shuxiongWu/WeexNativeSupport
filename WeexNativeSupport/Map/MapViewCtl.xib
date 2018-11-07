@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -15,9 +15,9 @@
                 <outlet property="annotationView" destination="9Lk-Pi-hZx" id="AW5-Hs-BjP"/>
                 <outlet property="inputViewBottomConstraint" destination="eRm-O8-ymc" id="P1g-Qh-tkD"/>
                 <outlet property="locatedAddressLbl" destination="smj-ef-ert" id="0sO-ZU-oVF"/>
-                <outlet property="mapView" destination="EnE-xu-uzZ" id="jXP-EM-Alg"/>
+                <outlet property="mapView" destination="EnE-xu-uzZ" id="BCo-4N-EBp"/>
                 <outlet property="textBoxImageView" destination="GoW-uJ-UO4" id="GCc-7V-Rkh"/>
-                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="dGp-XL-nUM"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
