@@ -15,6 +15,7 @@
 #import "WeexNativeSupportManage.h"
 #import "CMLocationManage.h"
 #import <AudioToolbox/AudioServices.h>
+static const DDLogLevel ddLogLevel = DDLogLevelVerbose;
 @interface WXCustomEventModule ()
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
