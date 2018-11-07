@@ -31,7 +31,6 @@
 #import "CMDateHelper.h"
 #import <MJExtension.h>
 #import "NSSQRViewController.h"
-#import "MapViewCtl.h"
 #import "HXPhotoPicker.h"
 #import "CMJFEncriptionHelper.h"
 #import "UIImage+XJSCompress.h"
@@ -47,7 +46,6 @@
 @property (nonatomic, strong) NSMutableArray *buletoothDataArray;                                   //已扫描蓝牙设备集合
 @property (nonatomic, assign) NSInteger scanNum;                                                    //当前已扫描次数
 @property (nonatomic, strong) NSSQRViewController *scanQRCtl;
-@property (nonatomic, strong) MapViewCtl *mapCtl;
 @property (nonatomic, strong) UIImagePickerController *imagePickerCtl;
 
 @property (nonatomic, copy) WXModuleKeepAliveCallback imageCallBack;
@@ -543,14 +541,6 @@ static WeexNativeSupportManage *manager = nil;
     }
 }
 
-#pragma mark -- 地图定位
-- (void)pushToCtrlGetLocation:(WXModuleKeepAliveCallback)callBack{
-    self.locationCallBack = callBack;
-    [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.mapCtl animated:YES completion:nil];
-//    [[self getCurrentVC].navigationController pushViewController:self.mapCtl animated:YES];
-//    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
-}
-
 //#pragma mark -- 淘宝优惠券
 //- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack{
 //#if __has_include(<AlibcTradeSDK/AlibcTradeSDK.h>) || __has_include("AlibcTradeSDK.h")
@@ -691,17 +681,7 @@ static WeexNativeSupportManage *manager = nil;
     return _scanQRCtl;
 }
 
-- (MapViewCtl *)mapCtl
-{
-    if (!_mapCtl) {
-        _mapCtl = [[MapViewCtl alloc] initWithNibName:NSStringFromClass([MapViewCtl class]) bundle:nil];
-        __weak typeof(self)weakSelf = self;
-        _mapCtl.locationAddressBlk = ^(double longitude, double latitude, NSString *address, NSString *detailAddress) {
-            weakSelf.locationCallBack ? weakSelf.locationCallBack(@{@"longitude": @(longitude), @"latitude": @(latitude), @"address": address, @"detailAddress": detailAddress}, YES) : nil;
-        };
-    }
-    return _mapCtl;
-}
+
 
 - (HXPhotoManager *)manager {
     if (!_manager) {

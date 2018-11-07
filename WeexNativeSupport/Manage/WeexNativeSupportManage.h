@@ -102,14 +102,6 @@
 - (void)jumpTocmshop:(WXModuleKeepAliveCallback)callBack;
 
 /**
- 地图定位
-
- @param callBack 回调
- */
-- (void)pushToCtrlGetLocation:(WXModuleKeepAliveCallback)callBack;
-
-
-/**
  拍照
 
  @param callBack 回调

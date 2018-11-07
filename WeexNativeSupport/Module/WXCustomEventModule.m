@@ -34,8 +34,6 @@ WX_EXPORT_METHOD(@selector(selectPhotoFromPhotoAlbum:callBack:))
 
 //定位（不需要地图）
 WX_EXPORT_METHOD(@selector(getLocation:))
-//地图定位页面
-WX_EXPORT_METHOD(@selector(pushToCtrlGetLocation:))
 
 //链接到超盟商家
 WX_EXPORT_METHOD(@selector(jumpTocmshop:))
@@ -107,11 +105,6 @@ WX_EXPORT_METHOD(@selector(setBrightness:))
 - (void)getLocation:(WXModuleKeepAliveCallback)callBack{
     [[CMLocationManage shareManage] startLocation];
     [[CMLocationManage shareManage] setLocationCallBack:callBack];
-}
-
-#pragma mark -- 地图定位
-- (void)pushToCtrlGetLocation:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage pushToCtrlGetLocation:callBack];
 }
 
 #pragma mark -- 链接到超盟商家
