@@ -15,7 +15,7 @@
                      success:(successHandle)success
                      failure:(failureHandle)failure{
     
-    [CMJFBaseNetworkingService parameters:nil func:nil baseUrl:url accessToken:nil contentType:nil responseDecode:NO success:^(NSURLSessionDataTask *operation, id result) {
+    [CMJFBaseNetworkingService parameters:nil func:nil baseUrl:url accessToken:nil contentType:nil responseDecode:YES success:^(NSURLSessionDataTask *operation, id result) {
         if ([[NSString stringWithFormat:@"%@",result[@"result"]] isEqualToString:@"1"]) {
             id data = result[@"data"];
             if ([data isKindOfClass:[NSDictionary class]]) {

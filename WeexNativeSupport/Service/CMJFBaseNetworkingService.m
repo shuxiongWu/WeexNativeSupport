@@ -33,7 +33,7 @@ static CMJFBaseNetworkingService *manager;
         manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/plain", @"text/javascript", @"text/json",@"application/x-www-form-urlencoded; charset=UTF-8", @"text/html", nil];//支持类型
         // 设置超时时间
         [manager.requestSerializer willChangeValueForKey:@"timeoutInterval"];
-        manager.requestSerializer.timeoutInterval = 8.0f;
+        manager.requestSerializer.timeoutInterval = 15.0f;
         [manager.requestSerializer didChangeValueForKey:@"timeoutInterval"];
         //https
         AFSecurityPolicy *securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeNone];
@@ -58,7 +58,7 @@ static CMJFBaseNetworkingService *manager;
     NSString *httpPath = func ? [NSString stringWithFormat:@"%@%@",bUrl,func] : bUrl;
     
     AFHTTPSessionManager *manager = [CMJFBaseNetworkingService shared];
-    
+     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     
     CMJFNetworkHelper *helper = [CMJFNetworkHelper shareHelper];
     NSString *network;
@@ -76,31 +76,30 @@ static CMJFBaseNetworkingService *manager;
         NSString *host = urls[1];
         [manager.requestSerializer setValue:host forHTTPHeaderField:@"host"];
     }
-    
-    
-    NSString *jsonString = [pdic mj_JSONString];
-    jsonString = [CMJFEncriptionHelper HloveyRC4:jsonString key:CKJFEncriptionSecurityKey];
-    
+
     [pdic setObject:@"IOS" forKey:@"versions"];
     [pdic setObject:@"110" forKey:@"vertype"];
     if (![pdic objectForKey:@"ver"]) {
         [pdic setObject:CMJFlocalVersion forKey:@"ver"];
     }
     
+    NSString *jsonString = [pdic mj_JSONString];
+    jsonString = [CMJFEncriptionHelper HloveyRC4:jsonString key:CKJFEncriptionSecurityKey];
+    
     NSDictionary *bodyDic = @{@"iOS_key":jsonString};
     [manager POST:httpPath parameters:bodyDic progress:^(NSProgress * _Nonnull uploadProgress) {
         
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        //NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+
+        NSString *jsonString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *err;
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
+                                                            options:NSJSONReadingMutableContainers
+                                                              error:&err];
         
-        if (responseDecode) {
-            NSString *messageInfo = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-            NSLog(@"----%@",messageInfo);
-            NSString *base64Decoded = [[NSString alloc] initWithData:[[NSData alloc] initWithBase64EncodedString:messageInfo options:0] encoding:NSUTF8StringEncoding];
-            NSLog(@"Decoded: %@", base64Decoded);
-            responseObject = [CMJFEncriptionHelper rc4Decode:messageInfo key:CKJFEncriptionSecurityKey];
-        }
-        
-        requestSuccess(task,responseObject);
+        requestSuccess(task,dic);
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"请求错误------------------------------\n%@",error.description);
