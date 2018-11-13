@@ -71,11 +71,11 @@ static CMJFBaseNetworkingService *manager;
     }
     NSString *user_agent = [NSString stringWithFormat:@"iOS/%@ Manufacture/apple Device/iPhone CMMerchant/%@ NetType/%@",[NSString stringWithFormat:@"%.1f",ios_version],CMJFlocalVersion,network];
     [manager.requestSerializer setValue:user_agent forHTTPHeaderField:@"User-Agent"];
-    NSArray *urls = [bUrl componentsSeparatedByString:@"://"];
-    if (urls.count > 1) {
-        NSString *host = urls[1];
-        [manager.requestSerializer setValue:host forHTTPHeaderField:@"host"];
-    }
+//    NSArray *urls = [bUrl componentsSeparatedByString:@"://"];
+//    if (urls.count > 1) {
+//        NSString *host = urls[1];
+//        [manager.requestSerializer setValue:host forHTTPHeaderField:@"host"];
+//    }
 
     [pdic setObject:@"IOS" forKey:@"versions"];
     [pdic setObject:@"110" forKey:@"vertype"];
