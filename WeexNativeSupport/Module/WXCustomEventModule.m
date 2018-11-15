@@ -65,6 +65,8 @@ WX_EXPORT_METHOD(@selector(updateApp:))
 
 //截屏保存图片
 WX_EXPORT_METHOD(@selector(captureImageFromViewAndSavePhoto:))
+WX_EXPORT_METHOD(@selector(savePhotoToMediaLibraryWithImageBase64Data:))
+
 
 //数据存储
 WX_EXPORT_METHOD(@selector(saveDataWithObject:callBack:))
@@ -198,6 +200,13 @@ WX_EXPORT_METHOD(@selector(setBrightness:))
 #pragma mark -- 截屏并保存图片
 - (void)captureImageFromViewAndSavePhoto:(WXModuleKeepAliveCallback)callBack{
     [self.nativeManage captureImageFromViewAndSavePhotoWithCurrentView:weexInstance.viewController.view];
+}
+
+- (void)savePhotoToMediaLibraryWithImageBase64Data:(NSString *)baseString{
+    NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:baseString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
+    UIImage *decodedImage = [UIImage imageWithData: decodeData];
+    [self.nativeManage savePhotoToMediaLibraryWithImage:decodedImage];
+
 }
 
 #pragma mark -- 导航跳转之页面回退

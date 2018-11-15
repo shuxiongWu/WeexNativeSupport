@@ -136,11 +136,10 @@
 
 
 /**
- 打开淘宝链接
+ 将图片存入相册
 
- @param string 地址
- @param callBack 回调
+ @param image image
  */
-//- (void)getCoupon:(NSString *)string callBack:(WXModuleKeepAliveCallback)callBack;
+- (void)savePhotoToMediaLibraryWithImage:(UIImage *)image;
 
 @end
