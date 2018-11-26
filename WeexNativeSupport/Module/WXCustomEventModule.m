@@ -39,6 +39,9 @@ WX_EXPORT_METHOD(@selector(getLocation:))
 //链接到超盟商家
 WX_EXPORT_METHOD(@selector(jumpTocmshop:))
 
+//链接到外部应用
+    WX_EXPORT_METHOD(@selector(openThirdApplication:callBack:))
+    
 //打电话
 WX_EXPORT_METHOD(@selector(call:))
 
@@ -115,6 +118,11 @@ WX_EXPORT_METHOD(@selector(setBrightness:))
     [self.nativeManage jumpTocmshop:callBack];
 }
 
+#pragma mark -- 链接到外部应用
+- (void)openThirdApplication:(NSString *)urlSchemes callBack:(WXModuleKeepAliveCallback)callBack{
+    [self.nativeManage openThirdApplication:urlSchemes callBack:callBack];
+}
+    
 #pragma mark -- 打电话
 -(void)call:(NSString*)num{
     NSMutableString *str=[[NSMutableString alloc] initWithFormat:@"tel:%@",num];

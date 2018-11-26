@@ -142,4 +142,11 @@
  */
 - (void)savePhotoToMediaLibraryWithImage:(UIImage *)image;
 
+/**
+ 打开第三方应用
+
+ @param urlSchemes urlSchemes
+ @param callBack callBack description
+ */
+- (void)openThirdApplication:(NSString *)urlSchemes callBack:(WXModuleKeepAliveCallback)callBack;
 @end
