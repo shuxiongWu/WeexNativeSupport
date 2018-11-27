@@ -63,7 +63,7 @@
     [backBtn addTarget:self action:@selector(back:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:backBtn];
     
-    UIImageView * imageView = [[UIImageView alloc]initWithFrame:kScanRect];
+    UIImageView * imageView = [[UIImageView alloc] initWithFrame:kScanRect];
     imageView.image = [UIImage imageNamed:@"icon_green_box"];
     [self.view addSubview:imageView];
     

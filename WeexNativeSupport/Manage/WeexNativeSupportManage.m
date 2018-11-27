@@ -35,6 +35,7 @@
 #import "CMJFEncriptionHelper.h"
 #import "UIImage+XJSCompress.h"
 #import "CMLocationManage.h"
+#import "CMQRViewController.h"
 #define scanMaxNumber 3                //扫描蓝牙最大次数
 @interface WeexNativeSupportManage ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
 
@@ -45,7 +46,7 @@
 @property (nonatomic, strong) JWBluetoothManage * bluetoothManage;                                  //蓝牙管理类
 @property (nonatomic, strong) NSMutableArray *buletoothDataArray;                                   //已扫描蓝牙设备集合
 @property (nonatomic, assign) NSInteger scanNum;                                                    //当前已扫描次数
-@property (nonatomic, strong) NSSQRViewController *scanQRCtl;
+@property (nonatomic, strong) CMQRViewController *scanQRCtl;
 @property (nonatomic, strong) UIImagePickerController *imagePickerCtl;
 
 @property (nonatomic, copy) WXModuleKeepAliveCallback imageCallBack;
@@ -662,13 +663,14 @@ static WeexNativeSupportManage *manager = nil;
     return _buletoothDataArray;
 }
 
-- (NSSQRViewController *)scanQRCtl
+- (CMQRViewController *)scanQRCtl
 {
-    _scanQRCtl = [[NSSQRViewController alloc] init];
+    _scanQRCtl = [[CMQRViewController alloc] init];
     __weak typeof(self)weakSelf = self;
-    _scanQRCtl.scanCallBlk = ^(int code,NSString *msg) {
+    _scanQRCtl.scanCallBack = ^(int code, NSString *msg) {
         weakSelf.sanqrCallBack ? weakSelf.sanqrCallBack(@{@"code": @(code),@"code_url": msg}, YES) : nil;
     };
+
     return _scanQRCtl;
 }
 
