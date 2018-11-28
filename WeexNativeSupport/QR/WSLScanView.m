@@ -7,7 +7,7 @@
 //
 
 #import "WSLScanView.h"
-
+#import "PublicTool.h"
 
 @interface WSLScanView ()
 
@@ -308,7 +308,7 @@
 - (UIButton *)flashBtn{
     if (_flashBtn == nil) {
         _flashBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
-        [_flashBtn setImage:[UIImage imageNamed:@"scanFlashlight"] forState:UIControlStateNormal];
+        [_flashBtn setImage:[PublicTool wx_imageNamed:@"scanFlashlight"] forState:UIControlStateNormal];
         [_flashBtn addTarget:self action:@selector(flashBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
         _flashBtn.center = CGPointMake(self.frame.size.width/2.0, self.scanRetangleRect.origin.y + self.scanRetangleRect.size.height - 40);
     }

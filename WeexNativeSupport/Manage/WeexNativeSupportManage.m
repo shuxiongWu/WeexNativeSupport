@@ -665,7 +665,11 @@ static WeexNativeSupportManage *manager = nil;
 
 - (CMQRViewController *)scanQRCtl
 {
-    _scanQRCtl = [[CMQRViewController alloc] init];
+    NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
+    
+    NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
+
+    _scanQRCtl = [[CMQRViewController alloc] initWithNibName:@"CMQRViewController" bundle:resourceBundle];
     __weak typeof(self)weakSelf = self;
     _scanQRCtl.scanCallBack = ^(int code, NSString *msg) {
         weakSelf.sanqrCallBack ? weakSelf.sanqrCallBack(@{@"code": @(code),@"code_url": msg}, YES) : nil;
