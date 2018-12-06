@@ -26,7 +26,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [_back setImage:[PublicTool wx_imageNamed:@"btn_back"] forState:UIControlStateNormal];
 }
 
 -(void)viewDidLayoutSubviews {
@@ -98,12 +97,13 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    
+    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
     [_scanView startScanAnimation];
     [_scanTool sessionStartRunning];
 }
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
+     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
     [_scanView stopScanAnimation];
     [_scanView finishedHandle];
     [_scanView showFlashSwitch:NO];

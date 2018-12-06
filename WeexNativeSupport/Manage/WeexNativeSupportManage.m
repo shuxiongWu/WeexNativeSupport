@@ -324,6 +324,11 @@ static WeexNativeSupportManage *manager = nil;
     printer = [[JWPrinter alloc] init];
     
     if ([params[@"singleType"] integerValue] == 0) {//普通单
+        if (params[@"serial_num"]) {
+            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter];
+            [self smallPrintWith:[printer getFinalData]];
+            printer = [[JWPrinter alloc] init];
+        }
         [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
         printer = [[JWPrinter alloc] init];
@@ -389,6 +394,11 @@ static WeexNativeSupportManage *manager = nil;
         [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
         printer = [[JWPrinter alloc] init];
+        if (params[@"serial_num"]) {
+            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter];
+            [self smallPrintWith:[printer getFinalData]];
+            printer = [[JWPrinter alloc] init];
+        }
         [printer appendText:@"*加菜*" alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
         printer = [[JWPrinter alloc] init];
@@ -449,6 +459,11 @@ static WeexNativeSupportManage *manager = nil;
         [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
         printer = [[JWPrinter alloc] init];
+        if (params[@"serial_num"]) {
+            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter];
+            [self smallPrintWith:[printer getFinalData]];
+            printer = [[JWPrinter alloc] init];
+        }
         [printer appendText:statusStrArr[[params[@"order_status"] integerValue]] alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
         printer = [[JWPrinter alloc] init];
@@ -584,7 +599,7 @@ static WeexNativeSupportManage *manager = nil;
             NSString *base64String = [CMJFEncriptionHelper encodeBase64WithData:data];
             self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
         } failed:^{
-            
+
         }];
     } cancel:^(HXCustomCameraViewController *viewController) {
 
@@ -612,8 +627,8 @@ static WeexNativeSupportManage *manager = nil;
         self.manager.configuration.photoMaxNum = [params[@"num"] integerValue];
     }else{
         self.manager.configuration.singleSelected = YES;
-        self.manager.configuration.singleJumpEdit = [params[@"edit"] boolValue];            //是否可以裁剪
         if([params[@"edit"] boolValue]){
+            self.manager.configuration.singleJumpEdit = [params[@"edit"] boolValue];            //是否可以裁剪
             self.manager.configuration.movableCropBox = [params[@"movableCropBox"] boolValue];  //是否可移动的裁剪框
             self.manager.configuration.movableCropBoxEditSize = [params[@"movableCropBoxEditSize"] boolValue];  //可移动的裁剪框是否可以编辑大小
             self.manager.configuration.movableCropBoxCustomRatio = CGPointMake([params[@"movableCropBoxCustomRatio"] floatValue], 1);  // 可移动裁剪框的比例 (w,h)

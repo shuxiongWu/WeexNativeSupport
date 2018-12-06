@@ -16,6 +16,7 @@
 #import "CMLocationManage.h"
 #import <AudioToolbox/AudioServices.h>
 #import "CMQRViewController.h"
+#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
@@ -40,7 +41,7 @@ WX_EXPORT_METHOD(@selector(getLocation:))
 WX_EXPORT_METHOD(@selector(jumpTocmshop:))
 
 //链接到外部应用
-    WX_EXPORT_METHOD(@selector(openThirdApplication:callBack:))
+WX_EXPORT_METHOD(@selector(openThirdApplication:callBack:))
     
 //打电话
 WX_EXPORT_METHOD(@selector(call:))
@@ -84,6 +85,10 @@ WX_EXPORT_METHOD(@selector(transientVibration))
 
 //调节屏幕亮度
 WX_EXPORT_METHOD(@selector(setBrightness:))
+
+//present、dismiss
+WX_EXPORT_METHOD(@selector(presentToController:))
+WX_EXPORT_METHOD(@selector(dismiss))
 
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
@@ -251,6 +256,20 @@ WX_EXPORT_METHOD(@selector(setBrightness:))
 - (void)setBrightness:(CGFloat)brightness {
     //设置亮度
     [[UIScreen mainScreen] setBrightness:brightness];
+}
+
+- (void)presentToController:(NSString *)url{
+//    url = [@"${PODS_ROOT}/bundlejs" stringByAppendingString:url];
+//    NSURL *URL = [[NSURL alloc] initFileURLWithPath:url];
+//
+//    UIViewController *demo = [[WXDemoViewController alloc] init];
+//    ((WXDemoViewController *)demo).url = URL;
+//    [weexInstance.viewController.navigationController pushViewController:demo animated:YES];
+   // [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:demo animated:YES completion:nil];
+}
+
+- (void)dismiss{
+    
 }
 
 #pragma mark -- setter\getter
