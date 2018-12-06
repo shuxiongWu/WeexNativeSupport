@@ -16,7 +16,7 @@
 #import "CMLocationManage.h"
 #import <AudioToolbox/AudioServices.h>
 #import "CMQRViewController.h"
-#import "WXDemoViewController.h"
+//#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
