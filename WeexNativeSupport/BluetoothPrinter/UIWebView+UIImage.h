@@ -13,7 +13,7 @@
 /**
  *  获取当前加载的网页的截图
  *
- *  @return 图片
+ *  @return
  */
 - (UIImage *)imageForWebView;
 

@@ -36,6 +36,7 @@
 #import "UIImage+XJSCompress.h"
 #import "CMLocationManage.h"
 #import "CMQRViewController.h"
+#import "HLPrinter.h"
 #define scanMaxNumber 3                //扫描蓝牙最大次数
 @interface WeexNativeSupportManage ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
 
@@ -315,210 +316,371 @@ static WeexNativeSupportManage *manager = nil;
         }
         return;
     }
-    JWPrinter *printer = [[JWPrinter alloc] init];
+    HLPrinter *printer = [[HLPrinter alloc] init];
     NSArray *statusStrArr = @[@"*取消*",@"*进行中*",@"*已完成*",@"*菜未上齐*",@"*菜已上齐*",@"*加菜*",@"*已结账*"];
     NSArray *payTypeArr = @[@"微信支付",@"支付宝支付",@"现金支付"];
-    
-    [printer appendSeperatorLine];
-    [self smallPrintWith:[printer getFinalData]];
-    printer = [[JWPrinter alloc] init];
-    
+
     if ([params[@"singleType"] integerValue] == 0) {//普通单
-        if (params[@"serial_num"]) {
-            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter];
-            [self smallPrintWith:[printer getFinalData]];
-            printer = [[JWPrinter alloc] init];
-        }
-        [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"订单号:" value:params[@"order_id"] ? params[@"order_id"] : @""];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"桌号:" value:params[@"board_num"] ? params[@"board_num"] : @""];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"交易时间:" value:[CMDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
+        printer = [[HLPrinter alloc] init];
+        [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
         [self smallPrintWith:[printer getFinalData]];
         
-        if (params[@"goods_list"] && [params[@"goods_list"] count] > 0) {
-            printer = [[JWPrinter alloc] init];
-            [printer appendLeftText:@"商品名称" middleText:@"数量" rightText:@"金额" isTitle:NO];
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendText:[NSString stringWithFormat:@"桌号： %@",params[@"board_num"]] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
+        [self smallPrintWith:[printer getFinalData]];
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        if (params[@"serial_num"]) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
             [self smallPrintWith:[printer getFinalData]];
+            printer = [[HLPrinter alloc] init];
+            [printer appendSeperatorLine];
+            [self smallPrintWith:[printer getFinalData]];
+        }
+
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"订单号" value:params[@"order_id"] ? params[@"order_id"] : @""];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"下单时间" value:[CMDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"桌号" value:params[@"board_num"] ? params[@"board_num"] : @""];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"下单员" value:params[@"account_name"] ? params[@"account_name"] : @""];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+
+        
+        if (params[@"goods_list"] && [params[@"goods_list"] count] > 0) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendLeftText:@"商品名称" middleText:@"数量" rightText:@"小计" isTitle:YES];
+            [self smallPrintWith:[printer getFinalData]];
+            
+            printer = [[HLPrinter alloc] init];
+            [printer appendSeperatorLine];
+            [self smallPrintWith:[printer getFinalData]];
+            
             NSArray *goodList = params[@"goods_list"];
             
             for (NSDictionary *tempDict in goodList) {
-                printer = [[JWPrinter alloc] init];
+                printer = [[HLPrinter alloc] init];
                 [printer appendLeftText:tempDict[@"goods_name"] ? tempDict[@"goods_name"] : @"" middleText:tempDict[@"goods_number"] ? tempDict[@"goods_number"] : @"" rightText:tempDict[@"goods_price"] ? tempDict[@"goods_price"] : @"" isTitle:NO];
                 [self smallPrintWith:[printer getFinalData]];
-                printer = [[JWPrinter alloc] init];
-                if (tempDict[@"property"] && [tempDict[@"property"] length] > 0) {
-                    [printer appendText:[NSString stringWithFormat:@"(%@)",tempDict[@"property"] ? tempDict[@"property"] : @""] alignment:HLTextAlignmentLeft];
+                
+                if ([tempDict[@"property"] length] > 0 || [tempDict[@"total_price"] length] > 0){
+                    
+                    printer = [[HLPrinter alloc] init];
+                    [printer appendLeftText:tempDict[@"property"] ? tempDict[@"property"] : @"" middleText:tempDict[@"goods_unit_num"] ? tempDict[@"goods_unit_num"] : @"" rightText:tempDict[@"total_price"] ? tempDict[@"total_price"] : @"" isTitle:NO];
+                    [self smallPrintWith:[printer getFinalData]];
                 }
+                
+                printer = [[HLPrinter alloc] init];
+                [printer appendSeperatorLine];
                 [self smallPrintWith:[printer getFinalData]];
             }
         }
         
-        printer = [[JWPrinter alloc] init];
-        [printer appendNewLine];
-        [self smallPrintWith:[printer getFinalData]];
-        
         if (params[@"generalSpecial"] && [params[@"generalSpecial"] length] > 0) {
-            printer = [[JWPrinter alloc] init];
+            printer = [[HLPrinter alloc] init];
             [printer appendTitle:@"备注：" value:params[@"generalSpecial"] ? params[@"generalSpecial"] : @""];
             [self smallPrintWith:[printer getFinalData]];
         }
-        
+
         if (params[@"discount"] && [params[@"discount"] length] > 0) {
-            printer = [[JWPrinter alloc] init];
+            printer = [[HLPrinter alloc] init];
             [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
             [self smallPrintWith:[printer getFinalData]];
         }
         
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"总金额:" value:params[@"total_amount"] ? params[@"total_amount"] : @""];
+        printer = [[HLPrinter alloc] init];
+        [printer appendLeftText:@"总数量" middleText:@"" rightText:params[@"total_num"] isTitle:NO];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"优惠金额:" value:params[@"preferential_price"] ? params[@"preferential_price"] : @""];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"应付:" value:params[@"total_amount"] ? params[@"total_amount"] : @"" valueOffset:1  fontSize:HLFontSizeTitleBig];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"实付金额:" value:params[@"pay_amount"] ? params[@"pay_amount"] : @""];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendNewLine];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendNewLine];
-        [self smallPrintWith:[printer getFinalData]];
-    }else if ([params[@"singleType"] integerValue] == 1){//加菜单
-        [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        if (params[@"serial_num"]) {
-            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter];
+        
+        if (params[@"preferential_price"] && [params[@"preferential_price"] floatValue] != 0) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendTitle:@"优惠:" value:params[@"preferential_price"] ? params[@"preferential_price"] : @"" valueOffset:1  fontSize:HLFontSizeTitleBig];
             [self smallPrintWith:[printer getFinalData]];
-            printer = [[JWPrinter alloc] init];
         }
+        
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"待付金额:" value:params[@"pay_amount"] ? params[@"pay_amount"] : @"" valueOffset:1  fontSize:HLFontSizeTitleBig];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendText:@"欢迎光临" alignment:HLTextAlignmentCenter];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendNewLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendNewLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+    }else if ([params[@"singleType"] integerValue] == 1){//加菜单
+        [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter  fontSize:HLFontSizeTitleBig];
+        [self smallPrintWith:[printer getFinalData]];
+
+        printer = [[HLPrinter alloc] init];
         [printer appendText:@"*加菜*" alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendText:@"--------------------------------" alignment:HLTextAlignmentCenter];
+        
+        
+        if (params[@"serial_num"]) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendSeperatorLine];
+            [self smallPrintWith:[printer getFinalData]];
+            
+            printer = [[HLPrinter alloc] init];
+            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter  fontSize:HLFontSizeTitleBig];
+            [self smallPrintWith:[printer getFinalData]];
+        }
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendText:[NSString stringWithFormat:@"桌号： %@",params[@"board_num"]] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
+        [self smallPrintWith:[printer getFinalData]];
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"订 单 号：" value:params[@"order_id"] ? params[@"order_id"] : @""];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"下单时间:" value:[CMDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
+        [self smallPrintWith:[printer getFinalData]];
+        printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"桌    号：" value:params[@"board_num"] ? params[@"board_num"] : @""];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"交易时间:" value:[CMDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"下单员：" value:params[@"account_name"] ? params[@"account_name"] : @""];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
         if (params[@"goods_list"] && [params[@"goods_list"] count] > 0) {
-            printer = [[JWPrinter alloc] init];
-            [printer appendLeftText:@"商品名称" middleText:@"数量" rightText:@"金额" isTitle:NO];
+            printer = [[HLPrinter alloc] init];
+            [printer appendLeftText:@"商品名称" middleText:@"数量" rightText:@"小计" isTitle:YES];
+            [self smallPrintWith:[printer getFinalData]];
+            
+            
+            printer = [[HLPrinter alloc] init];
+            [printer appendSeperatorLine];
             [self smallPrintWith:[printer getFinalData]];
             NSArray *goodList = params[@"goods_list"];
             
             for (NSDictionary *tempDict in goodList) {
-                printer = [[JWPrinter alloc] init];
+                printer = [[HLPrinter alloc] init];
                 [printer appendLeftText:tempDict[@"goods_name"] ? tempDict[@"goods_name"] : @"" middleText:tempDict[@"goods_number"] ? tempDict[@"goods_number"] : @"" rightText:tempDict[@"goods_price"] ? tempDict[@"goods_price"] : @"" isTitle:NO];
                 [self smallPrintWith:[printer getFinalData]];
-                printer = [[JWPrinter alloc] init];
-                if (tempDict[@"property"] && [tempDict[@"property"] length] > 0) {
-                    [printer appendText:[NSString stringWithFormat:@"(%@)",tempDict[@"property"] ? tempDict[@"property"] : @""] alignment:HLTextAlignmentLeft];
+            
+                if ([tempDict[@"property"] length] > 0 || [tempDict[@"total_price"] length] > 0){
+                    printer = [[HLPrinter alloc] init];
+                    [printer appendLeftText:tempDict[@"property"] ? tempDict[@"property"] : @"" middleText:tempDict[@"goods_unit_num"] ? tempDict[@"goods_unit_num"] : @"" rightText:tempDict[@"total_price"] ? tempDict[@"total_price"] : @"" isTitle:NO];
+                    [self smallPrintWith:[printer getFinalData]];
                 }
+                
+                printer = [[HLPrinter alloc] init];
+                [printer appendSeperatorLine];
                 [self smallPrintWith:[printer getFinalData]];
             }
         }
         
-        printer = [[JWPrinter alloc] init];
-        [printer appendNewLine];
-        [self smallPrintWith:[printer getFinalData]];
-        
         if (params[@"generalSpecial"] && [params[@"generalSpecial"] length] > 0) {
-            printer = [[JWPrinter alloc] init];
+            printer = [[HLPrinter alloc] init];
             [printer appendTitle:@"备注：" value:params[@"generalSpecial"] ? params[@"generalSpecial"] : @""];
             [self smallPrintWith:[printer getFinalData]];
         }
         
         if (params[@"discount"] && [params[@"discount"] length] > 0) {
-            printer = [[JWPrinter alloc] init];
+            printer = [[HLPrinter alloc] init];
             [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
             [self smallPrintWith:[printer getFinalData]];
         }
         
-        printer = [[JWPrinter alloc] init];
+        printer = [[HLPrinter alloc] init];
+        [printer appendLeftText:@"总数量" middleText:@"" rightText:params[@"total_num"] isTitle:NO];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendText:@"欢迎光临" alignment:HLTextAlignmentCenter];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
         [printer appendNewLine];
         [self smallPrintWith:[printer getFinalData]];
         
-        printer = [[JWPrinter alloc] init];
-        [printer appendNewLine];
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
+
     }else if ([params[@"singleType"] integerValue] == 2){//结账单
-        [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter];
+        [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter  fontSize:HLFontSizeTitleBig];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        if (params[@"serial_num"]) {
-            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter];
-            [self smallPrintWith:[printer getFinalData]];
-            printer = [[JWPrinter alloc] init];
-        }
+        
+        printer = [[HLPrinter alloc] init];
         [printer appendText:statusStrArr[[params[@"order_status"] integerValue]] alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendText:[NSString stringWithFormat:@"桌号： %@",params[@"board_num"]] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
+        [self smallPrintWith:[printer getFinalData]];
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
         [printer appendText:@"*商户存根*" alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendText:@"--------------------------------" alignment:HLTextAlignmentCenter];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
         
-        [printer appendTitle:@"商户UID：" value:params[@"uid"] ? params[@"uid"] : @""];
+        if (params[@"serial_num"]) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendSeperatorLine];
+            [self smallPrintWith:[printer getFinalData]];
+            
+            printer = [[HLPrinter alloc] init];
+            [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
+            [self smallPrintWith:[printer getFinalData]];
+
+        }
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+
+        printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"订 单 号：" value:params[@"order_id"] ? params[@"order_id"] : @""];
         [self smallPrintWith:[printer getFinalData]];
         if (params[@"discount"] && [params[@"discount"] length] > 0) {
-            printer = [[JWPrinter alloc] init];
+            printer = [[HLPrinter alloc] init];
             [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
             [self smallPrintWith:[printer getFinalData]];
         }
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"交易时间:" value:[CMDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+    
+        printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"桌    号：" value:params[@"board_num"] ? params[@"board_num"] : @""];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"结账操作员：" value:params[@"account_name"] ? params[@"account_name"] : @""];
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"收银员：" value:params[@"account_name"] ? params[@"account_name"] : @""];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+        
+        if (params[@"goods_list"] && [params[@"goods_list"] count] > 0) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendLeftText:@"商品名称" middleText:@"数量" rightText:@"小计" isTitle:YES];
+            [self smallPrintWith:[printer getFinalData]];
+            
+            
+            printer = [[HLPrinter alloc] init];
+            [printer appendSeperatorLine];
+            [self smallPrintWith:[printer getFinalData]];
+            NSArray *goodList = params[@"goods_list"];
+            
+            for (NSDictionary *tempDict in goodList) {
+                printer = [[HLPrinter alloc] init];
+                [printer appendLeftText:tempDict[@"goods_name"] ? tempDict[@"goods_name"] : @"" middleText:tempDict[@"goods_number"] ? tempDict[@"goods_number"] : @"" rightText:tempDict[@"goods_price"] ? tempDict[@"goods_price"] : @"" isTitle:NO];
+                [self smallPrintWith:[printer getFinalData]];
+                
+                if ([tempDict[@"property"] length] > 0 || [tempDict[@"total_price"] length] > 0){
+                    printer = [[HLPrinter alloc] init];
+                    [printer appendLeftText:tempDict[@"property"] ? tempDict[@"property"] : @"" middleText:tempDict[@"goods_unit_num"] ? tempDict[@"goods_unit_num"] : @"" rightText:tempDict[@"total_price"] ? tempDict[@"total_price"] : @"" isTitle:NO];
+                    [self smallPrintWith:[printer getFinalData]];
+                }
+                
+                printer = [[HLPrinter alloc] init];
+                [printer appendSeperatorLine];
+                [self smallPrintWith:[printer getFinalData]];
+            }
+        }
+        
+        if (params[@"generalSpecial"] && [params[@"generalSpecial"] length] > 0) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendTitle:@"备注：" value:params[@"generalSpecial"] ? params[@"generalSpecial"] : @""];
+            [self smallPrintWith:[printer getFinalData]];
+        }
+        
+        if (params[@"discount"] && [params[@"discount"] length] > 0) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
+            [self smallPrintWith:[printer getFinalData]];
+        }
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendLeftText:@"总数量" middleText:@"" rightText:params[@"total_num"] isTitle:NO];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"支付方式：" value:payTypeArr[[params[@"pay_type"] integerValue] - 1]];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+        
+        printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"状    态：" value:@"交易成功"];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
         
-        [printer appendText:@"--------------------------------" alignment:HLTextAlignmentCenter];
+        printer = [[HLPrinter alloc] init];
+        [printer appendTitle:@"应付:" value:params[@"total_amount"] ? params[@"total_amount"] : @"" valueOffset:1 fontSize:HLFontSizeTitleBig];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"实收金额：" value:params[@"pay_amount"] ? params[@"pay_amount"] : @""];
-        [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
         
-        [printer appendText:@"--------------------------------" alignment:HLTextAlignmentCenter];
+        if (params[@"preferential_price"] && [params[@"preferential_price"] floatValue] != 0) {
+            printer = [[HLPrinter alloc] init];
+            [printer appendTitle:@"优惠:" value:params[@"preferential_price"] ? params[@"preferential_price"] : @"" valueOffset:1 fontSize:HLFontSizeTitleBig];
+            [self smallPrintWith:[printer getFinalData]];
+            printer = [[HLPrinter alloc] init];
+        }
+        
+        [printer appendTitle:@"实付金额:" value:params[@"pay_amount"] ? params[@"pay_amount"] : @"" valueOffset:1 fontSize:HLFontSizeTitleBig];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendTitle:@"退菜金额：" value:params[@"retire_price"] ? params[@"retire_price"] : @""];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendText:@"欢迎下次光临" alignment:HLTextAlignmentCenter];
+        [self smallPrintWith:[printer getFinalData]];
+        
+        printer = [[HLPrinter alloc] init];
         [printer appendNewLine];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[JWPrinter alloc] init];
-        [printer appendNewLine];
+        
+        printer = [[HLPrinter alloc] init];
+        [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
+        
     }else{
         [printer appendText:@"--------------------------------" alignment:HLTextAlignmentCenter];
     }
@@ -536,9 +698,6 @@ static WeexNativeSupportManage *manager = nil;
     self.sanqrCallBack = callBack;
     [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.scanQRCtl animated:YES completion:nil];
 
-    
- //   [[self getCurrentVC].navigationController pushViewController:self.scanQRCtl animated:YES];
-//    [[self getCurrentVC].navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 #pragma mark -- 链接到超盟商家

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "JWBluetoothBlocks.h"
-#import "JWPrinter.h"
+#import "HLPrinter.h"
 
 
 @interface JWBluetoothManage : NSObject

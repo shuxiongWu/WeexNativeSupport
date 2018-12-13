@@ -1,25 +1,26 @@
 //
-//  JWPrinter.m
-//  JWBluetoothPrinte
+//  HLPrinter.m
+//  HLBluetoothDemo
 //
-//  Created by 张竟巍 on 2017/6/16.
-//  Copyright © 2017年 张竟巍. All rights reserved.
+//  Created by Harvey on 16/5/3.
+//  Copyright © 2016年 Halley. All rights reserved.
 //
 
-#import "JWPrinter.h"
+#import "HLPrinter.h"
+#import "NSString+NSSAutoresizing.h"
+#define kHLMargin 20
+#define kHLPadding 2
+#define kHLPreviewWidth 320
 
-#define kMargin 20
-#define kPadding 2
-#define kWidth 320
-
-@interface JWPrinter ()
+@interface HLPrinter ()
 
 /** 将要打印的排版后的数据 */
 @property (strong, nonatomic)   NSMutableData            *printerData;
 
 @end
 
-@implementation JWPrinter
+@implementation HLPrinter
+
 - (instancetype)init
 {
     self = [super init];
@@ -83,6 +84,7 @@
  */
 - (void)setFontSize:(HLFontSize)fontSize
 {
+    
     Byte fontSizeBytes[] = {0x1D,0x21,fontSize};
     [_printerData appendBytes:fontSizeBytes length:sizeof(fontSizeBytes)];
 }
@@ -94,7 +96,6 @@
  */
 - (void)setText:(NSString *)text
 {
-    text = [NSString stringWithFormat:@"%@",text];
     NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
     NSData *data = [text dataUsingEncoding:enc];
     [_printerData appendData:data];
@@ -108,7 +109,6 @@
  */
 - (void)setText:(NSString *)text maxChar:(int)maxChar
 {
-    text = [NSString stringWithFormat:@"%@",text];
     NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
     NSData *data = [text dataUsingEncoding:enc];
     if (data.length > maxChar) {
@@ -130,17 +130,15 @@
  */
 - (void)setOffsetText:(NSString *)text
 {
-    NSString *sring = [NSString stringWithFormat:@"%@",text];
     // 1.计算偏移量,因字体和字号不同，所以计算出来的宽度与实际宽度有误差(小字体与22字体计算值接近)
-    NSDictionary *dict = @{NSFontAttributeName:[UIFont systemFontOfSize:22.0]};
-    NSAttributedString *valueAttr = [[NSAttributedString alloc] initWithString:sring attributes:dict];
+    NSDictionary *dict = @{NSFontAttributeName:[UIFont systemFontOfSize:25.0]};
+    NSAttributedString *valueAttr = [[NSAttributedString alloc] initWithString:text attributes:dict];
     int valueWidth = valueAttr.size.width;
-    
     // 2.设置偏移量
     [self setOffset:368 - valueWidth];
     
     // 3.设置文字
-    [self setText:sring];
+    [self setText:text];
 }
 
 /**
@@ -164,7 +162,7 @@
 - (void)setLineSpace:(NSInteger)points
 {
     //最后一位，可选 0~255
-    Byte lineSpace[] = {0x1B,0x33,60};
+    Byte lineSpace[] = {0x1B,0x33,points};
     [_printerData appendBytes:lineSpace length:sizeof(lineSpace)];
 }
 
@@ -176,7 +174,7 @@
 - (void)setQRCodeSize:(NSInteger)size
 {
     Byte QRSize [] = {0x1D,0x28,0x6B,0x03,0x00,0x31,0x43,size};
-    //    Byte QRSize [] = {29,40,107,3,0,49,67,size};
+//    Byte QRSize [] = {29,40,107,3,0,49,67,size};
     [_printerData appendBytes:QRSize length:sizeof(QRSize)];
 }
 
@@ -188,15 +186,15 @@
 - (void)setQRCodeErrorCorrection:(NSInteger)level
 {
     Byte levelBytes [] = {0x1D,0x28,0x6B,0x03,0x00,0x31,0x45,level};
-    //    Byte levelBytes [] = {29,40,107,3,0,49,69,level};
+//    Byte levelBytes [] = {29,40,107,3,0,49,69,level};
     [_printerData appendBytes:levelBytes length:sizeof(levelBytes)];
 }
 
 /**
  *  将二维码数据存储到符号存储区
- * [范围]:  4≤(pL+pH×256)≤7092 (0≤pL≤255,0≤pH≤27)
- * cn=49
- * fn=80
+ * [范围]:  4≤(pL+pH×256)≤7092 (0≤pL≤255,0≤pH≤27) 
+ * cn=49  
+ * fn=80  
  * m=48
  * k=(pL+pH×256)-3, k就是数据的长度
  *
@@ -209,11 +207,11 @@
     NSInteger pH = kLength / 256;
     
     Byte dataBytes [] = {0x1D,0x28,0x6B,pL,pH,0x31,0x50,48};
-    //    Byte dataBytes [] = {29,40,107,pL,pH,49,80,48};
+//    Byte dataBytes [] = {29,40,107,pL,pH,49,80,48};
     [_printerData appendBytes:dataBytes length:sizeof(dataBytes)];
     NSData *infoData = [info dataUsingEncoding:NSUTF8StringEncoding];
     [_printerData appendData:infoData];
-    //    [self setText:info];
+//    [self setText:info];
 }
 
 /**
@@ -222,7 +220,7 @@
 - (void)printStoredQRData
 {
     Byte printBytes [] = {0x1D,0x28,0x6B,0x03,0x00,0x31,0x51,48};
-    //    Byte printBytes [] = {29,40,107,3,0,49,81,48};
+//    Byte printBytes [] = {29,40,107,3,0,49,81,48};
     [_printerData appendBytes:printBytes length:sizeof(printBytes)];
 }
 
@@ -230,13 +228,11 @@
 #pragma mark  文字
 - (void)appendText:(NSString *)text alignment:(HLTextAlignment)alignment
 {
-    text = [NSString stringWithFormat:@"%@",text];
     [self appendText:text alignment:alignment fontSize:HLFontSizeTitleSmalle];
 }
 
 - (void)appendText:(NSString *)text alignment:(HLTextAlignment)alignment fontSize:(HLFontSize)fontSize
 {
-    text = [NSString stringWithFormat:@"%@",text];
     // 1.文字对齐方式
     [self setAlignment:alignment];
     // 2.设置字号
@@ -252,13 +248,11 @@
 
 - (void)appendTitle:(NSString *)title value:(NSString *)value
 {
-    title = [NSString stringWithFormat:@"%@",title];
     [self appendTitle:title value:value fontSize:HLFontSizeTitleSmalle];
 }
 
 - (void)appendTitle:(NSString *)title value:(NSString *)value fontSize:(HLFontSize)fontSize
 {
-    title = [NSString stringWithFormat:@"%@",title];
     // 1.设置对齐方式
     [self setAlignment:HLTextAlignmentLeft];
     // 2.设置字号
@@ -272,17 +266,16 @@
     if (fontSize != HLFontSizeTitleSmalle) {
         [self appendNewLine];
     }
+
 }
 
 - (void)appendTitle:(NSString *)title value:(NSString *)value valueOffset:(NSInteger)offset
 {
-    title = [NSString stringWithFormat:@"%@",title];
     [self appendTitle:title value:value valueOffset:offset fontSize:HLFontSizeTitleSmalle];
 }
 
 - (void)appendTitle:(NSString *)title value:(NSString *)value valueOffset:(NSInteger)offset fontSize:(HLFontSize)fontSize
 {
-    title = [NSString stringWithFormat:@"%@",title];
     // 1.设置对齐方式
     [self setAlignment:HLTextAlignmentLeft];
     // 2.设置字号
@@ -302,32 +295,28 @@
 
 - (void)appendLeftText:(NSString *)left middleText:(NSString *)middle rightText:(NSString *)right isTitle:(BOOL)isTitle
 {
-    left = [NSString stringWithFormat:@"%@",left];
-    middle = [NSString stringWithFormat:@"%@",middle];
-    right = [NSString stringWithFormat:@"%@",right];
     [self setAlignment:HLTextAlignmentLeft];
     [self setFontSize:HLFontSizeTitleSmalle];
     NSInteger offset = 0;
     if (!isTitle) {
-        offset = 10;
+        offset = -30;
     }
     
     if (left) {
-        [self setText:left maxChar:10];
+        [self setText:left maxChar:60];
     }
     
     if (middle) {
-        [self setOffset:150 + offset];
+        [self setOffset:205];
         [self setText:middle];
     }
     
     if (right) {
-        [self setOffset:300 + offset];
-        [self setText:right];
+        [self setOffset:305 + offset];
+        [self setOffsetText:right];
     }
     
     [self appendNewLine];
-    
 }
 
 #pragma mark 图片
@@ -336,12 +325,12 @@
     if (!image) {
         return;
     }
-    
     // 1.设置图片对齐方式
     [self setAlignment:alignment];
     
     // 2.设置图片
     UIImage *newImage = [image imageWithscaleMaxWidth:maxWidth];
+//    newImage = [newImage blackAndWhiteImage];
     
     NSData *imageData = [newImage bitmapData];
     [_printerData appendData:imageData];
@@ -352,6 +341,7 @@
     // 4.打印图片后，恢复文字的行间距
     Byte lineSpace[] = {0x1B,0x32};
     [_printerData appendBytes:lineSpace length:sizeof(lineSpace)];
+    
 }
 
 - (void)appendBarCodeWithInfo:(NSString *)info
@@ -391,6 +381,19 @@
     [self appendImage:QRImage alignment:alignment maxWidth:maxWidth];
 }
 
+/**
+ 添加自定义的data
+ 
+ @param data 自定义的data
+ */
+- (void)appendCustomData:(NSData *)data
+{
+    if (data.length <= 0) {
+        return;
+    }
+    [_printerData appendData:data];
+}
+
 #pragma mark 其他
 - (void)appendSeperatorLine
 {
@@ -402,6 +405,28 @@
     NSString *line = @"- - - - - - - - - - - - - - - -";
     NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
     NSData *data = [line dataUsingEncoding:enc];
+    [_printerData appendData:data];
+    // 4.换行
+    [self appendNewLine];
+}
+
+//添加====标题
+- (void)appendEqualLineWithText:(NSString *)text{
+    // 1.设置分割线居中
+    [self setAlignment:HLTextAlignmentCenter];
+    // 2.设置字号
+    [self setFontSize:HLFontSizeTitleSmalle];
+    CGSize size = [text sizeWithFont:[UIFont systemFontOfSize:22] maxSize:CGSizeMake(1000, 30)];
+    CGFloat width = 368 - size.width;
+    int num = width/12;
+    int realNum = ceil(num/2.0);
+    if (realNum/2> 0) {
+        for (int i = 0; i < realNum/2; i++) {
+            text = [NSString stringWithFormat:@"%@ %@ %@",@"=",text,@"="];
+        }
+    }
+    NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
+    NSData *data = [text dataUsingEncoding:enc];
     [_printerData appendData:data];
     // 4.换行
     [self appendNewLine];
@@ -419,6 +444,10 @@
 - (NSData *)getFinalData
 {
     return _printerData;
+}
+
+- (void)dataSet{
+    _printerData = [NSMutableData data];
 }
 
 @end
