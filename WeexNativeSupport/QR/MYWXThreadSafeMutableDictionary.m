@@ -18,11 +18,7 @@
  */
 
 #import "MYWXThreadSafeMutableDictionary.h"
-#if __has_include(<WXUtility.h>)
 #import <WXUtility.h>
-#elif __has_include("WXUtility.h")
-#import "WXUtility.h"
-#endif
 #import <pthread/pthread.h>
 #import <os/lock.h>
 
