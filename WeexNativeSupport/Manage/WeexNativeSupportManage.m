@@ -478,9 +478,7 @@ static WeexNativeSupportManage *manager = nil;
         printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"下单时间:" value:[CMDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
         [self smallPrintWith:[printer getFinalData]];
-        printer = [[HLPrinter alloc] init];
-        [printer appendTitle:@"桌    号：" value:params[@"board_num"] ? params[@"board_num"] : @""];
-        [self smallPrintWith:[printer getFinalData]];
+
         printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"下单员：" value:params[@"account_name"] ? params[@"account_name"] : @""];
         [self smallPrintWith:[printer getFinalData]];
@@ -592,9 +590,6 @@ static WeexNativeSupportManage *manager = nil;
             [self smallPrintWith:[printer getFinalData]];
         }
     
-        printer = [[HLPrinter alloc] init];
-        [printer appendTitle:@"桌    号：" value:params[@"board_num"] ? params[@"board_num"] : @""];
-        [self smallPrintWith:[printer getFinalData]];
         printer = [[HLPrinter alloc] init];
         [printer appendTitle:@"收银员：" value:params[@"account_name"] ? params[@"account_name"] : @""];
         [self smallPrintWith:[printer getFinalData]];
