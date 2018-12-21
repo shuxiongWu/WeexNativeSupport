@@ -20,7 +20,8 @@
 @interface WXCustomEventModule ()
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
-
+@property (nonatomic, copy) WXModuleKeepAliveCallback sanqrCallBack;
+@property (nonatomic, strong) CMQRViewController *scanQRCtl;
 @end
 
 @implementation WXCustomEventModule
@@ -42,7 +43,7 @@ WX_EXPORT_METHOD(@selector(jumpTocmshop:))
 
 //链接到外部应用
 WX_EXPORT_METHOD(@selector(openThirdApplication:callBack:))
-    
+
 //打电话
 WX_EXPORT_METHOD(@selector(call:))
 
@@ -127,7 +128,7 @@ WX_EXPORT_METHOD(@selector(dismiss))
 - (void)openThirdApplication:(NSString *)urlSchemes callBack:(WXModuleKeepAliveCallback)callBack{
     [self.nativeManage openThirdApplication:urlSchemes callBack:callBack];
 }
-    
+
 #pragma mark -- 打电话
 -(void)call:(NSString*)num{
     NSMutableString *str=[[NSMutableString alloc] initWithFormat:@"tel:%@",num];
@@ -139,7 +140,9 @@ WX_EXPORT_METHOD(@selector(dismiss))
 #pragma mark -- 二维码扫描
 - (void)scanQR:(WXModuleKeepAliveCallback)callBack
 {
-    [self.nativeManage scanQR:callBack];
+    //[self.nativeManage scanQR:callBack];
+    self.sanqrCallBack = callBack;
+    [weexInstance.viewController.navigationController pushViewController:self.scanQRCtl animated:YES];
 }
 
 #pragma mark -- 存储数据
@@ -207,7 +210,7 @@ WX_EXPORT_METHOD(@selector(dismiss))
 
 #pragma mark -- 日志打印
 - (void)printeLogInfoWithLog:(id)log callBack:(WXModuleKeepAliveCallback)callBack{
-   // DDLogDebug(@"%@",log);
+    // DDLogDebug(@"%@",log);
 }
 
 #pragma mark -- 截屏并保存图片
@@ -219,7 +222,7 @@ WX_EXPORT_METHOD(@selector(dismiss))
     NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:baseString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
     UIImage *decodedImage = [UIImage imageWithData: decodeData];
     [self.nativeManage savePhotoToMediaLibraryWithImage:decodedImage];
-
+    
 }
 
 #pragma mark -- 导航跳转之页面回退
@@ -259,13 +262,13 @@ WX_EXPORT_METHOD(@selector(dismiss))
 }
 
 - (void)presentToController:(NSString *)url{
-//    url = [@"${PODS_ROOT}/bundlejs" stringByAppendingString:url];
-//    NSURL *URL = [[NSURL alloc] initFileURLWithPath:url];
-//
-//    UIViewController *demo = [[WXDemoViewController alloc] init];
-//    ((WXDemoViewController *)demo).url = URL;
-//    [weexInstance.viewController.navigationController pushViewController:demo animated:YES];
-   // [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:demo animated:YES completion:nil];
+    //    url = [@"${PODS_ROOT}/bundlejs" stringByAppendingString:url];
+    //    NSURL *URL = [[NSURL alloc] initFileURLWithPath:url];
+    //
+    //    UIViewController *demo = [[WXDemoViewController alloc] init];
+    //    ((WXDemoViewController *)demo).url = URL;
+    //    [weexInstance.viewController.navigationController pushViewController:demo animated:YES];
+    // [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:demo animated:YES completion:nil];
 }
 
 - (void)dismiss{
@@ -278,4 +281,20 @@ WX_EXPORT_METHOD(@selector(dismiss))
     return [WeexNativeSupportManage shareManage];
 }
 
+- (CMQRViewController *)scanQRCtl
+{
+    NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
+    
+    NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
+    
+    _scanQRCtl = [[CMQRViewController alloc] initWithNibName:@"CMQRViewController" bundle:resourceBundle];
+    __weak typeof(self)weakSelf = self;
+    _scanQRCtl.scanCallBack = ^(int code, NSString *msg) {
+        weakSelf.sanqrCallBack ? weakSelf.sanqrCallBack(@{@"code": @(code),@"code_url": msg}, YES) : nil;
+    };
+    
+    return _scanQRCtl;
+}
+
 @end
+

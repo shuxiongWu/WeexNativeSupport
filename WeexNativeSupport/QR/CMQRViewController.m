@@ -26,19 +26,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-}
-
--(void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    if (iPhoneX) {
-        self.top.constant = 24;
-    }
     //输出流视图
     UIView *preview  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 0)];
     [self.view addSubview:preview];
-
+    
     __weak typeof(self) weakSelf = self;
-
     
     //[_back setBackgroundImage:[PublicTool wx_imageNamed:@"btn_back"] forState:UIControlStateNormal];
     //构建扫描样式视图
@@ -53,13 +45,13 @@
     _scanView.notRecoginitonArea = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
     _scanView.animationImage = [PublicTool wx_imageNamed:@"scanLine"];
     _scanView.myQRCodeBlock = ^{
-
+        
     };
     _scanView.flashSwitchBlock = ^(BOOL open) {
         [weakSelf.scanTool openFlashSwitch:open];
     };
     [self.view addSubview:_scanView];
-
+    
     //初始化扫描工具
     _scanTool = [[WSLNativeScanTool alloc] initWithPreview:preview andScanFrame:_scanView.scanRetangleRect];
     _scanTool.scanFinishedBlock = ^(NSString *scanString) {
@@ -84,42 +76,52 @@
             }
         }
     };
-    // 全局并发队列的获取方法
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    // 异步执行任务创建方法
-    dispatch_async(queue, ^{
-        [_scanTool sessionStartRunning];
-    });
+    //        // 全局并发队列的获取方法
+    //        dispatch_queue_t queue = dispatch_queue_create("kk", DISPATCH_QUEUE_SERIAL);
+    //        // 异步执行任务创建方法
+    //        dispatch_async(queue, ^{
+    //            [weakSelf.scanTool sessionStartRunning];
+    //        });
     
-    [_scanView startScanAnimation];
+    [weakSelf.scanTool sessionStartRunning];
+    [weakSelf.scanView startScanAnimation];
     [self.view bringSubviewToFront:self.showView];
+}
+
+-(void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if (iPhoneX) {
+        self.top.constant = 24;
+    }
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
-    [_scanView startScanAnimation];
-    [_scanTool sessionStartRunning];
 }
+
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
     [_scanView stopScanAnimation];
     [_scanView finishedHandle];
     [_scanView showFlashSwitch:NO];
     [_scanTool sessionStopRunning];
+    _scanTool = nil;
+    _scanTool = nil;
 }
 
 #pragma mark -- Events Handle
 - (IBAction)back:(UIButton *)sender {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    //[self dismissViewControllerAnimated:YES completion:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 - (IBAction)photoAction:(UIButton *)sender {
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]){
         UIImagePickerController * _imagePickerController = [[UIImagePickerController alloc] init];
         _imagePickerController.delegate = self;
         _imagePickerController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-        _imagePickerController.allowsEditing = YES;
         _imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         [self presentViewController:_imagePickerController animated:YES completion:nil];
     }else{
@@ -141,4 +143,9 @@
     [_scanTool scanImageQRCode:image];
 }
 
+- (void)dealloc{
+    
+}
+
 @end
+
