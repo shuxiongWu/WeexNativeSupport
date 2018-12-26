@@ -90,6 +90,10 @@ WX_EXPORT_METHOD(@selector(setBrightness:))
 //present、dismiss
 WX_EXPORT_METHOD(@selector(presentToController:))
 WX_EXPORT_METHOD(@selector(dismiss))
+WX_EXPORT_METHOD(@selector(getPageSize:))
+
+//掉起第三方地图导航
+WX_EXPORT_METHOD(@selector(getPageSize:))
 
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
@@ -250,6 +254,11 @@ WX_EXPORT_METHOD(@selector(dismiss))
     [arr removeObjectsInRange:NSMakeRange(loc, length)];
 }
 
+#pragma mark -- 获取当前导航栈控制器数量
+- (void)getPageSize:(WXModuleKeepAliveCallback)callBack{
+    callBack(@(weexInstance.viewController.navigationController.viewControllers.count),YES);
+}
+
 #pragma mark -- 短震（类似3D touch）
 - (void)transientVibration{
     AudioServicesPlaySystemSound(1520);
@@ -283,7 +292,7 @@ WX_EXPORT_METHOD(@selector(dismiss))
 
 - (CMQRViewController *)scanQRCtl
 {
-    NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
+    NSString* bundlePath = [[NSBundle mainBundle] pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
     
     NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
     

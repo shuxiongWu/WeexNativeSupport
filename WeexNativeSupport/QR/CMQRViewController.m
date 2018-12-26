@@ -27,15 +27,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     //输出流视图
-    UIView *preview  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 0)];
+    UIView *preview  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 0)];
     [self.view addSubview:preview];
     
     __weak typeof(self) weakSelf = self;
     
     //[_back setBackgroundImage:[PublicTool wx_imageNamed:@"btn_back"] forState:UIControlStateNormal];
     //构建扫描样式视图
-    _scanView = [[WSLScanView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height - 0)];
-    _scanView.scanRetangleRect = CGRectMake(60, iPhoneX ? 144 : 120, (self.view.frame.size.width - 2 * 60),  (self.view.frame.size.width - 2 * 60));
+    _scanView = [[WSLScanView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 0)];
+    _scanView.scanRetangleRect = CGRectMake(60, iPhoneX ? 144 : 120, ([UIScreen mainScreen].bounds.size.width - 2 * 60),  ([UIScreen mainScreen].bounds.size.width - 2 * 60));
     _scanView.colorAngle = [UIColor greenColor];
     _scanView.photoframeAngleW = 20;
     _scanView.photoframeAngleH = 20;
@@ -58,7 +58,7 @@
         NSLog(@"扫描结果 %@",scanString);
         if (weakSelf.scanCallBack) {
             weakSelf.scanCallBack(1, scanString);
-            [weakSelf dismissViewControllerAnimated:YES completion:nil];
+            [weakSelf.navigationController popViewControllerAnimated:YES];
         }
         [weakSelf.scanView handlingResultsOfScan];
         [weakSelf.scanTool sessionStopRunning];
@@ -122,6 +122,7 @@
         UIImagePickerController * _imagePickerController = [[UIImagePickerController alloc] init];
         _imagePickerController.delegate = self;
         _imagePickerController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+        _imagePickerController.allowsEditing = YES;
         _imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         [self presentViewController:_imagePickerController animated:YES completion:nil];
     }else{
@@ -148,4 +149,3 @@
 }
 
 @end
-
