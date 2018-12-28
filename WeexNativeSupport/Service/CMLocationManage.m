@@ -46,10 +46,10 @@ static CMLocationManage *manager = nil;
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations{
     [_locationManager stopUpdatingLocation]; //不用的时候关闭更新位置服务
-    NSLog(@"%lu",(unsigned long)locations.count);
+    NSLog(@"#####%lu",(unsigned long)locations.count);
     CLLocation * location = locations.lastObject;
     if (self.locationCallBack) {
-        self.locationCallBack([@{@"longitude": @(location.coordinate.longitude), @"latitude": @(location.coordinate.latitude)} mj_JSONString], YES);
+        self.locationCallBack([@{@"longitude": @(location.coordinate.longitude), @"latitude": @(location.coordinate.latitude)} mj_JSONString], NO);
     }
 }
 

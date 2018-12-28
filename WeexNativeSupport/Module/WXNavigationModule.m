@@ -87,7 +87,7 @@ WX_EXPORT_METHOD(@selector(navigate:))
         if (i == 0) {
             
             UIAlertAction * action = [UIAlertAction actionWithTitle:title style:(UIAlertActionStyleDefault) handler:^(UIAlertAction * _Nonnull action) {
-                [self navAppleMap];
+                [self navAppleMapWithlatitude:endLocation[0] longitude:endLocation[1]];
             }];
             [alert addAction:action];
             
@@ -115,12 +115,12 @@ WX_EXPORT_METHOD(@selector(navigate:))
 
 
 //苹果地图
-- (void)navAppleMap
+- (void)navAppleMapWithlatitude:(NSString *)latitude longitude:(NSString *)longitude
 {
     //    CLLocationCoordinate2D gps = [JZLocationConverter bd09ToWgs84:self.destinationCoordinate2D];
-    
+   
     //终点坐标
-    CLLocationCoordinate2D loc = CLLocationCoordinate2DMake(26.08, 119.28);
+    CLLocationCoordinate2D loc = CLLocationCoordinate2DMake([latitude doubleValue], [longitude doubleValue]);
     
     //用户位置
     MKMapItem *currentLoc = [MKMapItem mapItemForCurrentLocation];

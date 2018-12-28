@@ -92,9 +92,6 @@ WX_EXPORT_METHOD(@selector(presentToController:))
 WX_EXPORT_METHOD(@selector(dismiss))
 WX_EXPORT_METHOD(@selector(getPageSize:))
 
-//掉起第三方地图导航
-WX_EXPORT_METHOD(@selector(getPageSize:))
-
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
 }
@@ -252,6 +249,7 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
         return;
     }
     [arr removeObjectsInRange:NSMakeRange(loc, length)];
+    weexInstance.viewController.navigationController.viewControllers = arr;
 }
 
 #pragma mark -- 获取当前导航栈控制器数量
