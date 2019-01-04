@@ -140,9 +140,6 @@ WX_EXPORT_METHOD(@selector(navigate:))
     //                           MKLaunchOptionsShowsTrafficKey: [NSNumber numberWithBool:YES]};
     
     [MKMapItem openMapsWithItems:items launchOptions:dic];
-    
-    
-    
 }
 
 @end

@@ -11,9 +11,9 @@
 #import <WeexSDK/WXExceptionUtils.h>
 #import <WeexSDK/WeexSDK.h>
 #import <WeexSDK/WXUtility.h>
-#import "HNDatePickerView.h"
-@interface WXDatePickerModule ()<HNdatePickerDelegate>
-@property (nonatomic, strong) HNDatePickerView *datePicker;
+#import "WeexDatePickerView.h"
+@interface WXDatePickerModule ()<WeexdatePickerDelegate>
+@property (nonatomic, strong) WeexDatePickerView *datePicker;
 @property (nonatomic, copy) WXKeepAliveCallback selectDateSuccessCallBack;
 @end
 
@@ -29,7 +29,7 @@ WX_EXPORT_METHOD(@selector(selectDateCallBack:))
                  
 - (void)selectDateCallBack:(WXKeepAliveCallback)callBack{
     self.selectDateSuccessCallBack = callBack;
-    _datePicker = [[HNDatePickerView alloc] initDatePickerViewDelegate:self];
+    _datePicker = [[WeexDatePickerView alloc] initDatePickerViewDelegate:self];
     [_datePicker showDatePickerView];
 }
 

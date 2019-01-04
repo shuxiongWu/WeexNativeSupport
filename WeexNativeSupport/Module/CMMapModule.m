@@ -7,12 +7,12 @@
 //
 
 #import "CMMapModule.h"
-#import "LocationViewController.h"
+#import "WeexLocationViewController.h"
 #import <WeexSDK/WeexSDK.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
 @interface CMMapModule ()
 @property (nonatomic, copy) WXModuleKeepAliveCallback locationCallBack;
-@property (nonatomic, strong) LocationViewController *mapCtl;
+@property (nonatomic, strong) WeexLocationViewController *mapCtl;
 @end
 
 @implementation CMMapModule
@@ -33,13 +33,13 @@ WX_EXPORT_METHOD(@selector(pushToCtrlGetLocationWithKey:callBack:))
     [weexInstance.viewController.navigationController pushViewController:self.mapCtl animated:YES];
 }
 
-- (LocationViewController *)mapCtl
+- (WeexLocationViewController *)mapCtl
 {
     NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
     
     NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
     if (!_mapCtl) {
-        _mapCtl = [[LocationViewController alloc] initWithNibName:@"LocationViewController" bundle:resourceBundle];
+        _mapCtl = [[WeexLocationViewController alloc] initWithNibName:@"WeexLocationViewController" bundle:resourceBundle];
         __weak typeof(self)weakSelf = self;
         _mapCtl.locationAddressBlk = ^(double longitude, double latitude, NSString *address, NSString *detailAddress) {
             weakSelf.locationCallBack ? weakSelf.locationCallBack(@{@"longitude": @(longitude), @"latitude": @(latitude), @"address": address, @"detailAddress": detailAddress}, YES) : nil;

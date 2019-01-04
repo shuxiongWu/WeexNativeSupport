@@ -13,15 +13,14 @@
 #import <WeexSDK/WXUtility.h>
 #import "WeexNativeSupport.h"
 #import "WeexNativeSupportManage.h"
-#import "CMLocationManage.h"
+#import "WeexLocationManage.h"
 #import <AudioToolbox/AudioServices.h>
-#import "CMQRViewController.h"
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
 @property (nonatomic, copy) WXModuleKeepAliveCallback sanqrCallBack;
-@property (nonatomic, strong) CMQRViewController *scanQRCtl;
+@property (nonatomic, strong) WeexQRViewController *scanQRCtl;
 @end
 
 @implementation WXCustomEventModule
@@ -116,8 +115,8 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
 
 #pragma mark -- 定位(不通过地图)
 - (void)getLocation:(WXModuleKeepAliveCallback)callBack{
-    [[CMLocationManage shareManage] startLocation];
-    [[CMLocationManage shareManage] setLocationCallBack:callBack];
+    [[WeexLocationManage shareManage] startLocation];
+    [[WeexLocationManage shareManage] setLocationCallBack:callBack];
 }
 
 #pragma mark -- 链接到超盟商家
@@ -288,13 +287,13 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
     return [WeexNativeSupportManage shareManage];
 }
 
-- (CMQRViewController *)scanQRCtl
+- (WeexQRViewController *)scanQRCtl
 {
     NSString* bundlePath = [[NSBundle mainBundle] pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
     
     NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
     
-    _scanQRCtl = [[CMQRViewController alloc] initWithNibName:@"CMQRViewController" bundle:resourceBundle];
+    _scanQRCtl = [[WeexQRViewController alloc] initWithNibName:@"WeexQRViewController" bundle:resourceBundle];
     __weak typeof(self)weakSelf = self;
     _scanQRCtl.scanCallBack = ^(int code, NSString *msg) {
         weakSelf.sanqrCallBack ? weakSelf.sanqrCallBack(@{@"code": @(code),@"code_url": msg}, YES) : nil;

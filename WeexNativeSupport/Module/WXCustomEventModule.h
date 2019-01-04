@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <WeexSDK/WXModuleProtocol.h>
-#import "NSSQRViewController.h"
+#import "WeexQRViewController.h"
 
 @interface WXCustomEventModule : NSObject<WXModuleProtocol>
 

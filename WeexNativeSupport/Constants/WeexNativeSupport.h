@@ -9,7 +9,7 @@
 #ifndef WeexNativeSupport_h
 #define WeexNativeSupport_h
 
-#import "MacrosAndConstants.h"
+#import "WeexMacrosAndConstants.h"
 #import <SVProgressHUD.h>
 #import <AFNetworking.h>
 #import <CocoaLumberjack/CocoaLumberjack.h>
