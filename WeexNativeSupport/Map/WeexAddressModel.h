@@ -16,4 +16,11 @@
 @property (nonatomic, assign) CGFloat longitude;
 
 @property (nonatomic, assign) CGFloat latitude;
+
+@property (nonatomic, strong) NSString *province;
+
+@property (nonatomic, strong) NSString *city;
+
+@property (nonatomic, strong) NSString *area;
+
 @end

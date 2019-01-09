@@ -205,7 +205,7 @@
             WeexAddressModel *model = [[WeexAddressModel alloc] init];
             model.longitude = poi.location.longitude;
             model.latitude = poi.location.latitude;
-
+            
             model.title = poi.name;
             model.subTitle = poi.address;
             if (model.longitude > 0 || model.latitude > 0) {
@@ -328,7 +328,7 @@
     if (reGeocode)
     {
         model.title = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
-        model.subTitle = @"";
+        model.subTitle = reGeocode.formattedAddress;
         if ([_dataSrouce count] > 0) {
             _dataSrouce[0] = @[model];
         }else{
