@@ -26,7 +26,7 @@ WX_EXPORT_METHOD(@selector(pushToCtrlGetLocationWithKey:callBack:))
 
 #pragma mark -- 地图定位
 - (void)pushToCtrlGetLocationWithKey:(NSString *)apiKey callBack:(WXModuleKeepAliveCallback)callBack{
-    [AMapServices sharedServices].apiKey = @"b1c9a5ba1334a6827a6d06908764645b";
+    [AMapServices sharedServices].apiKey = apiKey;//@"b1c9a5ba1334a6827a6d06908764645b";
     [AMapServices sharedServices].enableHTTPS = YES;
     self.locationCallBack = callBack;
     [weexInstance.viewController.navigationController pushViewController:self.mapCtl animated:YES];
