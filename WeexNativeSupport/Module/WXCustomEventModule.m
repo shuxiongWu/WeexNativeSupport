@@ -226,9 +226,13 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
 - (void)savePhotoToMediaLibraryWithImageBase64Data:(NSString *)baseString{
     
     if ([baseString containsString:@"http"]) {
+        #if __has_include(<SDWebImage/SDWebImageManager.h>) || __has_include("SDWebImageManager.h")
          SDWebImageManager *manager = [SDWebImageManager sharedManager];
         UIImage *image = [[manager imageCache] imageFromDiskCacheForKey:baseString];
         [self.nativeManage savePhotoToMediaLibraryWithImage:image];
+        #else
+        NSAssert(NO, @"请导入SDWebImage后再使用网络图片功能");
+        #endif
     }else{
         NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:baseString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
         UIImage *decodedImage = [UIImage imageWithData: decodeData];
