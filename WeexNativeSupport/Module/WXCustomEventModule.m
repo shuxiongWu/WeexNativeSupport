@@ -15,6 +15,7 @@
 #import "WeexNativeSupportManage.h"
 #import "WeexLocationManage.h"
 #import <AudioToolbox/AudioServices.h>
+#import "SDWebImageManager.h"
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
 
@@ -219,9 +220,17 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
 }
 
 - (void)savePhotoToMediaLibraryWithImageBase64Data:(NSString *)baseString{
-    NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:baseString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
-    UIImage *decodedImage = [UIImage imageWithData: decodeData];
-    [self.nativeManage savePhotoToMediaLibraryWithImage:decodedImage];
+    
+    if ([baseString containsString:@"http"]) {
+         SDWebImageManager *manager = [SDWebImageManager sharedManager];
+        [self.nativeManage savePhotoToMediaLibraryWithImage:[[manager imageCache] imageFromDiskCacheForKey:baseString]];
+    }else{
+        NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:baseString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
+        UIImage *decodedImage = [UIImage imageWithData: decodeData];
+        [self.nativeManage savePhotoToMediaLibraryWithImage:decodedImage];
+    }
+    
+    
     
 }
 

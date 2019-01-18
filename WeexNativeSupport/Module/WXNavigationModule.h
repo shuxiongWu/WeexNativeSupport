@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 #import <WeexSDK/WXModuleProtocol.h>
 @interface WXNavigationModule : NSObject<WXModuleProtocol>
-
+-(void)doNavigationWithEndLocation:(NSArray *)endLocation;
 @end
