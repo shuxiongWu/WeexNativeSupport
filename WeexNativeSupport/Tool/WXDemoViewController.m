@@ -12,8 +12,6 @@
 #import <WeexSDK/WXUtility.h>
 #import <WeexSDK/WXDebugTool.h>
 #import <WeexSDK/WXSDKManager.h>
-#import "UIViewController+WXDemoNaviBar.h"
-#import "DemoDefine.h"
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;
@@ -43,7 +41,6 @@
 {
     [super viewDidLoad];
     
-    [self setupNaviBar];
     [self setupRightBarItem];
     self.view.backgroundColor = [UIColor whiteColor];
     _weexHeight = self.view.frame.size.height - 64;
