@@ -15,7 +15,11 @@
 #import "WeexNativeSupportManage.h"
 #import "WeexLocationManage.h"
 #import <AudioToolbox/AudioServices.h>
+#if __has_include(<SDWebImage/SDWebImageManager.h>)
+#import <SDWebImage/SDWebImageManager.h>
+#elif __has_include("SDWebImageManager.h")
 #import "SDWebImageManager.h"
+#endif
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
 
