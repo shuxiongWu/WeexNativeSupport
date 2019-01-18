@@ -227,15 +227,13 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
     
     if ([baseString containsString:@"http"]) {
          SDWebImageManager *manager = [SDWebImageManager sharedManager];
-        [self.nativeManage savePhotoToMediaLibraryWithImage:[[manager imageCache] imageFromDiskCacheForKey:baseString]];
+        UIImage *image = [[manager imageCache] imageFromDiskCacheForKey:baseString];
+        [self.nativeManage savePhotoToMediaLibraryWithImage:image];
     }else{
         NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:baseString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
         UIImage *decodedImage = [UIImage imageWithData: decodeData];
         [self.nativeManage savePhotoToMediaLibraryWithImage:decodedImage];
     }
-    
-    
-    
 }
 
 #pragma mark -- 导航跳转之页面回退
