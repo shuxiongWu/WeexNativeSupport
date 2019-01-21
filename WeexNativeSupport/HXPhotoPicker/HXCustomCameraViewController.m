@@ -290,17 +290,19 @@
 }
 
 - (void)datePhotoEditViewControllerDidClipClick:(HXDatePhotoEditViewController *)datePhotoEditViewController beforeModel:(HXPhotoModel *)beforeModel afterModel:(HXPhotoModel *)afterModel{
+    
     afterModel.type = HXPhotoModelMediaTypeCameraPhoto;
     afterModel.subType = HXPhotoModelMediaSubTypePhoto;
     if (self.imageView.image.imageOrientation != UIImageOrientationUp) {
         self.imageView.image = [self.imageView.image normalizedImage];
     }
-    afterModel.thumbPhoto = self.imageView.image;
-    afterModel.imageSize = self.imageView.image.size;
-    afterModel.previewPhoto = self.imageView.image;
+//    afterModel.thumbPhoto = self.imageView.image;
+//    afterModel.imageSize = self.imageView.image.size;
+//    afterModel.previewPhoto = self.imageView.image;
     if (self.doneBlock) {
         self.doneBlock(afterModel, self);
     }
+    
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

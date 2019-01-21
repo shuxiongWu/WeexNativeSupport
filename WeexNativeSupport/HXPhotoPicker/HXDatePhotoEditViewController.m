@@ -9,7 +9,7 @@
 #import "HXDatePhotoEditViewController.h"
 #import "UIImage+HXExtension.h"
 #import "UIButton+HXExtension.h"
-
+#import <MJExtension.h>
 @interface HXDatePhotoEditViewController ()<HXDatePhotoEditBottomViewDelegate>
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) HXDatePhotoEditBottomView *bottomView;
@@ -38,6 +38,7 @@
     self.imageHeight = self.model.imageSize.height;
     [self setupUI];
     [self setupModel];
+    NSLog(@"%d----%d---%@",self.manager.configuration.singleJumpEdit,self.manager.configuration.singleSelected,NSStringFromCGPoint(self.manager.configuration.movableCropBoxCustomRatio));
     if (!self.manager.configuration.movableCropBox) {
         self.bottomView.enabled = NO;
     }else {

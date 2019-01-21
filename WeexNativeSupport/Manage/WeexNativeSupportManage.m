@@ -734,6 +734,7 @@ static WeexNativeSupportManage *manager = nil;
 //新api
 - (void)photographWithParameter:(NSDictionary *)parame callBack:(WXModuleKeepAliveCallback)callBack{
     self.imageCallBack = callBack;
+    self.manager.configuration.singleSelected = YES;
     self.manager.configuration.singleJumpEdit = [parame[@"edit"] boolValue];            //是否可以裁剪
     if([parame[@"edit"] boolValue]){
         self.manager.configuration.movableCropBox = [parame[@"movableCropBox"] boolValue];  //是否可移动的裁剪框
