@@ -14,6 +14,7 @@
     if (image) {
         return image;
     }
+    
     NSString *path = [NSString stringWithFormat:@"HXPhotoPicker.bundle/%@",imageName];
     image = [UIImage imageNamed:path];
     if (image) {

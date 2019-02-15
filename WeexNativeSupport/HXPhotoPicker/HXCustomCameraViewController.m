@@ -232,12 +232,14 @@
         model.thumbPhoto = self.imageView.image;
         model.imageSize = self.imageView.image.size;
         model.previewPhoto = self.imageView.image;
-        HXDatePhotoEditViewController *vc1 = [[HXDatePhotoEditViewController alloc] init];
-        vc1.model = model;
-        vc1.manager = self.manager;
-        vc1.delegate = self;
-        [self.navigationController pushViewController:vc1 animated:NO];
-        return;
+        if (self.manager.configuration.singleJumpEdit) {
+            HXDatePhotoEditViewController *vc1 = [[HXDatePhotoEditViewController alloc] init];
+            vc1.model = model;
+            vc1.manager = self.manager;
+            vc1.delegate = self;
+            [self.navigationController pushViewController:vc1 animated:NO];
+            return;
+        }
     }
 //    if (!self.videoURL) {
 //        model.type = HXPhotoModelMediaTypeCameraPhoto;

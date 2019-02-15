@@ -50,7 +50,8 @@ WX_EXPORT_METHOD(@selector(navigate:))
     if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"iosamap://"]]) {
         NSMutableDictionary *gaodeMapDic = [NSMutableDictionary dictionary];
         gaodeMapDic[@"title"] = @"高德地图";
-        NSString *urlString = [[NSString stringWithFormat:@"iosamap://navi?sourceApplication=%@&backScheme=%@&lat=%@&lon=%@&dev=0&rideType=elebike",@"导航功能",@"nav123456",endLocation[0],endLocation[1]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        //NSString *urlString = [[NSString stringWithFormat:@"iosamap://navi?sourceApplication=%@&backScheme=%@&lat=%@&lon=%@&dev=0&rideType=3",@"导航功能",@"nav123456",endLocation[0],endLocation[1]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *urlString = [[NSString stringWithFormat:@"iosamap://path?sourceApplication=%@&sid=BGVIS1&did=BGVIS2&dlat=%@&dlon=%@&dname=%@&dev=0&t=3",@"超盟集团",endLocation[0],endLocation[1],endLocation[2]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         gaodeMapDic[@"url"] = urlString;
         [maps addObject:gaodeMapDic];
     }
@@ -118,7 +119,7 @@ WX_EXPORT_METHOD(@selector(navigate:))
 - (void)navAppleMapWithlatitude:(NSString *)latitude longitude:(NSString *)longitude
 {
     //    CLLocationCoordinate2D gps = [JZLocationConverter bd09ToWgs84:self.destinationCoordinate2D];
-   
+    
     //终点坐标
     CLLocationCoordinate2D loc = CLLocationCoordinate2DMake([latitude doubleValue], [longitude doubleValue]);
     
@@ -131,7 +132,7 @@ WX_EXPORT_METHOD(@selector(navigate:))
     NSArray *items = @[currentLoc,toLocation];
     //第一个
     NSDictionary *dic = @{
-                          MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving,
+                          MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeWalking,
                           MKLaunchOptionsMapTypeKey : @(MKMapTypeStandard),
                           MKLaunchOptionsShowsTrafficKey : @(YES)
                           };
@@ -143,3 +144,4 @@ WX_EXPORT_METHOD(@selector(navigate:))
 }
 
 @end
+

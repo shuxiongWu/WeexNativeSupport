@@ -53,11 +53,20 @@
         _hotReloadSocket.delegate = self;
         [_hotReloadSocket open];
     }
-
+    
 #endif
     
     [self render];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pushNoticeData:) name:@"CMPushNoticeData" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webSocketNoticeData:) name:@"CMWebSocketNoticeData" object:nil];
+}
+
+- (void)pushNoticeData:(NSNotification *)noti {
+    [_instance fireGlobalEvent:@"CMPushNoticeData1" params:noti.object];
+}
+
+- (void)webSocketNoticeData:(NSNotification *)noti {
+    [_instance fireGlobalEvent:@"CMWebSocketNoticeData1" params:noti.object];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -96,7 +105,7 @@
     }
 #endif
     _instance.frame = CGRectMake(safeArea.left, safeArea.top, self.view.frame.size.width-safeArea.left-safeArea.right, _weexHeight-safeArea.bottom);
-
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -130,7 +139,7 @@
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, weakSelf.weexView);
     };
     _instance.onFailed = ^(NSError *error) {
-        #ifdef UITEST
+#ifdef UITEST
         if ([[error domain] isEqualToString:@"1"]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSMutableString *errMsg=[NSMutableString new];
@@ -142,11 +151,11 @@
                 [alertView show];
             });
         }
-        #endif
+#endif
     };
     
     _instance.renderFinish = ^(UIView *view) {
-         WXLogDebug(@"%@", @"Render Finish...");
+        WXLogDebug(@"%@", @"Render Finish...");
         [weakSelf updateInstanceState:WeexInstanceAppear];
     };
     
@@ -216,7 +225,7 @@
             }
             [self render];
         }
-       
+        
     }@catch(NSError * error) {
         NSLog(@"error");
     }
@@ -236,16 +245,16 @@
         pathComponents =[NSMutableArray arrayWithArray:[url.absoluteString pathComponents]];
         [pathComponents removeObjectsInRange:NSRangeFromString(@"0 3")];
         [pathComponents replaceObjectAtIndex:0 withObject:@"bundlejs"];
- 
+        
         NSString *filePath = [NSString stringWithFormat:@"%@/%@",[NSBundle mainBundle].bundlePath,[pathComponents componentsJoinedByString:@"/"]];
         localPath = [NSURL fileURLWithPath:filePath];
     }else {
         NSString *filePath = [NSString stringWithFormat:@"%@/bundlejs/index.js",[NSBundle mainBundle].bundlePath];
         localPath = [NSURL fileURLWithPath:filePath];
     }
- 
+    
     NSString *bundleUrl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/bundlejs/",[NSBundle mainBundle].bundlePath]].absoluteString;
-     [_instance renderWithURL:localPath options:@{@"bundleUrl":bundleUrl} data:nil];
+    [_instance renderWithURL:localPath options:@{@"bundleUrl":bundleUrl} data:nil];
 }
 
 #pragma mark - load local device bundle

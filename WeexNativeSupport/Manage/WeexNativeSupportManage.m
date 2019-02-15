@@ -273,6 +273,7 @@ static WeexNativeSupportManage *manager = nil;
 #pragma mark -- 自动连接蓝牙
 - (void)autoConnectLastPeripheral:(WXModuleKeepAliveCallback)callBack{
     [self.bluetoothManage autoConnectLastPeripheralCompletion:^(CBPeripheral *perpheral, NSError *error) {
+        [self.bluetoothManage stopScanPeripheral];
         if (!error) {
             if (callBack) {
                 callBack(perpheral.name, YES);
@@ -289,6 +290,7 @@ static WeexNativeSupportManage *manager = nil;
 - (void)connectPeripheral:(NSInteger)index callBack:(WXModuleKeepAliveCallback)callBack{
     [self.bluetoothManage connectPeripheral:self.buletoothDataArray[index] completion:^(CBPeripheral *perpheral, NSError *error) {
         if (!error) {
+             [self.bluetoothManage stopScanPeripheral];
             if (callBack) {
                 callBack(@"1", YES);
             }
@@ -318,7 +320,7 @@ static WeexNativeSupportManage *manager = nil;
     WeexPrinter *printer = [[WeexPrinter alloc] init];
     NSArray *statusStrArr = @[@"*取消*",@"*进行中*",@"*已完成*",@"*菜未上齐*",@"*菜已上齐*",@"*加菜*",@"*已结账*"];
     NSArray *payTypeArr = @[@"微信支付",@"支付宝支付",@"现金支付"];
-
+    
     if ([params[@"singleType"] integerValue] == 0) {//普通单
         printer = [[WeexPrinter alloc] init];
         [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
@@ -343,7 +345,7 @@ static WeexNativeSupportManage *manager = nil;
             [printer appendSeperatorLine];
             [self smallPrintWith:[printer getFinalData]];
         }
-
+        
         printer = [[WeexPrinter alloc] init];
         [printer appendTitle:@"订单号" value:params[@"order_id"] ? params[@"order_id"] : @""];
         [self smallPrintWith:[printer getFinalData]];
@@ -363,7 +365,7 @@ static WeexNativeSupportManage *manager = nil;
         printer = [[WeexPrinter alloc] init];
         [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
-
+        
         
         if (params[@"goods_list"] && [params[@"goods_list"] count] > 0) {
             printer = [[WeexPrinter alloc] init];
@@ -399,7 +401,7 @@ static WeexNativeSupportManage *manager = nil;
             [printer appendTitle:@"备注：" value:params[@"generalSpecial"] ? params[@"generalSpecial"] : @""];
             [self smallPrintWith:[printer getFinalData]];
         }
-
+        
         if (params[@"discount"] && [params[@"discount"] length] > 0) {
             printer = [[WeexPrinter alloc] init];
             [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
@@ -444,7 +446,7 @@ static WeexNativeSupportManage *manager = nil;
     }else if ([params[@"singleType"] integerValue] == 1){//加菜单
         [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter  fontSize:HLFontSizeTitleBig];
         [self smallPrintWith:[printer getFinalData]];
-
+        
         printer = [[WeexPrinter alloc] init];
         [printer appendText:@"*加菜*" alignment:HLTextAlignmentCenter];
         [self smallPrintWith:[printer getFinalData]];
@@ -477,11 +479,11 @@ static WeexNativeSupportManage *manager = nil;
         printer = [[WeexPrinter alloc] init];
         [printer appendTitle:@"下单时间:" value:[WeexDateHelper getDateStringWithTimeIntervalString:params[@"createtime"] ? params[@"createtime"] : @"" withType:@"yyyy-MM-dd HH:mm:ss"]];
         [self smallPrintWith:[printer getFinalData]];
-
+        
         printer = [[WeexPrinter alloc] init];
         [printer appendTitle:@"下单员：" value:params[@"account_name"] ? params[@"account_name"] : @""];
         [self smallPrintWith:[printer getFinalData]];
-
+        
         printer = [[WeexPrinter alloc] init];
         [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
@@ -501,7 +503,7 @@ static WeexNativeSupportManage *manager = nil;
                 printer = [[WeexPrinter alloc] init];
                 [printer appendLeftText:tempDict[@"goods_name"] ? tempDict[@"goods_name"] : @"" middleText:tempDict[@"goods_number"] ? tempDict[@"goods_number"] : @"" rightText:tempDict[@"goods_price"] ? tempDict[@"goods_price"] : @"" isTitle:NO];
                 [self smallPrintWith:[printer getFinalData]];
-            
+                
                 if ([tempDict[@"property"] length] > 0 || [tempDict[@"total_price"] length] > 0){
                     printer = [[WeexPrinter alloc] init];
                     [printer appendLeftText:tempDict[@"property"] ? tempDict[@"property"] : @"" middleText:tempDict[@"goods_unit_num"] ? tempDict[@"goods_unit_num"] : @"" rightText:tempDict[@"total_price"] ? tempDict[@"total_price"] : @"" isTitle:NO];
@@ -545,7 +547,7 @@ static WeexNativeSupportManage *manager = nil;
         printer = [[WeexPrinter alloc] init];
         [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
-
+        
     }else if ([params[@"singleType"] integerValue] == 2){//结账单
         [printer appendText:params[@"shopName"] alignment:HLTextAlignmentCenter  fontSize:HLFontSizeTitleBig];
         [self smallPrintWith:[printer getFinalData]];
@@ -573,13 +575,13 @@ static WeexNativeSupportManage *manager = nil;
             printer = [[WeexPrinter alloc] init];
             [printer appendText:[NSString stringWithFormat:@"流水号 %@",params[@"serial_num"]] alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
             [self smallPrintWith:[printer getFinalData]];
-
+            
         }
         
         printer = [[WeexPrinter alloc] init];
         [printer appendSeperatorLine];
         [self smallPrintWith:[printer getFinalData]];
-
+        
         printer = [[WeexPrinter alloc] init];
         [printer appendTitle:@"订 单 号：" value:params[@"order_id"] ? params[@"order_id"] : @""];
         [self smallPrintWith:[printer getFinalData]];
@@ -588,7 +590,7 @@ static WeexNativeSupportManage *manager = nil;
             [printer appendTitle:@"折扣：" value:params[@"discount"] ? params[@"discount"] : @""];
             [self smallPrintWith:[printer getFinalData]];
         }
-    
+        
         printer = [[WeexPrinter alloc] init];
         [printer appendTitle:@"收银员：" value:params[@"account_name"] ? params[@"account_name"] : @""];
         [self smallPrintWith:[printer getFinalData]];
@@ -691,7 +693,7 @@ static WeexNativeSupportManage *manager = nil;
     
     self.sanqrCallBack = callBack;
     [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.scanQRCtl animated:YES completion:nil];
-
+    
 }
 
 #pragma mark -- 链接到超盟商家
@@ -723,7 +725,7 @@ static WeexNativeSupportManage *manager = nil;
         }
     }
 }
-    
+
 #pragma mark -- 拍照
 - (void)photograph:(WXModuleKeepAliveCallback)callBack{
     self.imageCallBack = callBack;
@@ -749,20 +751,21 @@ static WeexNativeSupportManage *manager = nil;
     [[self getCurrentVC] hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
-            NSData *data = [image zec_compress];
-            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:data];
+            //NSData *data = [image zec_compress];
+            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(image, 0.5)];
             self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
         } failed:^{
-
+            
         }];
     } cancel:^(HXCustomCameraViewController *viewController) {
-
+        
     }];
 }
 
 #pragma mark -- 相册选取照片
 - (void)selectPhotoFromPhotoAlbumOfNum:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack
 {
+    self.manager.configuration.singleJumpEdit = NO;
     self.imageCallBack = callBack;
     if (num > 1) {
         self.manager.configuration.photoMaxNum = num;
@@ -775,7 +778,7 @@ static WeexNativeSupportManage *manager = nil;
 
 //建议使用新的api
 - (void)selectPhotoFromPhotoAlbum:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack {
-    
+    self.manager.configuration.singleJumpEdit = NO;
     self.imageCallBack = callBack;
     if([params[@"num"] integerValue] > 1){
         self.manager.configuration.photoMaxNum = [params[@"num"] integerValue];
@@ -797,8 +800,8 @@ static WeexNativeSupportManage *manager = nil;
             [self.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
                 NSMutableArray *base64StringArr = [NSMutableArray array];
                 for (UIImage *image in imageList) {
-                    NSData *data = [image zec_compress];
-                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:data];
+                    //NSData *data = [image zec_compress];
+                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(image, 0.5)];
                     [base64StringArr addObject:base64String];
                 }
                 
@@ -837,13 +840,13 @@ static WeexNativeSupportManage *manager = nil;
     NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
     
     NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
-
+    
     _scanQRCtl = [[WeexQRViewController alloc] initWithNibName:@"WeexQRViewController" bundle:resourceBundle];
     __weak typeof(self)weakSelf = self;
     _scanQRCtl.scanCallBack = ^(int code, NSString *msg) {
         weakSelf.sanqrCallBack ? weakSelf.sanqrCallBack(@{@"code": @(code),@"code_url": msg}, YES) : nil;
     };
-
+    
     return _scanQRCtl;
 }
 
@@ -916,3 +919,4 @@ static WeexNativeSupportManage *manager = nil;
 }
 
 @end
+

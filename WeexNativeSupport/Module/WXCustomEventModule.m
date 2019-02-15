@@ -92,9 +92,10 @@ WX_EXPORT_METHOD(@selector(transientVibration))
 WX_EXPORT_METHOD(@selector(setBrightness:))
 
 //present、dismiss
-WX_EXPORT_METHOD(@selector(presentToController:))
-WX_EXPORT_METHOD(@selector(dismiss))
 WX_EXPORT_METHOD(@selector(getPageSize:))
+
+//设置状态栏颜色
+WX_EXPORT_METHOD(@selector(setStatusBarColor:))
 
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
@@ -226,13 +227,13 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
 - (void)savePhotoToMediaLibraryWithImageBase64Data:(NSString *)baseString{
     
     if ([baseString containsString:@"http"]) {
-        #if __has_include(<SDWebImage/SDWebImageManager.h>) || __has_include("SDWebImageManager.h")
-         SDWebImageManager *manager = [SDWebImageManager sharedManager];
+#if __has_include(<SDWebImage/SDWebImageManager.h>) || __has_include("SDWebImageManager.h")
+        SDWebImageManager *manager = [SDWebImageManager sharedManager];
         UIImage *image = [[manager imageCache] imageFromDiskCacheForKey:baseString];
         [self.nativeManage savePhotoToMediaLibraryWithImage:image];
-        #else
+#else
         NSAssert(NO, @"请导入SDWebImage后再使用网络图片功能");
-        #endif
+#endif
     }else{
         NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:baseString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
         UIImage *decodedImage = [UIImage imageWithData: decodeData];
@@ -268,7 +269,9 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
 
 #pragma mark -- 获取当前导航栈控制器数量
 - (void)getPageSize:(WXModuleKeepAliveCallback)callBack{
-    callBack(@(weexInstance.viewController.navigationController.viewControllers.count),YES);
+    if (callBack) {
+        callBack(@(weexInstance.viewController.navigationController.viewControllers.count),YES);
+    }
 }
 
 #pragma mark -- 短震（类似3D touch）
@@ -282,14 +285,13 @@ WX_EXPORT_METHOD(@selector(getPageSize:))
     [[UIScreen mainScreen] setBrightness:brightness];
 }
 
-- (void)presentToController:(NSString *)url{
-    //    url = [@"${PODS_ROOT}/bundlejs" stringByAppendingString:url];
-    //    NSURL *URL = [[NSURL alloc] initFileURLWithPath:url];
-    //
-    //    UIViewController *demo = [[WXDemoViewController alloc] init];
-    //    ((WXDemoViewController *)demo).url = URL;
-    //    [weexInstance.viewController.navigationController pushViewController:demo animated:YES];
-    // [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:demo animated:YES completion:nil];
+#pragma mark -- 设置状态栏颜色
+- (void)setStatusBarColor:(NSString *)color {
+    if ([color isEqualToString:@"black"]) {
+        [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+    }else {
+        [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
+    }
 }
 
 - (void)dismiss{
