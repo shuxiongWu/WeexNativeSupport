@@ -15,7 +15,6 @@
 #import <Photos/Photos.h>
 #import "ASCameraMacro.h"
 #import "ASCameraUtility.h"
-#import "AppDelegate.h"
 
 typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
@@ -274,7 +273,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             }
             if (error) {
                 Plog(@"保存视频到相簿过程中发生错误，错误信息：%@",error.localizedDescription);
-                [ASCameraUtility showAllTextDialog:((AppDelegate*)[UIApplication sharedApplication].delegate).window Text:@"保存视频到相册发生错误"];
+                [ASCameraUtility showAllTextDialog:nil Text:@"保存视频到相册发生错误"];
             } else {
                 if (weakSelf.takeBlock) {
                     weakSelf.takeBlock(assetURL);
