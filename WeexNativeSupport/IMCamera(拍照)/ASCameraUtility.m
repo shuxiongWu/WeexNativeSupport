@@ -8,14 +8,12 @@
 
 #import "ASCameraUtility.h"
 #import <SVProgressHUD.h>
-#import "DLHDActivityIndicator.h"
 
 @implementation ASCameraUtility
 
 
 + (void)showProgressDialogText:(NSString *)text {
-    DLHDActivityIndicator *indicator = [DLHDActivityIndicator shared];
-    [indicator showWithLabelText:text];
+    [SVProgressHUD showWithStatus:text];
 }
 
 + (void)showAllTextDialog:(UIView *)view  Text:(NSString *)text{
@@ -48,7 +46,7 @@
 }
 
 + (void)hideProgressDialog {
-    [DLHDActivityIndicator hideActivityIndicator];
+    [SVProgressHUD dismiss];
 }
 
 
