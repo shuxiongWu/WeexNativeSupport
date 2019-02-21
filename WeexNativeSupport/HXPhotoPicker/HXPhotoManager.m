@@ -518,6 +518,9 @@
             }else if (asset.mediaType == PHAssetMediaTypeVideo) {
                 photoModel.subType = HXPhotoModelMediaSubTypeVideo;
                 photoModel.type = HXPhotoModelMediaTypeVideo;
+                [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                    photoModel.avAsset = asset;
+                }];
 //                if (!photoModel.isICloud) {
                     [videoArray addObject:photoModel];
 //                }
@@ -667,6 +670,9 @@
             }else if (asset.mediaType == PHAssetMediaTypeVideo) {
                 photoModel.subType = HXPhotoModelMediaSubTypeVideo;
                 photoModel.type = HXPhotoModelMediaTypeVideo;
+                [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                    photoModel.avAsset = asset;
+                }];
 //                if (!photoModel.isICloud) {
                     [videoArray addObject:photoModel];
 //                }

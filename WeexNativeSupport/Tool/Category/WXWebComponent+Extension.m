@@ -14,6 +14,8 @@
 
 @property (nonatomic) BOOL isBounces;
 
+@property (nonatomic) NSArray *urlInterceptArray;
+
 @end
 
 @implementation WXWebComponent (Extension)
@@ -32,9 +34,18 @@
     return [objc_getAssociatedObject(self, _cmd) boolValue];
 }
 
+-(void)setUrlInterceptArray:(NSArray *)urlInterceptArray {
+    objc_setAssociatedObject(self, @selector(urlInterceptArray), urlInterceptArray, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+-(NSArray *)urlInterceptArray {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
 + (void)load {
     [self weex_swizzle:[self class] Method:@selector(initWithRef:type:styles:attributes:events:weexInstance:) withMethod:@selector(new_initWithRef:type:styles:attributes:events:weexInstance:)];
-        [self weex_swizzle:[self class] Method:@selector(viewDidLoad) withMethod:@selector(new_viewDidLoad)];
+    [self weex_swizzle:[self class] Method:@selector(viewDidLoad) withMethod:@selector(new_viewDidLoad)];
+    [self weex_swizzle:[self class] Method:@selector(webView:shouldStartLoadWithRequest:navigationType:) withMethod:@selector(new_webView:shouldStartLoadWithRequest:navigationType:)];
 }
 
 -(instancetype)new_initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance {
@@ -42,6 +53,7 @@
     
     self.notifyEvent = [attributes[@"notifyEvent"] boolValue];
     self.isBounces = [attributes[@"isBounces"] boolValue];
+    self.urlInterceptArray = attributes[@"urlInterceptArray"];
     return ret;
 }
 
@@ -50,5 +62,16 @@
     
     [(UIScrollView *)[[self.view subviews] objectAtIndex:0] setBounces:self.isBounces];
 }
+
+- (BOOL)new_webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+    
+    for (NSInteger i = 0; i < self.urlInterceptArray.count; i ++) {
+        if ([request.URL.absoluteString containsString:self.urlInterceptArray[i]]) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
 
 @end
