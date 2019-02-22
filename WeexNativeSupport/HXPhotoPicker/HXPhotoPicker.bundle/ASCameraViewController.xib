@@ -10,9 +10,9 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ASCameraViewController"/>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <viewController wantsFullScreenLayout="YES" id="zfS-uQ-21E">
+        <viewController wantsFullScreenLayout="YES" id="zfS-uQ-21E" customClass="ASCameraViewController">
             <layoutGuides>
                 <viewControllerLayoutGuide type="top" id="pw0-Ad-XY7"/>
                 <viewControllerLayoutGuide type="bottom" id="OPa-mi-nnw"/>

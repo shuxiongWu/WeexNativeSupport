@@ -18,6 +18,7 @@
 #import <AFNetworking.h>
 #import <MJExtension.h>
 #import <SVProgressHUD.h>
+
 #define Timeout 30
 @interface CMVideoModule ()<HXAlbumListViewControllerDelegate>
 typedef void (^SuccesslBlock)(NSURLSessionDataTask *task, NSDictionary *respone);
@@ -48,7 +49,11 @@ static AFHTTPSessionManager *netWorkManager;
 }
 
 - (void)videoRecordingAndUploadWithParams:(NSDictionary *)params callBack:(WXKeepAliveCallback)callBack{
-    ASCameraViewController *cameraVC = [[NSBundle mainBundle] loadNibNamed:@"ASCameraViewController" owner:nil options:nil].lastObject;
+    NSString *bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
+    NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
+    ASCameraViewController *cameraVC = [resourceBundle loadNibNamed:@"ASCameraViewController" owner:self
+                         options:nil].lastObject;
+//    ASCameraViewController *cameraVC = [[ASCameraViewController alloc] initWithNibName:@"ASCameraViewController" bundle:nil];
     cameraVC.ASSeconds = [params[@"seconds"] integerValue];//设置可录制最长时间
     self.manager.configuration.videoMaximumDuration = [params[@"seconds"] integerValue];
     [cameraVC setTakeBlock:^(id item) {
@@ -75,7 +80,8 @@ static AFHTTPSessionManager *netWorkManager;
 }
 
 - (void)selectVideoFromPhotoAlbumAndUploadWithParams:(NSDictionary *)params callBack:(WXKeepAliveCallback)callBack {
-    self.manager.configuration.videoMaximumDuration = [params[@"seconds"] integerValue];
+    self.manager.configuration.videoMaxDuration = [params[@"seconds"] integerValue];
+    [self.manager clearSelectedList];
     [weexInstance.viewController hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
         __block NSURL *videoUrl = nil;
         [SVProgressHUD showWithStatus:@"视频上传中…"];

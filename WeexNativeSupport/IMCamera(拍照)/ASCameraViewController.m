@@ -15,6 +15,7 @@
 #import <Photos/Photos.h>
 #import "ASCameraMacro.h"
 #import "ASCameraUtility.h"
+#import "WeexPublicTool.h"
 
 typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
@@ -87,7 +88,14 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    UIImage *image = [UIImage imageNamed:@"sc_btn_take.png"];
+    UIImage *image = [WeexPublicTool wx_imageNamed:@"sc_btn_take.png"];
+    [self.btnCamera setImage:[WeexPublicTool wx_imageNamed:@"btn_video_flip_camera"] forState:UIControlStateNormal];
+    [self.btnBack setImage:[WeexPublicTool wx_imageNamed:@"hVideo_back"] forState:UIControlStateNormal];
+    [self.btnEnsure setImage:[WeexPublicTool wx_imageNamed:@"hVideo_confirm"] forState:UIControlStateNormal];
+    [self.btnAfresh setImage:[WeexPublicTool wx_imageNamed:@"hVideo_cancel"] forState:UIControlStateNormal];
+    self.focusCursor.image = [WeexPublicTool wx_imageNamed:@"hVideo_focusing"];
+    self.imgRecord.image = [WeexPublicTool wx_imageNamed:@"hVideo_take"];
+    
     self.backCenterX.constant = -(SCREEN_WIDTH/2/2)-image.size.width/2/2;
     
     self.progressView.layer.cornerRadius = self.progressView.frame.size.width/2;
