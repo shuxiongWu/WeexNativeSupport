@@ -900,13 +900,13 @@
     if (model.type == HXPhotoModelMediaTypeVideo) {
         if (model.asset.duration < 3) {
             return [NSBundle hx_localizedStringForKey:@"视频少于3秒,无法选择"];
-        }else if (model.asset.duration >= self.configuration.videoMaxDuration + 1) {
+        }else if (model.asset.duration >= self.configuration.videoMaxDuration + 0.5) {
             return [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"];
         }
     }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
         if (model.videoDuration < 3) {
             return [NSBundle hx_localizedStringForKey:@"视频少于3秒,无法选择"];
-        }else if (model.videoDuration >= self.configuration.videoMaxDuration + 1) {
+        }else if (model.videoDuration >= self.configuration.videoMaxDuration + 0.5) {
             return [NSBundle hx_localizedStringForKey:@"视频过大,无法选择"];
         }
     }
@@ -923,13 +923,13 @@
         if (model.type == HXPhotoModelMediaTypeVideo) {
             if (model.asset.duration < 3) {
                 model.videoState = HXPhotoModelVideoStateUndersize;
-            }else if (model.asset.duration >= self.configuration.videoMaxDuration + 1) {
+            }else if (model.asset.duration >= self.configuration.videoMaxDuration + 0.5) {
                 model.videoState = HXPhotoModelVideoStateOversize;
             }
         }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             if (model.videoDuration < 3) {
                 model.videoState = HXPhotoModelVideoStateUndersize;
-            }else if (model.videoDuration >= self.configuration.videoMaxDuration + 1) {
+            }else if (model.videoDuration >= self.configuration.videoMaxDuration + 0.5) {
                 model.videoState = HXPhotoModelVideoStateOversize;
             }
         }

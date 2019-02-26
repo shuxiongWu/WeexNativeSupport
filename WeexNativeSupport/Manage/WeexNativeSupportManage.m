@@ -36,6 +36,7 @@
 #import "WeexLocationManage.h"
 #import "WeexQRViewController.h"
 #import "WeexPrinter.h"
+#import <AFNetworking.h>
 #define scanMaxNumber 3                //扫描蓝牙最大次数
 @interface WeexNativeSupportManage ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
 
@@ -56,6 +57,19 @@
 
 @implementation WeexNativeSupportManage
 static WeexNativeSupportManage *manager = nil;
+static AFHTTPSessionManager *netWorkManager;
+- (AFHTTPSessionManager *)netWorkManager {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        netWorkManager = [[AFHTTPSessionManager alloc] init];
+        netWorkManager.requestSerializer =  [AFHTTPRequestSerializer serializer];
+        netWorkManager.requestSerializer.timeoutInterval = 30;//请求超时
+        //      manager.requestSerializer.cachePolicy = NSURLRequestUseProtocolCachePolicy; //缓存策略
+        netWorkManager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/plain", @"text/javascript", @"text/json", @"text/html", nil];//支持类型
+        
+    });
+    return netWorkManager;
+}
 + (instancetype)shareManage {
     static dispatch_once_t oneToken;
     dispatch_once(&oneToken, ^{
@@ -751,8 +765,8 @@ static WeexNativeSupportManage *manager = nil;
     [[self getCurrentVC] hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
-            //NSData *data = [image zec_compress];
-            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(image, 0.5)];
+            UIImage *tempImage = [self compressImageQuality:image toByte:102400];
+            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(tempImage, 1)];
             self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
         } failed:^{
             
@@ -800,8 +814,9 @@ static WeexNativeSupportManage *manager = nil;
             [self.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
                 NSMutableArray *base64StringArr = [NSMutableArray array];
                 for (UIImage *image in imageList) {
-                    //NSData *data = [image zec_compress];
-                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(image, 0.5)];
+                    
+                    UIImage *tempImage = [self compressImageQuality:image toByte:102400];
+                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(tempImage, 1)];
                     [base64StringArr addObject:base64String];
                 }
                 
@@ -815,6 +830,27 @@ static WeexNativeSupportManage *manager = nil;
     } cancel:^(HXAlbumListViewController *viewController) {
         
     }];
+}
+
+- (UIImage *)compressImageQuality:(UIImage *)image toByte:(NSInteger)maxLength {
+    CGFloat compression = 1;
+    NSData *data = UIImageJPEGRepresentation(image, compression);
+    if (data.length < maxLength) return image;
+    CGFloat max = 1;
+    CGFloat min = 0;
+    for (int i = 0; i < 6; ++i) {
+        compression = (max + min) / 2;
+        data = UIImageJPEGRepresentation(image, compression);
+        if (data.length < maxLength * 0.9) {
+            min = compression;
+        } else if (data.length > maxLength) {
+            max = compression;
+        } else {
+            break;
+        }
+    }
+    UIImage *resultImage = [UIImage imageWithData:data];
+    return resultImage;
 }
 
 #pragma mark -- delegate
