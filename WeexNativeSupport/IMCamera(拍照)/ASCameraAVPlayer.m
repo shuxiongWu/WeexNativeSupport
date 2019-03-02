@@ -28,7 +28,7 @@
         if (url) {
             self.videoUrl = url;
         }
-        
+        self.backgroundColor = [UIColor blackColor];
         [bgView addSubview:self];
     }
     return self;

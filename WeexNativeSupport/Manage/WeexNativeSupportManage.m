@@ -304,7 +304,7 @@ static AFHTTPSessionManager *netWorkManager;
 - (void)connectPeripheral:(NSInteger)index callBack:(WXModuleKeepAliveCallback)callBack{
     [self.bluetoothManage connectPeripheral:self.buletoothDataArray[index] completion:^(CBPeripheral *perpheral, NSError *error) {
         if (!error) {
-             [self.bluetoothManage stopScanPeripheral];
+            [self.bluetoothManage stopScanPeripheral];
             if (callBack) {
                 callBack(@"1", YES);
             }
@@ -765,8 +765,7 @@ static AFHTTPSessionManager *netWorkManager;
     [[self getCurrentVC] hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
-            UIImage *tempImage = [self compressImageQuality:image toByte:102400];
-            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(tempImage, 1)];
+            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
             self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
         } failed:^{
             
@@ -815,8 +814,7 @@ static AFHTTPSessionManager *netWorkManager;
                 NSMutableArray *base64StringArr = [NSMutableArray array];
                 for (UIImage *image in imageList) {
                     
-                    UIImage *tempImage = [self compressImageQuality:image toByte:102400];
-                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(tempImage, 1)];
+                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
                     [base64StringArr addObject:base64String];
                 }
                 
@@ -832,10 +830,10 @@ static AFHTTPSessionManager *netWorkManager;
     }];
 }
 
-- (UIImage *)compressImageQuality:(UIImage *)image toByte:(NSInteger)maxLength {
+- (NSData *)compressImageQuality:(UIImage *)image toByte:(NSInteger)maxLength {
     CGFloat compression = 1;
     NSData *data = UIImageJPEGRepresentation(image, compression);
-    if (data.length < maxLength) return image;
+    if (data.length < maxLength) return data;
     CGFloat max = 1;
     CGFloat min = 0;
     for (int i = 0; i < 6; ++i) {
@@ -849,8 +847,8 @@ static AFHTTPSessionManager *netWorkManager;
             break;
         }
     }
-    UIImage *resultImage = [UIImage imageWithData:data];
-    return resultImage;
+    //UIImage *resultImage = [UIImage imageWithData:data];
+    return data;
 }
 
 #pragma mark -- delegate

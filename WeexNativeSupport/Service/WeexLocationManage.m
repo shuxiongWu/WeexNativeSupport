@@ -9,7 +9,7 @@
 #import "WeexLocationManage.h"
 #import <MJExtension.h>
 
-@interface WeexLocationManage ()<CLLocationManagerDelegate>{//添加代理协议 CLLocationManagerDelegate
+@interface WeexLocationManage ()<CLLocationManagerDelegate,UIAlertViewDelegate>{//添加代理协议 CLLocationManagerDelegate
     CLLocationManager *_locationManager;//定位服务管理类
 }
 
@@ -41,7 +41,27 @@ static WeexLocationManage *manager = nil;
 }
 
 - (void)startLocation{
+    if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied)
+    {
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"打开[定位服务]来允许访问您的位置" message:@"请在系统设置中开启定位服务(设置>隐私>定位服务>开启)" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置" , nil];
+        alertView.delegate = self;
+        alertView.tag = 1;
+        [alertView show];
+        
+    }
     [_locationManager startUpdatingLocation];
+}
+
+- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex{
+    if (alertView.tag == 1) {
+        if (buttonIndex == 1) {
+            //跳转到定位权限页面
+            NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+            if( [[UIApplication sharedApplication]canOpenURL:url] ) {
+                [[UIApplication sharedApplication] openURL:url];
+            }
+        }
+    }
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations{
@@ -55,3 +75,4 @@ static WeexLocationManage *manager = nil;
 
 
 @end
+

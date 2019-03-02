@@ -42,6 +42,4 @@ WX_EXPORT_METHOD(@selector(showHUDWithParams:))
     }
 }
     
-
-    
 @end

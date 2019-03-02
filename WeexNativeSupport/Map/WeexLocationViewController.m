@@ -19,7 +19,7 @@
 #import <SVProgressHUD.h>
 #import "WeexAddressModel.h"
 #import "WeexPublicTool.h"
-@interface WeexLocationViewController ()<AMapLocationManagerDelegate,AMapSearchDelegate,MAMapViewDelegate,UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate>
+@interface WeexLocationViewController ()<AMapLocationManagerDelegate,AMapSearchDelegate,MAMapViewDelegate,UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate,UIAlertViewDelegate>
 @property (nonatomic, strong) AMapLocationManager* locationManager;
 @property (nonatomic, strong) AMapSearchAPI *search;
 @property (nonatomic, assign) CLLocationCoordinate2D coordinate;
@@ -50,8 +50,28 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [self findMe];
+    if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied)
+    {
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"打开[定位服务]来允许访问您的位置" message:@"请在系统设置中开启定位服务(设置>隐私>定位服务>开启)" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"设置" , nil];
+        alertView.delegate = self;
+        alertView.tag = 1;
+        [alertView show];
+        
+    }
     self.barStyle = [UIApplication sharedApplication].statusBarStyle;
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+}
+
+- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex{
+    if (alertView.tag == 1) {
+        if (buttonIndex == 1) {
+            //跳转到定位权限页面
+            NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+            if( [[UIApplication sharedApplication]canOpenURL:url] ) {
+                [[UIApplication sharedApplication] openURL:url];
+            }
+        }
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
