@@ -8,10 +8,6 @@
 
 #import "CMWeexBaseModule.h"
 #import <WeexSDK/WeexSDK.h>
-#import <SDWebImage/UIImageView+WebCache.h>
-#import <AssetsLibrary/AssetsLibrary.h>
-#import <Photos/Photos.h>
-#import <SVProgressHUD.h>
 
 @implementation CMWeexBaseModule
 @synthesize weexInstance;
@@ -84,56 +80,6 @@ WX_EXPORT_METHOD(@selector(getUUID:))
     if (keyData)
         CFRelease(keyData);
     return ret;
-}
-
-#pragma mark ---------------------保存图片到相册---------------------
-- (void)savePhotos:(NSArray *)array {
-    
-    __block BOOL fail = NO;
-    __block NSInteger index = 0;
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    if (status == PHAuthorizationStatusRestricted ||
-        status == PHAuthorizationStatusDenied) {
-        //无权限
-        [SVProgressHUD showInfoWithStatus:@"请先配置访问权限"];
-        return;
-    }
-    
-    [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSString *urlString = array[idx];
-        if ([urlString containsString:@"http"]) {//网络地址
-            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:array[idx]] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
-                
-            } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-                __block ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
-                [lib writeImageToSavedPhotosAlbum:image.CGImage metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
-                    if (error) {
-                        fail = YES;
-                    }
-                    index ++;
-                }];
-            }];
-        }else {//base64图片字符串
-            NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:urlString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
-            UIImage *decodedImage = [UIImage imageWithData: decodeData];
-            __block ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
-            [lib writeImageToSavedPhotosAlbum:decodedImage.CGImage metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
-                if (error) {
-                    fail = YES;
-                }
-                index ++;
-            }];
-        }
-        
-    }];
-    
-    if (index == array.count) {
-        if (fail) {
-            [SVProgressHUD showErrorWithStatus:@"保存失败"];
-        }else {
-            [SVProgressHUD showSuccessWithStatus:@"保存成功"];
-        }
-    }
 }
 
 @end
