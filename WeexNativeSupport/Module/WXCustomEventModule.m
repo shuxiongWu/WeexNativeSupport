@@ -23,7 +23,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <Photos/Photos.h>
 #import <SVProgressHUD.h>
-#import "SDWebImage/UIImageView+WebCache.h"
+#import "UIImageView+WebCache.h"
 
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
