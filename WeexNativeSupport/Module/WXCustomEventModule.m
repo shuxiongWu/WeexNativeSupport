@@ -17,13 +17,15 @@
 #import <AudioToolbox/AudioServices.h>
 #if __has_include(<SDWebImage/SDWebImageManager.h>)
 #import <SDWebImage/SDWebImageManager.h>
+#import <SDWebImage/UIImageView+WebCache.h>
 #elif __has_include("SDWebImageManager.h")
 #import "SDWebImageManager.h"
+#import "UIImageView+WebCache.h"
 #endif
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <Photos/Photos.h>
 #import <SVProgressHUD.h>
-#import "UIImageView+WebCache.h"
+
 
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
