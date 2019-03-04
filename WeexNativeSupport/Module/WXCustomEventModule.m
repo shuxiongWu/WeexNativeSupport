@@ -320,6 +320,7 @@ WX_EXPORT_METHOD(@selector(savePhotos:callBack:))
     [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSString *urlString = array[idx];
         if ([urlString containsString:@"http"]) {//网络地址
+#if __has_include(<SDWebImage/SDWebImageManager.h>) || __has_include("UIImageView+WebCache.h")
             [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:array[idx]] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
                 
             } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
@@ -336,6 +337,9 @@ WX_EXPORT_METHOD(@selector(savePhotos:callBack:))
                     }
                 }];
             }];
+#else
+            NSAssert(NO, @"请导入SDWebImage后再使用网络图片功能");
+#endif
         }else {//base64图片字符串
             NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:urlString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
             UIImage *decodedImage = [UIImage imageWithData: decodeData];
