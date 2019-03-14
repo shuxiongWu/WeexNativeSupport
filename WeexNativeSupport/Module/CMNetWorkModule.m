@@ -11,7 +11,7 @@
 #import <WeexSDK/WeexSDK.h>
 #import <WeexSDK/WXUtility.h>
 
-#if __has_include(<WYNetworkManager/WYNetworkManage.h>)
+#if __has_include(<WYNetworkManage.h>)
 #import <WYNetworkManage.h>
 #elif __has_include("WYNetworkManage.h")
 #import "WYNetworkManage.h"
