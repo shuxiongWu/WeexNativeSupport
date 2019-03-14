@@ -10,7 +10,13 @@
 #import <WeexSDK/WXExceptionUtils.h>
 #import <WeexSDK/WeexSDK.h>
 #import <WeexSDK/WXUtility.h>
-#import <WYNetworkManager/WYNetworkManage.h>
+
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>)
+#import <WYNetworkManage.h>
+#elif __has_include("WYNetworkManage.h")
+#import "WYNetworkManage.h"
+#endif
+
 @implementation CMNetWorkModule
 
 
@@ -39,6 +45,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  @param callBack 动态返回当前网络状态
  */
 - (void)realNetworkStatus:(WXKeepAliveCallback)callBack {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     __block NSString *netWorkStatus;
     [WYNetworkManage networkStatusWithBlock:^(WYNetworkStatusType status) {
         switch (status) {
@@ -61,6 +68,9 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
             callBack(netWorkStatus,YES);
         }
     }];
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 
@@ -70,10 +80,14 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  @param callBack YES or NO
  */
 - (void)isNetWork:(WXKeepAliveCallback)callBack {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     BOOL bol = [WYNetworkManage isNetwork];
     if (callBack) {
         callBack(@(bol),YES);
     }
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 /**
@@ -82,10 +96,14 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  @param callBack YES or NO
  */
 - (void)isWWANNetwork:(WXKeepAliveCallback)callBack {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     BOOL bol = [WYNetworkManage isWWANNetwork];
     if (callBack) {
         callBack(@(bol),YES);
     }
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 /**
@@ -94,10 +112,14 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  @param callBack YES or NO
  */
 - (void)isWiFiNetwork:(WXKeepAliveCallback)callBack {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     BOOL bol = [WYNetworkManage isWiFiNetwork];
     if (callBack) {
         callBack(@(bol),YES);
     }
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 #pragma mark ------------------取消网络请求---------------------
@@ -106,7 +128,11 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  取消所有HTTP请求
  */
 - (void)cancelAllRequest {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     [WYNetworkManage cancelAllRequest];
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 
@@ -116,7 +142,11 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  @param URL 要取消的URL
  */
 - (void)cancelRequestWithURL:(NSString *)URL {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     [WYNetworkManage cancelRequestWithURL:URL];
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 #pragma mark ------------------日志控制---------------------
@@ -126,16 +156,21 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
 日志打印（默认关闭）
  */
 - (void)openLog:(NSString *)open{
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     if ([open boolValue]) {
         [WYNetworkManage openLog];
     }else {
         [WYNetworkManage closeLog];
     }
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 #pragma mark ------------------HTTP请求---------------------
 
 - (void)fetch:(NSDictionary *)params cache:(WXKeepAliveCallback)cache success:(WXKeepAliveCallback)success failure:(WXKeepAliveCallback)failure {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     NSString *method = params[@"method"] ? params[@"method"] : nil;
     NSString *url = params[@"url"] ? params[@"url"] : nil;
     BOOL bol = params[@"cache"] ? [params[@"cache"] boolValue] : NO;
@@ -158,7 +193,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
                     if (cache) {
                         cache([[NSString alloc] initWithData:responseCache encoding:NSUTF8StringEncoding],YES);
                     }
-                   
+                    
                 }
             } success:^(id  _Nonnull responseObject) {
                 if ([responseObject isKindOfClass:[NSDictionary class]]) {
@@ -242,6 +277,9 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
             }];
         }
     }
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 #pragma mark ------------------公共参数设置----------------------
@@ -251,11 +289,15 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  *  @param requestSerializer WYRequestSerializerJSON(JSON格式),WYRequestSerializerHTTP(二进制格式),
  */
 - (void)setRequestSerializer:(NSString *)serializer {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     if ([serializer isEqualToString:@"JSON"]) {
         [WYNetworkManage setRequestSerializer:WYRequestSerializerJSON];
     } else if ([serializer isEqualToString:@"HTTP"]) {
         [WYNetworkManage setRequestSerializer:WYRequestSerializerHTTP];
     }
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 /**
@@ -264,11 +306,15 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  *  @param responseSerializer WYResponseSerializerJSON(JSON格式),WYResponseSerializerHTTP(二进制格式)
  */
 - (void)setResponseSerializer:(NSString *)serializer {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     if ([serializer isEqualToString:@"JSON"]) {
         [WYNetworkManage setResponseSerializer:WYResponseSerializerJSON];
     } else if ([serializer isEqualToString:@"HTTP"]) {
         [WYNetworkManage setResponseSerializer:WYResponseSerializerHTTP];
     }
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 /**
@@ -277,7 +323,11 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  *  @param time 时长
  */
 - (void)setRequestTimeoutInterval:(NSString *)time {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     [WYNetworkManage setRequestTimeoutInterval:[time doubleValue]];
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 /// 设置请求头
@@ -294,7 +344,11 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
  *  @param open YES(打开), NO(关闭)
  */
 - (void)openNetworkActivityIndicator:(NSString *)open {
+#if __has_include(<WYNetworkManager/WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     [WYNetworkManage openNetworkActivityIndicator:[open boolValue]];
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 #pragma mark ------------------json转字符串---------------------
