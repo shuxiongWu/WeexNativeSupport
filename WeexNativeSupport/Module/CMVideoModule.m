@@ -92,7 +92,14 @@ static AFHTTPSessionManager *netWorkManager;
                 UIImage *preViewImage = [self getVideoPreViewImage:videoUrl];
                 NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(preViewImage, 0.5)];
                 [self zipVideoWithInputURL:model.fileURL completeBlock:^(NSURL * url) {
-                    NSData *data = [NSData dataWithContentsOfURL:url];
+                    NSData *data = [NSData dataWithContentsOfURL:url?:videoUrl];
+                    if (!data) {
+                        [SVProgressHUD showErrorWithStatus:@"发生了预期之外的错误~"];
+                        if (callBack) {
+                            callBack(@{},YES);
+                        }
+                        return;
+                    }
                     [self uploadVideoTodataBaseWithUrl:params[@"url"] parameters:@{
                                                                                    @"img":base64String
                                                                                    } videoData:data success:^(NSURLSessionDataTask *task, NSDictionary *respone) {
@@ -186,8 +193,9 @@ static AFHTTPSessionManager *netWorkManager;
                      if (completeBlock) {
                          completeBlock(newVideoUrl);
                      }
-                 });}
+                 });
                  break;
+             }
              case AVAssetExportSessionStatusFailed:
                  NSLog(@"AVAssetExportSessionStatusFailed");
                  dispatch_async(dispatch_get_main_queue(), ^{

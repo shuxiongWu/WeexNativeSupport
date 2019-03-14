@@ -82,4 +82,7 @@ WX_EXPORT_METHOD(@selector(getUUID:))
     return ret;
 }
 
+#pragma mark ---------------------应用已经进入后台---------------------
+
+
 @end
