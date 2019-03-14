@@ -12,6 +12,7 @@
 #import <WeexSDK/WXUtility.h>
 #import <WeexSDK/WXDebugTool.h>
 #import <WeexSDK/WXSDKManager.h>
+#import <AFNetworkReachabilityManager.h>
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;
@@ -55,6 +56,27 @@
     }
     
 #endif
+    
+    AFNetworkReachabilityManager *netManager = [AFNetworkReachabilityManager sharedManager];
+    [netManager startMonitoring];  //开始监听
+    [netManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status){
+        
+        if (status == AFNetworkReachabilityStatusNotReachable)
+        {
+//showAlert
+//            [EPProgressHUD showErrorWithStatus:@"网络链接错误,请检查网络链接"];
+            
+            return;
+        }else if (status == AFNetworkReachabilityStatusUnknown){
+            
+            
+        }else if ((status == AFNetworkReachabilityStatusReachableViaWWAN)||(status == AFNetworkReachabilityStatusReachableViaWiFi)){
+            
+//            DLog(@"WiFi");
+            [self render];
+        }
+        
+    }];
     
     [self render];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pushNoticeData:) name:@"CMPushNoticeData" object:nil];

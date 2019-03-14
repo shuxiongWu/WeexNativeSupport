@@ -9,7 +9,6 @@
 #import "CMWXCarouselComponent.h"
 #import <WeexSDK/WeexSDK.h>
 #import "iCarousel.h"
-#import <SDWebImage/UIImageView+WebCache.h>
 #if __has_include(<SDWebImage/SDWebImageManager.h>)
 #import <SDWebImage/SDWebImageManager.h>
 #import <SDWebImage/UIImageView+WebCache.h>
@@ -97,7 +96,12 @@
     }
     
     UIImageView *imageView = (UIImageView *)view;
+#if __has_include(<SDWebImage/SDWebImageManager.h>) || __has_include("SDWebImageManager.h")
     [imageView sd_setImageWithURL:[NSURL URLWithString:self.urlArray[index]] placeholderImage:[UIImage imageNamed:self.placeholder]];
+#else
+    NSAssert(NO, @"请导入SDWebImage后再使用网络图片功能");
+#endif
+    
     return view;
 }
 
