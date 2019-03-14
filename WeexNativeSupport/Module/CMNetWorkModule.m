@@ -332,10 +332,14 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
 
 /// 设置请求头
 - (void)setValueForHTTPHeaderField:(NSDictionary *)dict {
+#if __has_include(<WYNetworkManage.h>) || __has_include("WYNetworkManage.h")
     NSArray *allKeys = [dict allKeys];
     [allKeys enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [WYNetworkManage setValue:dict[allKeys[idx]] forHTTPHeaderField:allKeys[idx]];
     }];
+#else
+    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+#endif
 }
 
 /**
