@@ -73,6 +73,7 @@ HXDatePhotoEditViewControllerDelegate
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    self.navigationController.delegate = nil;
     if (self.needChangeViewFrame) {
         self.needChangeViewFrame = NO;
     }

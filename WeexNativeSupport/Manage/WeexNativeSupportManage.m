@@ -762,7 +762,15 @@ static AFHTTPSessionManager *netWorkManager;
 
 - (void)takePhoto
 {
-    [[self getCurrentVC] hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
+    UIViewController *topRootViewController = [[UIApplication  sharedApplication] keyWindow].rootViewController;
+    
+    // 在这里加一个这个样式的循环
+    while (topRootViewController.presentedViewController)
+    {
+        // 这里固定写法
+        topRootViewController = topRootViewController.presentedViewController;
+    }
+    [topRootViewController hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
             NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
@@ -808,7 +816,15 @@ static AFHTTPSessionManager *netWorkManager;
 }
 
 - (void)selectPhoto{
-    [[self getCurrentVC] hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
+    UIViewController *topRootViewController = [[UIApplication  sharedApplication] keyWindow].rootViewController;
+    
+    // 在这里加一个这个样式的循环
+    while (topRootViewController.presentedViewController)
+    {
+        // 这里固定写法
+        topRootViewController = topRootViewController.presentedViewController;
+    }
+    [topRootViewController hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
         if (photoList.count > 0) {
             [self.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
                 NSMutableArray *base64StringArr = [NSMutableArray array];
@@ -953,4 +969,3 @@ static AFHTTPSessionManager *netWorkManager;
 }
 
 @end
-
