@@ -197,8 +197,8 @@ WX_EXPORT_METHOD(@selector(savePhotos:callBack:))
 
 
 #pragma mark -- 检查更新
-- (void)checkVersion:(NSString *)appId callBack:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage checkVersionToUpdateWithUrl:nil appId:appId isShowLatestVersionTips:YES];
+- (void)checkVersion:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack{
+    [self.nativeManage checkVersionToUpdateWithUrl:params[@"url"] appId:params[@"appid"] isShowLatestVersionTips:YES];
 }
 
 #pragma mark -- 获取版本号
@@ -354,7 +354,7 @@ WX_EXPORT_METHOD(@selector(savePhotos:callBack:))
         
     }];
     
-
+    
 }
 
 #pragma mark -- setter\getter
