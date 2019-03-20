@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.4.28'
+s.version      = '1.4.29'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -21,6 +21,7 @@ s.dependency 'MJRefresh'
 s.dependency 'AMapSearch-NO-IDFA'
 s.dependency 'AMapLocation-NO-IDFA'
 s.dependency 'AMap2DMap-NO-IDFA'
+s.dependency 'WYNetworkManage'
 s.requires_arc = true
 
 end

@@ -503,10 +503,6 @@ HXDatePhotoEditViewControllerDelegate
         }];
     }else {
         HXDatePhotoViewCell *cell = (HXDatePhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-//        if (cell.model.type == HXPhotoModelMediaTypeVideo && !(cell.model.avAsset && [cell.model.avAsset isKindOfClass:[AVURLAsset class]])) {
-//            [self.view showImageHUDText:@"不支持的视频类型！"];
-//            return;
-//        }
         if (cell.model.isICloud) {
             if (self.manager.configuration.downloadICloudAsset) {
                 if (!cell.model.iCloudDownloading) {
@@ -696,10 +692,6 @@ HXDatePhotoEditViewControllerDelegate
         selectBtn.selected = NO;
     }else {
         NSString *str = [self.manager maximumOfJudgment:cell.model];
-        if (cell.model.type == HXPhotoModelMediaTypeVideo && !(cell.model.avAsset && [cell.model.avAsset isKindOfClass:[AVURLAsset class]])) {
-            [self.view showImageHUDText:@"不支持的视频类型！"];
-            return;
-        }
         if (str) {
             [self.view showImageHUDText:str];
             return;

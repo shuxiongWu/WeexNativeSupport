@@ -46,6 +46,15 @@
     [self weex_swizzle:[self class] Method:@selector(initWithRef:type:styles:attributes:events:weexInstance:) withMethod:@selector(new_initWithRef:type:styles:attributes:events:weexInstance:)];
     [self weex_swizzle:[self class] Method:@selector(viewDidLoad) withMethod:@selector(new_viewDidLoad)];
     [self weex_swizzle:[self class] Method:@selector(webView:shouldStartLoadWithRequest:navigationType:) withMethod:@selector(new_webView:shouldStartLoadWithRequest:navigationType:)];
+    
+    [self weex_swizzle:[self class] Method:@selector(notifyWebview:) withMethod:@selector(new_notifyWebview:)];
+}
+
+- (void)new_notifyWebview:(NSDictionary *)data {
+    NSString *json = [WXUtility JSONString:data];
+    NSString *code = [NSString stringWithFormat:@"(function(){var evt=null;var data=%@;if(typeof CustomEvent==='function'){evt=new CustomEvent('notify',{detail:data})}else{evt=document.createEvent('CustomEvent');evt.initCustomEvent('notify',true,true,data)}document.dispatchEvent(evt)}())", json];
+    /// 解决[_jsContext evaluateScript:code];导致的崩溃问题
+    [(UIWebView *)self.view stringByEvaluatingJavaScriptFromString:code];
 }
 
 -(instancetype)new_initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance {

@@ -309,11 +309,6 @@ HXDateVideoEditViewControllerDelegate
     }
     HXPhotoModel *model = self.modelArray[self.currentModelIndex];
     
-    if (model.type == HXPhotoModelMediaTypeVideo && !(model.avAsset && [model.avAsset isKindOfClass:[AVURLAsset class]])) {
-        [self.view showImageHUDText:@"不支持的视频类型！"];
-        return;
-    }
-    
     if (model.isICloud) {
         HXDatePhotoPreviewViewCell *cell = (HXDatePhotoPreviewViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentModelIndex inSection:0]];
         [cell cancelRequest];
@@ -624,9 +619,6 @@ HXDateVideoEditViewControllerDelegate
             }else if (model.asset.duration < 3.f) {
                 [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频少于3秒,无法选择"]];
                 return;
-            }else if (!(model.avAsset && [model.avAsset isKindOfClass:[AVURLAsset class]])) {
-                [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"不支持的视频类型！"]];
-                return;
             }
         }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {
             if (model.videoDuration > self.manager.configuration.videoMaxDuration) {
@@ -675,9 +667,6 @@ HXDateVideoEditViewControllerDelegate
                 return;
             }else if (model.asset.duration < 3.f) {
                 [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"视频少于3秒,无法选择"]];
-                return;
-            }else if (!(model.avAsset && [model.avAsset isKindOfClass:[AVURLAsset class]])) {
-                [self.view showImageHUDText: [NSBundle hx_localizedStringForKey:@"不支持的视频类型！"]];
                 return;
             }
         }else if (model.type == HXPhotoModelMediaTypeCameraVideo) {

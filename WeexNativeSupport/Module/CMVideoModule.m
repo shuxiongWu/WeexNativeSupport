@@ -79,6 +79,142 @@ static AFHTTPSessionManager *netWorkManager;
     [weexInstance.viewController presentViewController:cameraVC animated:YES completion:nil];
 }
 
+static int getPHAssetRandomKey() {
+    static int curRandomKey;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        curRandomKey = 1 + arc4random()%999;
+    });
+    return curRandomKey;
+}
+
+typedef void(^ResultPath)(AVURLAsset *avurlAsset,NSString *filePath, NSString *fileName);
+
+/// 将慢动作视频转换成普通视频
+- (PHImageRequestID)getVideoPathFromPHAsset:(PHAsset *)asset
+                                   Complete:(ResultPath)result
+                              progressblock:(void (^)(float progress))progressblock {
+    
+    NSArray *assetResources = [PHAssetResource assetResourcesForAsset:asset];
+    PHAssetResource *resource;
+    
+    for (PHAssetResource *assetRes in assetResources) {
+        if (@available(iOS 8.0, *)) {
+            if (assetRes.type == PHAssetResourceTypePairedVideo ||
+                assetRes.type == PHAssetResourceTypeVideo) {
+                resource = assetRes;
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+    }
+    NSString *fileName = @"tempAssetVideo.mov";
+    if (resource.originalFilename) {
+        fileName = resource.originalFilename;
+    }
+    
+    if (@available(iOS 8.0, *)) {
+        if (asset.mediaType == PHAssetMediaTypeVideo ||
+            asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+            PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+            options.version = PHImageRequestOptionsVersionCurrent;
+            options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+            
+            NSLog(@"getPHAssetRandomKey = %d",getPHAssetRandomKey());
+            NSString *PATH_MOVIE_FILE = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"sol-mo-%d-%@",getPHAssetRandomKey(),fileName]];
+            
+            if ([[NSFileManager defaultManager] fileExistsAtPath:PATH_MOVIE_FILE]) {
+                NSURL * url = [NSURL fileURLWithPath:PATH_MOVIE_FILE];
+                NSDictionary *options = @{AVURLAssetPreferPreciseDurationAndTimingKey : @YES};
+                AVURLAsset *avasset = [[AVURLAsset alloc] initWithURL:url options:options];
+                result(avasset,url.absoluteString,fileName);
+                return 0;
+            }
+            [[NSFileManager defaultManager] removeItemAtPath:PATH_MOVIE_FILE error:nil];
+            
+            PHImageManager *manager = [PHImageManager defaultManager];
+            PHImageRequestID reqid = [manager requestExportSessionForVideo:asset options:options exportPreset:AVAssetExportPreset960x540 resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
+                
+                NSString *savePath = PATH_MOVIE_FILE;
+                exportSession.outputURL = [NSURL fileURLWithPath:savePath];
+                exportSession.shouldOptimizeForNetworkUse = NO;
+                exportSession.outputFileType = AVFileTypeMPEG4;
+                [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                    switch ([exportSession status]) {
+                        case AVAssetExportSessionStatusCompleted:
+                        {
+                            NSURL * fileurl = [NSURL fileURLWithPath:PATH_MOVIE_FILE];
+                            NSDictionary *options = @{ AVURLAssetPreferPreciseDurationAndTimingKey : @YES };
+                            AVURLAsset *avasset = [[AVURLAsset alloc] initWithURL:fileurl options:options];
+                            
+                            result(avasset,fileurl.absoluteString,fileName);
+                            break;
+                        }
+                        case AVAssetExportSessionStatusFailed:
+                        case AVAssetExportSessionStatusCancelled:
+                        default:
+                        {
+                            [[NSFileManager defaultManager] removeItemAtPath:PATH_MOVIE_FILE error:nil];
+                            result(nil,nil, nil);
+                            break;
+                        }
+                    }
+                }];
+                
+            }];
+            return reqid;
+        } else {
+            result(nil,nil, nil);
+        }
+    } else {
+        // Fallback on earlier versions
+    }
+    return 0;
+}
+
+/**
+ 上传视频
+ 
+ @param videoURL 视频URL
+ @param fileURL 视频路径URL
+ @param uploadUrl 上传路径
+ @param callBack 回调
+ */
+- (void)uploadVideoWithVideoURL:(NSURL *)videoURL
+                        fileURL:(NSURL *)fileURL
+                      uploadUrl:(NSString *)uploadUrl
+                       callBack:(WXKeepAliveCallback)callBack {
+    
+    [SVProgressHUD showWithStatus:@"视频上传中…"];
+    
+    UIImage *preViewImage = [self getVideoPreViewImage:videoURL];
+    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(preViewImage, 0.5)];
+    [self zipVideoWithInputURL:fileURL completeBlock:^(NSURL * url) {
+        
+        NSData *data = [NSData dataWithContentsOfURL:url?:videoURL];
+        if (!data) {
+            [SVProgressHUD showErrorWithStatus:@"发生了预期之外的错误~"];
+            if (callBack) {
+                callBack(@{},YES);
+            }
+            return;
+        }
+        [self uploadVideoTodataBaseWithUrl:uploadUrl parameters:@{
+                                                                  @"img":base64String
+                                                                  } videoData:data success:^(NSURLSessionDataTask *task, NSDictionary *respone) {
+                                                                      if (callBack) {
+                                                                          callBack(respone ,YES);
+                                                                      }
+                                                                  } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                                                                      if (callBack) {
+                                                                          callBack(@{},YES);
+                                                                      }
+                                                                  }];
+        
+        
+    }];
+}
+
 - (void)selectVideoFromPhotoAlbumAndUploadWithParams:(NSDictionary *)params callBack:(WXKeepAliveCallback)callBack {
     self.manager.configuration.videoMaxDuration = [params[@"seconds"] integerValue];
     [self.manager clearSelectedList];
@@ -88,41 +224,51 @@ static AFHTTPSessionManager *netWorkManager;
         HXPhotoModel *model = [videoList firstObject];
         switch (model.type) {
             case HXPhotoModelMediaTypeVideo:{
-                videoUrl = [model.avAsset valueForKey:@"URL"];
-                UIImage *preViewImage = [self getVideoPreViewImage:videoUrl];
-                NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(preViewImage, 0.5)];
-                [self zipVideoWithInputURL:model.fileURL completeBlock:^(NSURL * url) {
-                    NSData *data = [NSData dataWithContentsOfURL:url?:videoUrl];
-                    if (!data) {
-                        [SVProgressHUD showErrorWithStatus:@"发生了预期之外的错误~"];
-                        if (callBack) {
+                
+                if ([model.avAsset isKindOfClass:[AVComposition class]]) {
+                    /// 慢动作视频转换
+                    [SVProgressHUD showWithStatus:@"视频转换中…"];
+                    [self getVideoPathFromPHAsset:model.asset Complete:^(AVURLAsset *avurlAsset, NSString *filePath, NSString *fileName) {
+                        
+                        if (avurlAsset) {
+                            [self uploadVideoWithVideoURL:avurlAsset.URL
+                                                  fileURL:model.fileURL
+                                                uploadUrl:params[@"url"]
+                                                 callBack:callBack];
+                        } else {
+                            [SVProgressHUD showErrorWithStatus:@"视频转换失败！"];
                             callBack(@{},YES);
                         }
-                        return;
-                    }
-                    [self uploadVideoTodataBaseWithUrl:params[@"url"] parameters:@{
-                                                                                   @"img":base64String
-                                                                                   } videoData:data success:^(NSURLSessionDataTask *task, NSDictionary *respone) {
-                        if (callBack) {
-                            callBack(respone ,YES);
-                        }
-                    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-                        if (callBack) {
-                            callBack(@{},YES);
-                        }
+                    } progressblock:^(float progress) {
+                        /// 这里返回进度
+                        
                     }];
-
-
-                }];
+                    return;
+                }
+                if (![model.avAsset isKindOfClass:[AVAsset class]]) {
+                    /// 防止崩溃。
+                    [SVProgressHUD showErrorWithStatus:@"暂不支持此视频格式"];
+                    if (callBack) {
+                        callBack(@{},YES);
+                    }
+                    return;
+                }
+                
+                videoUrl = [model.avAsset valueForKey:@"URL"];
+                
+                [self uploadVideoWithVideoURL:videoUrl
+                                      fileURL:model.fileURL
+                                    uploadUrl:params[@"url"]
+                                     callBack:callBack];
             }
                 break;
             case HXPhotoModelMediaTypeCameraVideo:{
-                NSData *data = [NSData dataWithContentsOfURL:model.videoURL];
-                NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:data];
-                
-                if (callBack) {
-                    callBack(@[base64String],YES);
-                }
+                //                NSData *data = [NSData dataWithContentsOfURL:model.videoURL];
+                //                NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:data];
+                //
+                //                if (callBack) {
+                //                    callBack(@[base64String],YES);
+                //                }
             }
                 break;
             default:
@@ -132,7 +278,7 @@ static AFHTTPSessionManager *netWorkManager;
                 NSLog(@"我是默认类型");
                 break;
         }
-
+        
     } cancel:^(HXAlbumListViewController *viewController) {
         
     }];
