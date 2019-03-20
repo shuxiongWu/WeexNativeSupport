@@ -95,27 +95,23 @@ typedef void(^ResultPath)(AVURLAsset *avurlAsset,NSString *filePath, NSString *f
                                    Complete:(ResultPath)result
                               progressblock:(void (^)(float progress))progressblock {
     
-    NSArray *assetResources = [PHAssetResource assetResourcesForAsset:asset];
-    PHAssetResource *resource;
-    
-    for (PHAssetResource *assetRes in assetResources) {
-        if (@available(iOS 8.0, *)) {
+    NSString *fileName = @"tempAssetVideo.mov";
+    if (@available(iOS 9.1, *)) {
+        NSArray *assetResources = [PHAssetResource assetResourcesForAsset:asset];
+        PHAssetResource *resource;
+        for (PHAssetResource *assetRes in assetResources) {
             if (assetRes.type == PHAssetResourceTypePairedVideo ||
                 assetRes.type == PHAssetResourceTypeVideo) {
                 resource = assetRes;
             }
-        } else {
-            // Fallback on earlier versions
         }
-    }
-    NSString *fileName = @"tempAssetVideo.mov";
-    if (resource.originalFilename) {
-        fileName = resource.originalFilename;
+        if (resource.originalFilename) {
+            fileName = resource.originalFilename;
+        }
     }
     
     if (@available(iOS 8.0, *)) {
-        if (asset.mediaType == PHAssetMediaTypeVideo ||
-            asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+        if (asset.mediaType == PHAssetMediaTypeVideo) {
             PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
             options.version = PHImageRequestOptionsVersionCurrent;
             options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
