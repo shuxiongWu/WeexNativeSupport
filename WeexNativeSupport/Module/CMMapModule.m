@@ -12,7 +12,7 @@
 #import <AMapFoundationKit/AMapFoundationKit.h>
 @interface CMMapModule ()
 @property (nonatomic, copy) WXModuleKeepAliveCallback locationCallBack;
-@property (nonatomic, strong) WeexLocationViewController *mapCtl;
+
 @end
 
 @implementation CMMapModule
@@ -29,22 +29,16 @@ WX_EXPORT_METHOD(@selector(pushToCtrlGetLocationWithKey:callBack:))
     [AMapServices sharedServices].apiKey = apiKey;//@"b1c9a5ba1334a6827a6d06908764645b";
     [AMapServices sharedServices].enableHTTPS = YES;
     self.locationCallBack = callBack;
-    [weexInstance.viewController.navigationController pushViewController:self.mapCtl animated:YES];
-}
-
-- (WeexLocationViewController *)mapCtl
-{
-    NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
     
+    NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
     NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
-    if (!_mapCtl) {
-        _mapCtl = [[WeexLocationViewController alloc] initWithNibName:@"WeexLocationViewController" bundle:resourceBundle];
-        __weak typeof(self)weakSelf = self;
-        _mapCtl.locationAddressBlk = ^(double longitude, double latitude, NSString *address, NSString *detailAddress) {
-            weakSelf.locationCallBack ? weakSelf.locationCallBack(@{@"longitude": @(longitude), @"latitude": @(latitude), @"address": address, @"detailAddress": detailAddress}, YES) : nil;
-        };
-    }
-    return _mapCtl;
+    WeexLocationViewController *mapVC = [[WeexLocationViewController alloc] initWithNibName:@"WeexLocationViewController" bundle:resourceBundle];
+    __weak typeof(self)weakSelf = self;
+    mapVC.locationAddressBlk = ^(double longitude, double latitude, NSString *address, NSString *detailAddress) {
+        weakSelf.locationCallBack ? weakSelf.locationCallBack(@{@"longitude": @(longitude), @"latitude": @(latitude), @"address": address, @"detailAddress": detailAddress}, YES) : nil;
+    };
+    
+    [weexInstance.viewController.navigationController pushViewController:mapVC animated:YES];
 }
 
 @end

@@ -41,7 +41,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initDataSrouce];
-   
+    
     [self initSetting];
     //开始持续定位
     [self findMe];
@@ -77,6 +77,14 @@
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [UIApplication sharedApplication].statusBarStyle = self.barStyle;
+    _mapView.delegate = nil;
+    _locationManager.delegate = nil;
+    _search.delegate = nil;
+    _searchBar.delegate = nil;
+}
+
+- (void)dealloc {
+    //    NSLog(@"WeexLocationViewController dealloc");
 }
 
 /**
@@ -85,14 +93,20 @@
  * @param wasUserAction 标识是否是用户动作
  */
 - (void)mapView:(MAMapView *)mapView mapWillMoveByUser:(BOOL)wasUserAction{
+    [self.view endEditing:YES];
     if (wasUserAction) {
         _dataSrouce[0] = @[];
     }
 }
+/// 单击地图
+- (void)mapView:(MAMapView *)mapView didSingleTappedAtCoordinate:(CLLocationCoordinate2D)coordinate {
+    
+    [self.view endEditing:YES];
+}
 
 #pragma mark --- 地图区域改变完成后会调用此接口
 - (void)mapView:(MAMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-
+    
     AMapPOIAroundSearchRequest *request = [[AMapPOIAroundSearchRequest alloc] init];
     request.location = [AMapGeoPoint locationWithLatitude:mapView.region.center.latitude longitude:mapView.region.center.longitude];
     request.keywords = @"";
@@ -199,11 +213,12 @@
     [self findMe];
 }
 
-- (void)searchAddress{
+- (void)searchAddress {
+    [self.view endEditing:YES];
     if (_searchBar.text.length == 0) {
-        [SVProgressHUD showInfoWithStatus:@"请输入搜索关键字"];
-    }else{
-        [self.view endEditing:YES];
+        //        [SVProgressHUD showInfoWithStatus:@"请输入搜索关键字"];
+    } else {
+        
         AMapInputTipsSearchRequest *tips = [[AMapInputTipsSearchRequest alloc] init];
         tips.keywords = _searchBar.text;
         //tips.city     = @"北京";
@@ -248,9 +263,9 @@
     [self searchAddress];
 }
 - (void)initDataSrouce{
-
+    
     _dataSrouce = [NSMutableArray array];
-
+    
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
@@ -310,7 +325,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
     }
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-
+    
     cell.textLabel.text = model.title;
     cell.detailTextLabel.text = model.subTitle;
     cell.detailTextLabel.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1];
@@ -344,7 +359,7 @@
     _mapView.centerCoordinate = _coordinate;
     self.search = [[AMapSearchAPI alloc] init];
     self.search.delegate = self;
-
+    
     if (reGeocode)
     {
         model.title = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
@@ -395,12 +410,12 @@
             model.subTitle = poi.address;
             [addressArr addObject:model];
         }
-//        if (_dataSrouce.count == 2) {
-//            _dataSrouce[1] = addressArr;
-//        }else{
-//            [_dataSrouce addObject:@[]];
-//            [_dataSrouce addObject:addressArr];
-//        }
+        //        if (_dataSrouce.count == 2) {
+        //            _dataSrouce[1] = addressArr;
+        //        }else{
+        //            [_dataSrouce addObject:@[]];
+        //            [_dataSrouce addObject:addressArr];
+        //        }
         _dataSrouce[1] = addressArr;
         [self.tableView reloadData];
     }
