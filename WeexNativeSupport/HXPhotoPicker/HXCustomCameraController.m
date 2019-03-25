@@ -433,6 +433,9 @@ static const NSString *HXCustomCameraAdjustingExposureContext;
     
     AVCaptureVideoOrientation orientation;
     switch (self.imageOrientation) {
+        case UIDeviceOrientationUnknown:
+            orientation = AVCaptureVideoOrientationPortrait;
+            break;
         case UIDeviceOrientationPortrait:
             orientation = AVCaptureVideoOrientationPortrait;
             break;
