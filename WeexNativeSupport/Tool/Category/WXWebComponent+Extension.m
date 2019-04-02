@@ -48,6 +48,7 @@
     [self weex_swizzle:[self class] Method:@selector(webView:shouldStartLoadWithRequest:navigationType:) withMethod:@selector(new_webView:shouldStartLoadWithRequest:navigationType:)];
     
     [self weex_swizzle:[self class] Method:@selector(notifyWebview:) withMethod:@selector(new_notifyWebview:)];
+    [self weex_swizzle:[self class] Method:@selector(webViewDidFinishLoad:) withMethod:@selector(new_webViewDidFinishLoad:)];
 }
 
 - (void)new_notifyWebview:(NSDictionary *)data {
@@ -82,5 +83,38 @@
     return YES;
 }
 
+- (void)new_webViewDidFinishLoad:(UIWebView *)webView {
+    [self updateJSContextNotify];
+    BOOL finishLoadEvent = [[self valueForKey:@"finishLoadEvent"] boolValue];
+    if (finishLoadEvent) {
+        
+        NSDictionary *data = [self baseInfo];
+        [self fireEvent:@"pagefinish" params:data domChanges:@{@"attrs": @{@"src":webView.request.URL.absoluteString}}];
+    }
+}
+
+- (NSMutableDictionary<NSString *, id> *)baseInfo {
+    UIWebView *webView = (UIWebView *)self.view;
+    NSMutableDictionary<NSString *, id> *info = [NSMutableDictionary new];
+    [info setObject:webView.request.URL.absoluteString ?: @"" forKey:@"url"];
+    [info setObject:[webView stringByEvaluatingJavaScriptFromString:@"document.title"] ?: @"" forKey:@"title"];
+    [info setObject:@(webView.canGoBack) forKey:@"canGoBack"];
+    [info setObject:@(webView.canGoForward) forKey:@"canGoForward"];
+    return info;
+}
+
+- (void)updateJSContextNotify {
+    UIWebView *_webview = (UIWebView *)self.view;
+    
+    JSContext *_jsContext = [_webview valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    __weak typeof(self) weakSelf = self;
+    
+    // This method will be abandoned slowly.
+    _jsContext[@"$notifyWeex"] = ^(JSValue *data) {
+        if (weakSelf.notifyEvent) {
+            [weakSelf fireEvent:@"notify" params:[data toDictionary]];
+        }
+    };
+}
 
 @end
