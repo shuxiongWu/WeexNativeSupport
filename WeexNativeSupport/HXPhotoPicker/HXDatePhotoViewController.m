@@ -1278,6 +1278,8 @@ HXDatePhotoEditViewControllerDelegate
             }
         } completion:^(HXPhotoModel *model, AVAsset *asset) {
             if (weakSelf.model == model) {
+                /// 把model添加到model里面，后续才能拿到URL
+                weakSelf.model.avAsset = asset;
                 weakSelf.downloadView.progress = 1;
                 if ([weakSelf.delegate respondsToSelector:@selector(datePhotoViewCellRequestICloudAssetComplete:)]) {
                     [weakSelf.delegate datePhotoViewCellRequestICloudAssetComplete:weakSelf];

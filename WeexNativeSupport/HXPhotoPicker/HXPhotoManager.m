@@ -83,7 +83,7 @@
     self.iCloudUploadArray = [NSMutableArray array];
 //    [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
     /// 过滤掉iCloud内容
-    self.configuration.filtrationICloudAsset = YES;
+//    self.configuration.filtrationICloudAsset = YES;
 }
 - (HXPhotoConfiguration *)configuration {
     if (!_configuration) {
