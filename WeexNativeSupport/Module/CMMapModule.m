@@ -34,8 +34,16 @@ WX_EXPORT_METHOD(@selector(pushToCtrlGetLocationWithKey:callBack:))
     NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
     WeexLocationViewController *mapVC = [[WeexLocationViewController alloc] initWithNibName:@"WeexLocationViewController" bundle:resourceBundle];
     __weak typeof(self)weakSelf = self;
-    mapVC.locationAddressBlk = ^(double longitude, double latitude, NSString *address, NSString *detailAddress) {
-        weakSelf.locationCallBack ? weakSelf.locationCallBack(@{@"longitude": @(longitude), @"latitude": @(latitude), @"address": address, @"detailAddress": detailAddress}, YES) : nil;
+    mapVC.locationAddressBlk = ^(double longitude, double latitude ,NSString *province ,NSString *city ,NSString *area ,NSString *address, NSString *detailAddress) {
+        weakSelf.locationCallBack ? weakSelf.locationCallBack(@{
+                                                                    @"longitude": @(longitude),
+                                                                    @"latitude": @(latitude),
+                                                                    @"province":province,
+                                                                    @"city":city,
+                                                                    @"area":area,
+                                                                    @"address": address,
+                                                                    @"detailAddress": detailAddress
+                                                                }, YES) : nil;
     };
     
     [weexInstance.viewController.navigationController pushViewController:mapVC animated:YES];

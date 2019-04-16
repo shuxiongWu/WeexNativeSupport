@@ -307,7 +307,7 @@
     NSArray *arr = _dataSrouce[indexPath.section];
     WeexAddressModel *model = arr[indexPath.row];
     if (_locationAddressBlk) {
-        _locationAddressBlk(model.longitude,model.latitude,model.title,model.subTitle);
+        _locationAddressBlk(model.longitude,model.latitude,model.province,model.city,model.area,model.title,model.subTitle);
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
@@ -355,6 +355,11 @@
     NSLog(@"location:{lat:%f; lon:%f; accuracy:%f}", location.coordinate.latitude, location.coordinate.longitude, location.horizontalAccuracy);
     model.longitude = location.coordinate.longitude;
     model.latitude = location.coordinate.latitude;
+    
+    model.province = reGeocode.province ?:@"";
+    model.city = reGeocode.city ?:@"";
+    model.area = reGeocode.district ?:@"";
+    
     _coordinate = location.coordinate;
     _mapView.centerCoordinate = _coordinate;
     self.search = [[AMapSearchAPI alloc] init];

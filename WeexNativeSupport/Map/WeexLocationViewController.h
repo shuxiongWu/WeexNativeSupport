@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-typedef void(^LocationAddressBlock)(double longitude, double latitude ,NSString *address, NSString *detailAddress);
+typedef void(^LocationAddressBlock)(double longitude, double latitude ,NSString *province ,NSString *city ,NSString *area ,NSString *address, NSString *detailAddress);
 @interface WeexLocationViewController : UIViewController
 
 
