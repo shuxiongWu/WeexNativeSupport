@@ -302,12 +302,47 @@
     return 50;
 }
 
+- (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response {
+    
+    if (response.regeocode != nil) {
+        if (_locationAddressBlk) {
+            //            model.title = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
+            //            model.subTitle = reGeocode.formattedAddress;
+            _locationAddressBlk(
+                                request.location.longitude,
+                                request.location.latitude,
+                                response.regeocode.addressComponent.province,
+                                response.regeocode.addressComponent.city,
+                                response.regeocode.addressComponent.district,
+                                response.regeocode.formattedAddress,
+                                response.regeocode.formattedAddress
+                                );
+        }
+        
+    } else {
+        
+    }
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSArray *arr = _dataSrouce[indexPath.section];
     WeexAddressModel *model = arr[indexPath.row];
+    if (!model.province) {
+        AMapReGeocodeSearchRequest *req = [[AMapReGeocodeSearchRequest alloc] init];
+        req.location = [AMapGeoPoint locationWithLatitude:model.latitude longitude:model.longitude];
+        return;
+    }
     if (_locationAddressBlk) {
-        _locationAddressBlk(model.longitude,model.latitude,model.province,model.city,model.area,model.title,model.subTitle);
+        _locationAddressBlk(
+                            model.longitude,
+                            model.latitude,
+                            model.province,
+                            model.city,
+                            model.area,
+                            model.title,
+                            model.subTitle
+                            );
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
@@ -411,6 +446,11 @@
             WeexAddressModel *model = [[WeexAddressModel alloc] init];
             model.longitude = poi.location.longitude;
             model.latitude = poi.location.latitude;
+            
+            model.province = poi.province ?:@"";
+            model.city = poi.city ?:@"";
+            model.area = poi.district ?:@"";
+            
             model.title = poi.name;
             model.subTitle = poi.address;
             [addressArr addObject:model];
