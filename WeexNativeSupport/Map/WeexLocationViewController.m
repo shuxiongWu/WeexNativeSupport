@@ -326,6 +326,7 @@
     if (indexPath.section == 0) {
         WeexCurrentLocationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"WeexCurrentLocationTableViewCell"];
         cell.titleLabel.text = model.title;
+        cell.icon.hidden = YES;
         return cell;
     }
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
