@@ -440,6 +440,7 @@
             _dataSrouce[1] = addressArr;
         } else {
             [_dataSrouce removeAllObjects];
+            [_dataSrouce addObject:@[]];
             [_dataSrouce addObject:addressArr];
         }
         [self.tableView reloadData];
