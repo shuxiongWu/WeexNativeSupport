@@ -84,7 +84,7 @@
 }
 
 - (void)dealloc {
-    //    NSLog(@"WeexLocationViewController dealloc");
+//    NSLog(@"WeexLocationViewController dealloc==================================");
 }
 
 /**
@@ -431,10 +431,17 @@
 //        if (_dataSrouce.count == 2) {
 //            _dataSrouce[1] = addressArr;
 //        }else{
-//            [_dataSrouce addObject:@[]];
+//            [_dataSrouce removeAllObjects];
 //            [_dataSrouce addObject:addressArr];
 //        }
-        _dataSrouce[1] = addressArr;
+        if (_dataSrouce.count == 1) {
+            [_dataSrouce addObject:addressArr];
+        } else if (_dataSrouce.count == 2) {
+            _dataSrouce[1] = addressArr;
+        } else {
+            [_dataSrouce removeAllObjects];
+            [_dataSrouce addObject:addressArr];
+        }
         [self.tableView reloadData];
     }
     //停止动画
