@@ -110,7 +110,7 @@
     AMapPOIAroundSearchRequest *request = [[AMapPOIAroundSearchRequest alloc] init];
     request.location = [AMapGeoPoint locationWithLatitude:mapView.region.center.latitude longitude:mapView.region.center.longitude];
     request.keywords = @"";
-    NSLog(@"%@",request.location);
+//    NSLog(@"%@",request.location);
     /* 按照距离排序. */
     request.sortrule = 0;
     request.requireExtension = YES;
@@ -234,26 +234,27 @@
     _dataSrouce[0] = @[];
     if (response.count > 0) {
         AMapTip *firstPoi = [response.tips firstObject];
+        /// 位置更新会再调搜索此点附近的地点
         self.mapView.centerCoordinate = CLLocationCoordinate2DMake(firstPoi.location.latitude, firstPoi.location.longitude);
-        NSMutableArray *addressArr = [NSMutableArray array];
-        for (AMapTip *poi in response.tips) {
-            WeexAddressModel *model = [[WeexAddressModel alloc] init];
-            model.longitude = poi.location.longitude;
-            model.latitude = poi.location.latitude;
-            
-            model.title = poi.name;
-            model.subTitle = poi.address;
-            if (model.longitude > 0 || model.latitude > 0) {
-                [addressArr addObject:model];
-            }
-        }
-        if (_dataSrouce.count == 2) {
-            _dataSrouce[1] = addressArr;
-        }else{
-            [_dataSrouce addObject:addressArr];
-        }
-        
-        [self.tableView reloadData];
+//        NSMutableArray *addressArr = [NSMutableArray array];
+//        for (AMapTip *poi in response.tips) {
+//            WeexAddressModel *model = [[WeexAddressModel alloc] init];
+//            model.longitude = poi.location.longitude;
+//            model.latitude = poi.location.latitude;
+//
+//            model.title = poi.name;
+//            model.subTitle = poi.address;
+//            if (model.longitude > 0 || model.latitude > 0) {
+//                [addressArr addObject:model];
+//            }
+//        }
+//        if (_dataSrouce.count == 2) {
+//            _dataSrouce[1] = addressArr;
+//        }else{
+//            [_dataSrouce addObject:addressArr];
+//        }
+//
+//        [self.tableView reloadData];
     }
 }
 
@@ -302,46 +303,18 @@
     return 50;
 }
 
-- (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response {
-    
-    if (response.regeocode != nil) {
-        if (_locationAddressBlk) {
-            //            model.title = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
-            //            model.subTitle = reGeocode.formattedAddress;
-            _locationAddressBlk(
-                                request.location.longitude,
-                                request.location.latitude,
-                                response.regeocode.addressComponent.province,
-                                response.regeocode.addressComponent.city,
-                                response.regeocode.addressComponent.district,
-                                response.regeocode.formattedAddress,
-                                response.regeocode.formattedAddress
-                                );
-        }
-        
-    } else {
-        
-    }
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSArray *arr = _dataSrouce[indexPath.section];
     WeexAddressModel *model = arr[indexPath.row];
-    if (!model.province) {
-        AMapReGeocodeSearchRequest *req = [[AMapReGeocodeSearchRequest alloc] init];
-        req.location = [AMapGeoPoint locationWithLatitude:model.latitude longitude:model.longitude];
-        return;
-    }
     if (_locationAddressBlk) {
         _locationAddressBlk(
-                            model.longitude,
-                            model.latitude,
-                            model.province,
-                            model.city,
-                            model.area,
-                            model.title,
-                            model.subTitle
+                                model.longitude,
+                                model.latitude,
+                                model.province,
+                                model.city,
+                                model.area,
+                                model.title,
+                                model.subTitle
                             );
         [self.navigationController popViewControllerAnimated:YES];
     }
@@ -455,12 +428,12 @@
             model.subTitle = poi.address;
             [addressArr addObject:model];
         }
-        //        if (_dataSrouce.count == 2) {
-        //            _dataSrouce[1] = addressArr;
-        //        }else{
-        //            [_dataSrouce addObject:@[]];
-        //            [_dataSrouce addObject:addressArr];
-        //        }
+//        if (_dataSrouce.count == 2) {
+//            _dataSrouce[1] = addressArr;
+//        }else{
+//            [_dataSrouce addObject:@[]];
+//            [_dataSrouce addObject:addressArr];
+//        }
         _dataSrouce[1] = addressArr;
         [self.tableView reloadData];
     }
