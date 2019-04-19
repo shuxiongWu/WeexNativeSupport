@@ -25,7 +25,8 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <Photos/Photos.h>
 #import <SVProgressHUD.h>
-
+#import <UserNotifications/UserNotifications.h>
+#import <StoreKit/StoreKit.h>
 
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
@@ -107,8 +108,82 @@ WX_EXPORT_METHOD(@selector(setStatusBarColor:))
 //保存图片到相册
 WX_EXPORT_METHOD(@selector(savePhotos:callBack:))
 
+//查询通知权限
+WX_EXPORT_METHOD(@selector(getNotificationSettings:))
+
+//打开APP设置页面
+WX_EXPORT_METHOD(@selector(openSettings))
+
+//撰写评论
+WX_EXPORT_METHOD(@selector(writeReviews:))
+
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
+}
+
+
+#pragma mark -- 撰写评论
+- (void)writeReviews:(NSString *)appId {
+    
+    if (@available(iOS 10.3, *)) {
+        [SKStoreReviewController requestReview];
+    } else {
+        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+        NSString *app_Name = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"喜欢“%@”吗？",app_Name] message:@"" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"去评分" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"itms-apps://itunes.apple.com/app/id%@?action=write-review",appId]]];
+        }];
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"下次" style:UIAlertActionStyleCancel handler:nil];
+        [alert addAction:cancel];
+        [alert addAction:confirm];
+        [weexInstance.viewController presentViewController:alert animated:YES completion:nil];
+    }
+    
+}
+
+#pragma mark -- 打开APP设置页面
+- (void)openSettings {
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL: url]) {
+        if (@available(iOS 10.0, *)) {
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        } else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    }
+}
+
+#pragma mark -- 查询通知权限
+- (void)getNotificationSettings:(WXModuleCallback)callBack {
+    if (@available(iOS 10.0, *)) {
+        
+        [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+            
+            if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                if (callBack) {
+                    callBack(@(YES));
+                }
+            } else {
+                if (callBack) {
+                    callBack(@(NO));
+                }
+            }
+        }];
+    } else {
+        UIUserNotificationSettings *setting = [[UIApplication sharedApplication] currentUserNotificationSettings];
+        if (setting.types == UIUserNotificationTypeNone) {
+            if (callBack) {
+                callBack(@(NO));
+            }
+        } else {
+            if (callBack) {
+                callBack(@(YES));
+            }
+        }
+    }
+    
 }
 
 #pragma mark -- 从相册选取照片
