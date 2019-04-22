@@ -306,26 +306,26 @@
 #pragma mark -
 #pragma mark - UIResponder support motion
 
--(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
-{
-}
-
--(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event
-{
-}
-
--(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
-{
-    static BOOL shakeMarker = YES;
-    if (motion == UIEventSubtypeMotionShake) {
-        if (shakeMarker) {
-            [self addNaviationBar];
-            shakeMarker = NO;
-        }else {
-            [self removeNaviationBar];
-            shakeMarker = YES;
-        }
-    }
-}
+//-(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
+//{
+//}
+//
+//-(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event
+//{
+//}
+//
+//-(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+//{
+//    static BOOL shakeMarker = YES;
+//    if (motion == UIEventSubtypeMotionShake) {
+//        if (shakeMarker) {
+//            [self addNaviationBar];
+//            shakeMarker = NO;
+//        }else {
+//            [self removeNaviationBar];
+//            shakeMarker = YES;
+//        }
+//    }
+//}
 
 @end
