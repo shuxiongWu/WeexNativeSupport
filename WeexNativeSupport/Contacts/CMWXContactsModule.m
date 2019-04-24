@@ -16,7 +16,7 @@
 WX_EXPORT_METHOD(@selector(getContacts:))
 
 + (void)load {
-    [WXSDKEngine registerModule:@"event" withClass:[CMWXContactsModule class]];
+    [WXSDKEngine registerModule:@"contacts" withClass:[CMWXContactsModule class]];
 }
 
 - (void)getContacts:(WXModuleKeepAliveCallback)callBack {
