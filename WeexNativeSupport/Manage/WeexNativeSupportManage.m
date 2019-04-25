@@ -745,7 +745,7 @@ static AFHTTPSessionManager *netWorkManager;
     self.imageCallBack = callBack;
     self.manager.configuration.singleJumpEdit = YES;
     self.manager.configuration.singleSelected = YES;
-    [self takePhoto];
+    [self checkAuthorizationStatus];
 }
 //新api
 - (void)photographWithParameter:(NSDictionary *)parame callBack:(WXModuleKeepAliveCallback)callBack{
@@ -757,11 +757,10 @@ static AFHTTPSessionManager *netWorkManager;
         self.manager.configuration.movableCropBoxEditSize = [parame[@"movableCropBoxEditSize"] boolValue];;  //可移动的裁剪框是否可以编辑大小
         self.manager.configuration.movableCropBoxCustomRatio = CGPointMake([parame[@"movableCropBoxCustomRatio"] floatValue], 1);
     }
-    [self takePhoto];
+    [self checkAuthorizationStatus];
 }
 
-- (void)takePhoto
-{
+- (void)takePhoto {
     UIViewController *topRootViewController = [[UIApplication  sharedApplication] keyWindow].rootViewController;
     
     // 在这里加一个这个样式的循环
@@ -769,33 +768,6 @@ static AFHTTPSessionManager *netWorkManager;
     {
         // 这里固定写法
         topRootViewController = topRootViewController.presentedViewController;
-    }
-    
-    AVAuthorizationStatus authorizationStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    
-    if (authorizationStatus == AVAuthorizationStatusDenied || authorizationStatus == AVAuthorizationStatusRestricted) {
-        //无权限
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请在设置-隐私-相机中允许访问相机" preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
-        UIAlertAction *settings = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
-                
-                if (@available(iOS 10.0, *)) {
-                    
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
-                } else {
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-                }
-            }
-            
-        }];
-        
-        [alert addAction:cancel];
-        [alert addAction:settings];
-        
-        [topRootViewController presentViewController:alert animated:YES completion:nil];
-        return;
     }
     
     [topRootViewController hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
@@ -810,6 +782,79 @@ static AFHTTPSessionManager *netWorkManager;
         
     }];
 }
+
+- (UIViewController *)topRootViewController {
+    UIViewController *viewController = [[UIApplication  sharedApplication] keyWindow].rootViewController;
+    
+    // 在这里加一个这个样式的循环
+    while (viewController.presentedViewController)
+    {
+        // 这里固定写法
+        viewController = viewController.presentedViewController;
+    }
+    return viewController;
+}
+
+#pragma mark - 检测摄像头权限
+-(void)checkAuthorizationStatus {
+    
+    AVAuthorizationStatus authorizationStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    switch (authorizationStatus) {
+        case AVAuthorizationStatusNotDetermined:[self showAuthorizationNotDetermined]; break;// 用户尚未决定授权与否，那就请求授权
+        case AVAuthorizationStatusAuthorized:[self showAuthorizationAuthorized]; break;// 用户已授权，那就立即使用
+        case AVAuthorizationStatusDenied:[self showAuthorizationDenied]; break;// 用户明确地拒绝授权，那就展示提示
+        case AVAuthorizationStatusRestricted:[self showAuthorizationRestricted]; break;// 无法访问相机设备，那就展示提示
+    }
+}
+
+#pragma mark - 相机使用权限处理
+#pragma mark 用户还未决定是否授权使用相机
+-(void)showAuthorizationNotDetermined {
+    __weak typeof(self) weakSelf = self;
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        if (granted) {
+            [weakSelf takePhoto];
+        } else {
+            [weakSelf showAuthorizationDenied];
+        }
+    }];
+}
+#pragma mark 被授权使用相机
+- (void)showAuthorizationAuthorized {
+    [self takePhoto];
+}
+#pragma mark 未被授权使用相机
+-(void)showAuthorizationDenied {
+    //无权限
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请在设置-隐私-相机中允许访问相机" preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *settings = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
+            
+            if (@available(iOS 10.0, *)) {
+                
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+            } else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            }
+        }
+        
+    }];
+    
+    [alert addAction:cancel];
+    [alert addAction:settings];
+    
+    [[self topRootViewController] presentViewController:alert animated:YES completion:nil];
+}
+#pragma mark 使用相机设备受限
+-(void)showAuthorizationRestricted {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请检查您的手机硬件或设置" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:cancel];
+    [[self topRootViewController] presentViewController:alert animated:YES completion:nil];
+}
+
 
 #pragma mark -- 相册选取照片
 - (void)selectPhotoFromPhotoAlbumOfNum:(NSInteger)num callBack:(WXModuleKeepAliveCallback)callBack
