@@ -60,8 +60,13 @@
     [self render];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pushNoticeData:) name:@"CMPushNoticeData" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(webSocketNoticeData:) name:@"CMWebSocketNoticeData" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userClickPushNoticeData:) name:@"CMSLUserClickNotificationData" object:nil];
+    
 }
 
+- (void)userClickPushNoticeData:(NSNotification *)noti {
+    [_instance fireGlobalEvent:@"CMUserClickNotificationData1" params:noti.object];
+}
 - (void)pushNoticeData:(NSNotification *)noti {
     [_instance fireGlobalEvent:@"CMPushNoticeData1" params:noti.object];
 }
