@@ -770,6 +770,34 @@ static AFHTTPSessionManager *netWorkManager;
         // 这里固定写法
         topRootViewController = topRootViewController.presentedViewController;
     }
+    
+    AVAuthorizationStatus authorizationStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    if (authorizationStatus == AVAuthorizationStatusDenied || authorizationStatus == AVAuthorizationStatusRestricted) {
+        //无权限
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请在设置-隐私-相机中允许访问相机" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *settings = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
+                
+                if (@available(iOS 10.0, *)) {
+                    
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+                } else {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+            }
+            
+        }];
+        
+        [alert addAction:cancel];
+        [alert addAction:settings];
+        
+        [topRootViewController presentViewController:alert animated:YES completion:nil];
+        return;
+    }
+    
     [topRootViewController hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
