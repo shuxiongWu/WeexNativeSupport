@@ -87,7 +87,27 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
+    switch ([PHPhotoLibrary authorizationStatus]) {
+        case PHAuthorizationStatusNotDetermined: [self showPhotoLibraryAuthNotDetermined]; break;
+        case PHAuthorizationStatusAuthorized: break;
+        case PHAuthorizationStatusRestricted: [self showAuthorizationRestricted]; return;
+        case PHAuthorizationStatusDenied: [self showPhotoLibraryAuthDenied]; return;
+            
+        default:
+            break;
+    }
+    
+    /// 相机权限
+    AVAuthorizationStatus authorizationStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    switch (authorizationStatus) {
+        case AVAuthorizationStatusNotDetermined:[self showCameraAuthorizationNotDetermined]; break;// 用户尚未决定授权与否，那就请求授权
+        case AVAuthorizationStatusAuthorized: break;// 用户已授权，那就立即使用
+        case AVAuthorizationStatusDenied:[self showCameraAuthorizationDenied]; break;// 用户明确地拒绝授权，那就展示提示
+        case AVAuthorizationStatusRestricted:[self showAuthorizationRestricted]; break;// 无法访问相机设备，那就展示提示
+    }
+    
     UIImage *image = [WeexPublicTool wx_imageNamed:@"sc_btn_take.png"];
     [self.btnCamera setImage:[WeexPublicTool wx_imageNamed:@"btn_video_flip_camera"] forState:UIControlStateNormal];
     [self.btnBack setImage:[WeexPublicTool wx_imageNamed:@"hVideo_back"] forState:UIControlStateNormal];
@@ -119,7 +139,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
     [super viewWillAppear:animated];
     self.statusBarHiden = YES;
     [self prefersStatusBarHidden];
-//    [[UIApplication sharedApplication] setStatusBarHidden:YES];
+    //    [[UIApplication sharedApplication] setStatusBarHidden:YES];
     [self customCamera];
     [self.session startRunning];
 }
@@ -140,10 +160,120 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-//    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    //    [[UIApplication sharedApplication] setStatusBarHidden:NO];
     self.statusBarHiden = NO;
     [self prefersStatusBarHidden];
 }
+- (void)showCameraAuthorizationNotDetermined {
+    __weak typeof(self) weakSelf = self;
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        if (granted) {
+        } else {
+            [weakSelf showCameraAuthorizationDenied];
+            return;
+        }
+    }];
+}
+- (void)showPhotoLibraryAuthNotDetermined {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        if (status == PHAuthorizationStatusAuthorized) {
+        } else {
+            [self showPhotoLibraryAuthDenied];
+        }
+    }];
+}
+/// 无照片权限
+- (void)showPhotoLibraryAuthDenied {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相册"
+                                                                       message:@"可能无法使用此功能，请前往\"设置-隐私-照片\"开启相册访问权限"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
+                
+                if (@available(iOS 10.0, *)) {
+                    
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+                } else {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+            }
+        }];
+        [alert addAction:cancel];
+        [alert addAction:action];
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+    
+}
+/// 无相机权限
+-(void)showCameraAuthorizationDenied {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //无权限
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请在设置-隐私-相机中允许访问相机" preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *settings = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
+                
+                if (@available(iOS 10.0, *)) {
+                    
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+                } else {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+            }
+            
+        }];
+        
+        [alert addAction:cancel];
+        [alert addAction:settings];
+        
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+    
+}
+/// 使用相机设备受限
+-(void)showAuthorizationRestricted {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"设备受限"
+                                                                       message:@"请检查您的手机硬件或设置"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleCancel handler:nil];
+        [alert addAction:cancel];
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+    
+}
+
+- (void)showPhotoWriteDenied {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //无权限
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法写入相簿"
+                                                                       message:@"请在设置-隐私-相机中允许访问相簿"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *settings = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
+                
+                if (@available(iOS 10.0, *)) {
+                    
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+                } else {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+            }
+            
+        }];
+        
+        [alert addAction:cancel];
+        [alert addAction:settings];
+        
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+}
+
 
 - (void)customCamera {
     
@@ -282,6 +412,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
             if (error) {
                 Plog(@"保存视频到相簿过程中发生错误，错误信息：%@",error.localizedDescription);
                 [ASCameraUtility showAllTextDialog:nil Text:@"保存视频到相册发生错误"];
+                [weakSelf showPhotoWriteDenied];
             } else {
                 if (weakSelf.takeBlock) {
                     weakSelf.takeBlock(assetURL);
@@ -372,7 +503,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
         }
     } else {
         //照片
-//        self.saveVideoUrl = nil;
+        //        self.saveVideoUrl = nil;
         self.labelTipTitle.hidden = NO;
         [self performSelector:@selector(hiddenTipsLabel) withObject:nil afterDelay:4];
     }
