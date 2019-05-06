@@ -377,7 +377,7 @@
     if (reGeocode)
     {
         model.title = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
-        model.subTitle = reGeocode.formattedAddress;
+        model.subTitle = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
         if ([_dataSrouce count] > 0) {
             _dataSrouce[0] = @[model];
         }else{
