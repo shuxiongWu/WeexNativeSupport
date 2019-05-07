@@ -73,6 +73,11 @@ static WeexLocationManage *manager = nil;
     }
 }
 
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    if (self.locationCallBack) {
+        self.locationCallBack(@"", NO);
+    }
+}
 
 @end
 
