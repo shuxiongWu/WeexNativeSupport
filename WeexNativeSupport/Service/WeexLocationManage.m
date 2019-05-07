@@ -8,6 +8,7 @@
 
 #import "WeexLocationManage.h"
 #import <MJExtension.h>
+#import "CMLocationTransform.h"
 
 @interface WeexLocationManage ()<CLLocationManagerDelegate,UIAlertViewDelegate>{//添加代理协议 CLLocationManagerDelegate
     CLLocationManager *_locationManager;//定位服务管理类
@@ -57,8 +58,12 @@ static WeexLocationManage *manager = nil;
         if (buttonIndex == 1) {
             //跳转到定位权限页面
             NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-            if( [[UIApplication sharedApplication]canOpenURL:url] ) {
-                [[UIApplication sharedApplication] openURL:url];
+            if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                if (@available(iOS 10.0, *)) {
+                    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                } else {
+                    [[UIApplication sharedApplication] openURL:url];
+                }
             }
         }
     }
@@ -66,10 +71,13 @@ static WeexLocationManage *manager = nil;
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations{
     [_locationManager stopUpdatingLocation]; //不用的时候关闭更新位置服务
-    NSLog(@"#####%lu",(unsigned long)locations.count);
     CLLocation * location = locations.lastObject;
     if (self.locationCallBack) {
-        self.locationCallBack([@{@"longitude": @(location.coordinate.longitude), @"latitude": @(location.coordinate.latitude)} mj_JSONString], NO);
+        CMLocationTransform *trans = [[CMLocationTransform alloc] initWithLatitude:location.coordinate.latitude andLongitude:location.coordinate.longitude];
+        trans = [trans transformFromGPSToGD];
+        trans = [trans transformFromGDToBD];
+        NSDictionary *coor = @{@"latitude":@(trans.latitude),@"longitude":@(trans.longitude)};
+        self.locationCallBack([coor mj_JSONString], NO);
     }
 }
 
