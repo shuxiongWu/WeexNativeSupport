@@ -42,8 +42,8 @@
 - (void)new1_updateAttributes:(NSDictionary *)attributes {
     [self new1_updateAttributes:attributes];
     
+    UITableView *tableView = (UITableView *)self.view;
     if (attributes[@"editType"]) {
-        UITableView *tableView = (UITableView *)self.view;
         if ([attributes[@"editType"] isEqualToString:@"move"]) {
             tableView.editing = YES;
         }else if ([attributes[@"editType"] isEqualToString:@"delete"]){
@@ -51,6 +51,8 @@
         }else if ([attributes[@"editType"] isEqualToString:@"none"]){
             tableView.editing = NO;
         }
+    } else if ([attributes[@"reloadData"] isEqualToString:@"YES"]) {
+        [tableView reloadData];
     }
 }
 
@@ -62,7 +64,7 @@
         tableView.delegate = self;
         tableView.dataSource = self;
     }
-
+    
 }
 
 #pragma mark -- delegate
