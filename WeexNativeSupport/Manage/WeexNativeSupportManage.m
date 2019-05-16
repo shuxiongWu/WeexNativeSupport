@@ -108,7 +108,7 @@ static AFHTTPSessionManager *netWorkManager;
         [alertCtrl addAction:action];
     }
     if (cancelString) {
-        UIAlertAction *action = [UIAlertAction actionWithTitle:sureString style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *action = [UIAlertAction actionWithTitle:cancelString style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
             
         }];
         [alertCtrl addAction:action];
