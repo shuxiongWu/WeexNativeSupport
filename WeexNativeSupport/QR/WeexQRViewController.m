@@ -26,6 +26,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    /// 相机权限
+    AVAuthorizationStatus authorizationStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    
+    switch (authorizationStatus) {
+        case AVAuthorizationStatusNotDetermined:[self showAuthorizationNotDetermined]; break;// 用户尚未决定授权与否，那就请求授权
+        case AVAuthorizationStatusAuthorized: break;// 用户已授权，那就立即使用
+        case AVAuthorizationStatusDenied:[self showAuthorizationDenied]; break;// 用户明确地拒绝授权，那就展示提示
+        case AVAuthorizationStatusRestricted:[self showAuthorizationRestricted]; break;// 无法访问相机设备，那就展示提示
+    }
+    
+    
     //输出流视图
     UIView *preview  = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 0)];
     [self.view addSubview:preview];
@@ -91,6 +103,60 @@
     [weakSelf.scanView startScanAnimation];
     [self.view bringSubviewToFront:self.showView];
 }
+
+
+#pragma mark - 相机使用权限处理
+#pragma mark 用户还未决定是否授权使用相机
+-(void)showAuthorizationNotDetermined {
+    __weak typeof(self) weakSelf = self;
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        if (granted) {
+            
+        } else {
+            [weakSelf showAuthorizationDenied];
+        }
+    }];
+}
+
+#pragma mark 未被授权使用相机
+-(void)showAuthorizationDenied {
+    //无权限
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请在设置-隐私-相机中允许访问相机" preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }];
+    UIAlertAction *settings = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self.navigationController popViewControllerAnimated:YES];
+        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
+            
+            if (@available(iOS 10.0, *)) {
+                
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+            } else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            }
+        }
+        
+    }];
+    
+    [alert addAction:cancel];
+    [alert addAction:settings];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+#pragma mark 使用相机设备受限
+-(void)showAuthorizationRestricted {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请检查您的手机硬件或设置" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }];
+    [alert addAction:cancel];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+
+
 
 -(void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
