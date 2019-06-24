@@ -29,7 +29,7 @@ static WeexLocationManage *manager = nil;
     
 }
 
-- (void)initLocationService{
+- (void)initLocationService {
     _locationManager = [[CLLocationManager alloc] init];
     [_locationManager requestWhenInUseAuthorization];
     //[_locationManager requestAlwaysAuthorization];//iOS8必须，这两行必须有一行执行，否则无法获取位置信息，和定位
@@ -53,7 +53,7 @@ static WeexLocationManage *manager = nil;
     [_locationManager startUpdatingLocation];
 }
 
-- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex{
+- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex {
     if (alertView.tag == 1) {
         if (buttonIndex == 1) {
             //跳转到定位权限页面
@@ -69,13 +69,18 @@ static WeexLocationManage *manager = nil;
     }
 }
 
--(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations{
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
     [_locationManager stopUpdatingLocation]; //不用的时候关闭更新位置服务
     CLLocation * location = locations.lastObject;
     if (self.locationCallBack) {
         CMLocationTransform *trans = [[CMLocationTransform alloc] initWithLatitude:location.coordinate.latitude andLongitude:location.coordinate.longitude];
         trans = [trans transformFromGPSToGD];
-        trans = [trans transformFromGDToBD];
+        if (self.type == nil || [self.type isEqualToString:@"baidu"]) {
+            /// 兼容旧方法，默认没有传参数的话就返回百度坐标
+            trans = [trans transformFromGDToBD];
+        } else if ([self.type isEqualToString:@"gps"]) {
+            trans = [trans transformFromGDToGPS];
+        }
         NSDictionary *coor = @{@"latitude":@(trans.latitude),@"longitude":@(trans.longitude)};
         self.locationCallBack([coor mj_JSONString], NO);
     }

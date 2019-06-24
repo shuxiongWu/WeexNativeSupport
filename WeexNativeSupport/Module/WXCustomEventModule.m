@@ -49,6 +49,7 @@ WX_EXPORT_METHOD(@selector(selectPhotoFromPhotoAlbum:callBack:))
 
 //定位（不需要地图）
 WX_EXPORT_METHOD(@selector(getLocation:))
+WX_EXPORT_METHOD(@selector(getLocationWithType:callBack:))
 
 //链接到超盟商家
 WX_EXPORT_METHOD(@selector(jumpTocmshop:))
@@ -205,7 +206,14 @@ WX_EXPORT_METHOD(@selector(writeReviews:))
 }
 
 #pragma mark -- 定位(不通过地图)
+/// 建议使用👇的新api
 - (void)getLocation:(WXModuleKeepAliveCallback)callBack{
+    [[WeexLocationManage shareManage] startLocation];
+    [[WeexLocationManage shareManage] setLocationCallBack:callBack];
+}
+/// type: baidu gaode gps
+- (void)getLocationWithType:(NSString *)type callBack:(WXModuleKeepAliveCallback)callBack {
+    [WeexLocationManage shareManage].type = type;
     [[WeexLocationManage shareManage] startLocation];
     [[WeexLocationManage shareManage] setLocationCallBack:callBack];
 }
