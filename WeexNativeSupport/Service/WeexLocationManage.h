@@ -13,6 +13,8 @@
 
 @property (nonatomic, copy) WXModuleKeepAliveCallback locationCallBack;
 
+// baidu/gaode/gps
+@property (nonatomic, copy) NSString *type;
 + (instancetype)shareManage;
 //开始定位
 - (void)startLocation;
