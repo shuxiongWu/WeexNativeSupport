@@ -8,7 +8,7 @@
 
 #import "UploadModule.h"
 #import <WeexSDK/WeexSDK.h>
-#import <HXPhotoPicker.h>
+#import "HXPhotoPicker.h"
 #import <SVProgressHUD.h>
 
 #import <QCloudCOSXML/QCloudCOSXMLTransfer.h>
