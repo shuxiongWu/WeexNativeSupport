@@ -216,7 +216,7 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
                     //                    pasteboard.string = result.location;
                     //                    [SVProgressHUD showSuccessWithStatus:@"上传至腾讯云成功，下载地址已添加到剪切板，复制至网页查看"];
                     
-                    NSDictionary *result = @{@"code":@(0), @"message":@"上传成功",@"data":@{@"videoUrl":object,@"image":base64String}};
+                    NSDictionary *result = @{@"code":@(0), @"message":@"上传成功",@"data":@{@"videoUrl":object,@"fullVideoUrl":result.location,@"image":base64String}};
 //                    NSLog(@"\n\n\n\nresult = %@",result);
                     callBack([result mj_JSONString],YES);
                 } else {
