@@ -341,7 +341,7 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 - (IBAction)onCancelAction:(UIButton *)sender {
     [self dismissViewControllerAnimated:YES completion:^{
-        [ASCameraUtility hideProgressDialog];
+//        [ASCameraUtility hideProgressDialog];
     }];
 }
 
