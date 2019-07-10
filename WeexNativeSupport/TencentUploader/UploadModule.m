@@ -158,7 +158,7 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
     
     /// 获取视频封面图
     UIImage *preViewImage = [self getVideoPreViewImage:url];
-    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(preViewImage, 0.5)];
+    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:preViewImage toByte:102400]];
     
     NSDictionary *tmpData = [[NSUserDefaults standardUserDefaults] objectForKey:tencentCloudTmpData];
     
@@ -314,7 +314,7 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
     
 }
 
-// 获取视频第一帧
+/// 获取视频第一帧
 - (UIImage*)getVideoPreViewImage:(NSURL *)path {
     AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:path options:nil];
     AVAssetImageGenerator *assetGen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
@@ -327,6 +327,28 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
     UIImage *videoImage = [[UIImage alloc] initWithCGImage:image];
     CGImageRelease(image);
     return videoImage;
+}
+
+/// 视频压缩到指定大小
+- (NSData *)compressImageQuality:(UIImage *)image toByte:(NSInteger)maxLength {
+    CGFloat compression = 1;
+    NSData *data = UIImageJPEGRepresentation(image, compression);
+    if (data.length < maxLength) return data;
+    CGFloat max = 1;
+    CGFloat min = 0;
+    for (int i = 0; i < 6; ++i) {
+        compression = (max + min) / 2;
+        data = UIImageJPEGRepresentation(image, compression);
+        if (data.length < maxLength * 0.9) {
+            min = compression;
+        } else if (data.length > maxLength) {
+            max = compression;
+        } else {
+            break;
+        }
+    }
+    //UIImage *resultImage = [UIImage imageWithData:data];
+    return data;
 }
 
 @end
