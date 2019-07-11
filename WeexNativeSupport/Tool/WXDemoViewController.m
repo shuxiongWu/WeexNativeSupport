@@ -110,7 +110,7 @@
         // Fallback on earlier versions
     }
 #endif
-    _instance.frame = CGRectMake(safeArea.left, safeArea.top, self.view.frame.size.width-safeArea.left-safeArea.right, _weexHeight-safeArea.bottom);
+    _instance.frame = CGRectMake(safeArea.left, 0, self.view.frame.size.width-safeArea.left, _weexHeight-safeArea.bottom);
     
 }
 
