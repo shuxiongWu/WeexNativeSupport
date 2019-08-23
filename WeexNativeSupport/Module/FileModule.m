@@ -36,7 +36,7 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
  */
 - (void)setUpdateInfo:(NSDictionary *)data {
     
-    NSLog(@"update info = %@",data);
+    //NSLog(@"update info = %@",data);
     
     if (!data || ![data isKindOfClass:NSDictionary.class]) {
         return;
@@ -64,7 +64,7 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
         BOOL isAppStoreEqual = [[serverVersionArr componentsJoinedByString:@"."] isEqualToString:localVersion];
         
         if (isAppStoreEqual) {
-            NSLog(@"isAppStoreEqual = YES");
+            //NSLog(@"isAppStoreEqual = YES");
             /// 只有当App Store版本号和服务器上的版本号一致的时候才进行热更新判断操作
             NSInteger currentHotVersion = [[udf objectForKey:@"hotVersion"]?:@"0" integerValue];
             NSInteger serverHotVersion = hotVersion.integerValue;
@@ -80,7 +80,7 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
             }
             
         } else {
-            NSLog(@"isAppStoreEqual = NO");
+            //NSLog(@"isAppStoreEqual = NO");
             /// 和App Store的版本不相同，不进行操作，本地的热更新版本号归0
             [udf setObject:@"0" forKey:@"hotVersion"];
             [udf synchronize];
@@ -99,9 +99,9 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
     if (![fileManager fileExistsAtPath:resourcePath]) {
         NSError *error;
         [fileManager createDirectoryAtPath:resourcePath withIntermediateDirectories:YES attributes:nil error:&error];
-        NSLog(@"创建文件夹: %@",error?error.localizedDescription:@"创建Resources文件夹成功");
+        //NSLog(@"创建文件夹: %@",error?error.localizedDescription:@"创建Resources文件夹成功");
     } else {
-        NSLog(@"Resources文件夹已存在");
+        //NSLog(@"Resources文件夹已存在");
     }
     
     NSURL *url = [NSURL URLWithString:urlString];
@@ -114,14 +114,14 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
         [fileManager removeItemAtPath:fullFilePath error:nil];
     }
     
-    NSLog(@"filePath = %@",fullFilePath);
+    //NSLog(@"filePath = %@",fullFilePath);
     
     /* 创建网络下载对象 */
     AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     
     /* 开始请求下载 */
     NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:^(NSProgress * _Nonnull downloadProgress) {
-        NSLog(@"下载进度：%.0f％", downloadProgress.fractionCompleted * 100);
+        //NSLog(@"下载进度：%.0f％", downloadProgress.fractionCompleted * 100);
     } destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
         dispatch_async(dispatch_get_main_queue(), ^{
             //如果需要进行UI操作，需要获取主线程进行操作
@@ -130,7 +130,7 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
         return [NSURL fileURLWithPath:fullFilePath];
         
     } completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
-        NSLog(@"下载完成");
+        //NSLog(@"下载完成");
         if ([url.lastPathComponent hasSuffix:@".zip"]) {
             
             /// 清除旧文件
@@ -138,7 +138,7 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
             
             /// 解压到Resources
             BOOL isSuccess = [SSZipArchive unzipFileAtPath:fullFilePath toDestination:resourcePath];
-            NSLog(@"解压%@",isSuccess?@"成功":@"失败");
+            //NSLog(@"解压%@",isSuccess?@"成功":@"失败");
             if (isSuccess) {
                 //保存热更新版本号
                 NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
@@ -149,12 +149,12 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
                 NSError *error;
                 [fileManager removeItemAtPath:fullFilePath error:&error];
                 if (error) {
-                    NSLog(@"移除失败");
+                    //NSLog(@"移除失败");
                 }
-                NSLog(@"解压完成，Resources下的文件：%@",[fileManager contentsOfDirectoryAtPath:resourcePath error:nil]);
+                //NSLog(@"解压完成，Resources下的文件：%@",[fileManager contentsOfDirectoryAtPath:resourcePath error:nil]);
             }
         } else {
-            NSLog(@"不是压缩文件");
+            //NSLog(@"不是压缩文件");
         }
     }];
     [downloadTask resume];
@@ -167,22 +167,22 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray *contents = [fileManager contentsOfDirectoryAtPath:path error:nil];
-    NSLog(@"contents = %@",contents);
+    //NSLog(@"contents = %@",contents);
     if (contents.count == 0) {
         return;
     }
     NSEnumerator *e = [contents objectEnumerator];
     NSString *fileName;
     while (fileName = [e nextObject]) {
-        NSLog(@"fileName = %@",fileName);
+        //NSLog(@"fileName = %@",fileName);
         NSError *error;
         [fileManager removeItemAtPath:[path stringByAppendingString:[NSString stringWithFormat:@"/%@",fileName]] error:&error];
         if (error) {
-            NSLog(@"删除失败：%@",error.localizedDescription);
+            //NSLog(@"删除失败：%@",error.localizedDescription);
         }
     }
     contents = [fileManager contentsOfDirectoryAtPath:path error:nil];
-    NSLog(@"删除后的contents = %@",contents);
+    //NSLog(@"删除后的contents = %@",contents);
     
 }
 
@@ -208,6 +208,6 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
             callback(full_path);
         }
     }
-    NSLog(@"full_path = %@",full_path);
+    //NSLog(@"full_path = %@",full_path);
 }
 @end
