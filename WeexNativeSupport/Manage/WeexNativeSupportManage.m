@@ -27,7 +27,6 @@
 #import "WeexNativeSupport.h"
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <Photos/Photos.h>
-#import "WeexBluetoothManage.h"
 #import "WeexDateHelper.h"
 #import <MJExtension.h>
 #import "HXPhotoPicker.h"
@@ -35,7 +34,6 @@
 #import "UIImage+WeexCompress.h"
 #import "WeexLocationManage.h"
 #import "WeexQRViewController.h"
-#import "WeexPrinter.h"
 #import <AFNetworking.h>
 
 #define scanMaxNumber 3                //扫描蓝牙最大次数
@@ -45,9 +43,6 @@
 @property (strong, nonatomic) HXDatePhotoToolManager *toolManager;
 
 @property (nonatomic, copy) NSString *url;  //存储域名
-@property (nonatomic, strong) WeexBluetoothManage * bluetoothManage;                                  //蓝牙管理类
-@property (nonatomic, strong) NSMutableArray *buletoothDataArray;                                   //已扫描蓝牙设备集合
-@property (nonatomic, assign) NSInteger scanNum;                                                    //当前已扫描次数
 @property (nonatomic, strong) WeexQRViewController *scanQRCtl;
 @property (nonatomic, strong) UIImagePickerController *imagePickerCtl;
 
@@ -504,20 +499,6 @@ static AFHTTPSessionManager *netWorkManager;
 
 
 #pragma mark -- setter\getter
-- (WeexBluetoothManage *)bluetoothManage{
-    if (!_bluetoothManage) {
-        _bluetoothManage = [WeexBluetoothManage sharedInstance];
-    }
-    return _bluetoothManage;
-}
-
-- (NSMutableArray *)buletoothDataArray{
-    if (!_buletoothDataArray) {
-        _buletoothDataArray = [NSMutableArray array];
-    }
-    return _buletoothDataArray;
-}
-
 - (WeexQRViewController *)scanQRCtl
 {
     NSString* bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
