@@ -37,6 +37,7 @@
 #import "WeexQRViewController.h"
 #import "WeexPrinter.h"
 #import <AFNetworking.h>
+#import "TscCommand.h"
 #define scanMaxNumber 3                //扫描蓝牙最大次数
 @interface WeexNativeSupportManage ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
 
@@ -263,19 +264,14 @@ static AFHTTPSessionManager *netWorkManager;
 #pragma mark -- 开始扫描
 - (void)beginScanPerpheral:(WXModuleKeepAliveCallback)callBack{
     self.scanNum = 0;
-    [self.bluetoothManage beginScanPerpheralSuccess:^(NSArray<CBPeripheral *> *peripherals, NSArray<NSNumber *> *rssis) {
+    [self.bluetoothManage beginScanPerpheralSuccess:^(NSDictionary *peripherals, NSArray<NSNumber *> *rssis) {
         if (callBack && self.scanNum < scanMaxNumber) {
-            [self.buletoothDataArray removeAllObjects];
-            NSMutableArray *nameArray = [NSMutableArray array];
-            for (CBPeripheral *per in peripherals) {
-                [self.buletoothDataArray addObject:per];
-                [nameArray addObject:per.name];
-            }
+            
             self.scanNum ++;
             if (_scanNum == scanMaxNumber - 1) {
                 _scanNum = 0;
             }
-            callBack([nameArray mj_JSONString], YES);
+            callBack([peripherals mj_JSONString], YES);
         }
     } failure:^(CBManagerState status) {
         if (callBack) {
@@ -301,8 +297,8 @@ static AFHTTPSessionManager *netWorkManager;
 }
 
 #pragma mark -- 手动连接蓝牙
-- (void)connectPeripheral:(NSInteger)index callBack:(WXModuleKeepAliveCallback)callBack{
-    [self.bluetoothManage connectPeripheral:self.buletoothDataArray[index] completion:^(CBPeripheral *perpheral, NSError *error) {
+- (void)connectPeripheral:(NSString *)UUIDString callBack:(WXModuleKeepAliveCallback)callBack{
+    [self.bluetoothManage connectPeripheral:UUIDString completion:^(CBPeripheral *perpheral, NSError *error) {
         if (!error) {
             [self.bluetoothManage stopScanPeripheral];
             if (callBack) {
@@ -314,6 +310,10 @@ static AFHTTPSessionManager *netWorkManager;
             }
         }
     }];
+}
+
+- (void)disconnectPeripheral:(NSString *)UUIDString {
+    [self.bluetoothManage cancelPeripheralConnectionWithUUID:UUIDString];
 }
 
 #pragma mark -- 蓝牙打印
@@ -695,6 +695,129 @@ static AFHTTPSessionManager *netWorkManager;
         [printer appendText:@"--------------------------------" alignment:HLTextAlignmentCenter];
     }
     
+}
+
+- (void)bluetoothPrinteUseTsc:(NSString *)dataString callBack:(WXModuleKeepAliveCallback)callBack {
+    
+    if (![dataString isKindOfClass:NSString.class]) {
+        if (callBack) {
+            callBack(@"数据格式有误",YES);
+        }
+        return;
+    }
+    NSArray *dataArray = [dataString mj_JSONObject];
+    
+    if (!dataArray.count) {
+        if (callBack) {
+            callBack(@"没有需要打印的数据",YES);
+        }
+        return;
+    }
+    
+    for (NSDictionary *dic in dataArray) {
+        NSData *printData = [self getPrintData:dic];
+        [self.bluetoothManage sendTscPrintData:printData completion:nil];
+    }
+}
+
+- (NSData *)getPrintData:(NSDictionary *)dataDic {
+    
+    NSString *bp_title = dataDic[@"bp_title"]?:@"";
+    NSString *bp_order_id = dataDic[@"bp_order_id"]?:@"";
+    NSString *bp_date = dataDic[@"bp_date"]?:@"";
+    NSString *bp_shop_name = dataDic[@"bp_shop_name"]?:@"";
+    NSString *bp_time = dataDic[@"bp_time"]?:@"";
+    NSString *bp_qrcode = dataDic[@"bp_qrcode"]?:@"";
+    NSString *title = dataDic[@"title"]?:@"";
+    NSString *desc = dataDic[@"desc"]?:@"";
+    
+    
+    TscCommand *command = [[TscCommand alloc] init];
+    
+    [command addSize:50 :40];
+    [command addReference:0 :0];
+    /// 自动对齐
+    [command addTear:@"ON"];
+    
+    [command addCls];
+    
+    
+    [command addTextwithX:30
+                    withY:20
+                 withFont:@"TSS24.BF2"
+             withRotation:0
+                withXscal:1
+                withYscal:2
+                 withText:bp_title];
+    
+    [command addTextwithX:180
+                    withY:20
+                 withFont:@"TSS24.BF2"
+             withRotation:0
+                withXscal:1
+                withYscal:1
+                 withText:bp_order_id];
+    
+    [command addTextwithX:310
+                    withY:20
+                 withFont:@"TSS24.BF2"
+             withRotation:0
+                withXscal:1
+                withYscal:1
+                 withText:bp_date];
+    
+    [command addTextwithX:30
+                    withY:90
+                 withFont:@"TSS24.BF2"
+             withRotation:0
+                withXscal:1
+                withYscal:2
+                 withText:title];
+    
+    [command addTextwithX:30
+                    withY:170
+                 withFont:@"TSS24.BF2"
+             withRotation:0
+                withXscal:1
+                withYscal:1
+                 withText:desc];
+    
+    [command addTextwithX:30
+                    withY:200
+                 withFont:@"TSS24.BF2"
+             withRotation:0
+                withXscal:1
+                withYscal:1
+                 withText:bp_shop_name];
+    
+    [command addTextwithX:30
+                    withY:240
+                 withFont:@"TSS24.BF2"
+             withRotation:0
+                withXscal:1
+                withYscal:1
+                 withText:bp_time];
+    
+    
+    [command addQRCode:300
+                      :200
+                      :@"H"
+                      :5
+                      :@"A"
+                      :0
+                      :bp_qrcode];
+    
+    [command addPrint:1 :1];
+    
+    NSData *printData = [command getCommand];
+    return printData;
+}
+
+- (void)getConnectedPeripheral:(WXModuleKeepAliveCallback)callback {
+    if (callback) {
+        CBPeripheral *peripheral = self.bluetoothManage.connectedPerpheral;
+        callback(peripheral ? [@{peripheral.identifier.UUIDString:peripheral.name} mj_JSONString] : @"", YES);
+    }
 }
 
 - (void)smallPrintWith:(NSData *)data{

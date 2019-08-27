@@ -31,7 +31,7 @@
  @param peripheral 要连接的蓝牙外设
  @param completion 连接成功回调(有成功 跟失败判断error是否为空就可以了)
  */
-- (void)connectPeripheral:(CBPeripheral *)peripheral completion:(JWConnectPeripheralCompletion)completion;
+- (void)connectPeripheral:(NSString *)UUIDString completion:(JWConnectPeripheralCompletion)completion;
 
 /**
  自动连接上次连接的蓝牙
@@ -63,6 +63,7 @@
  @param peripheral 设备
  */
 - (void)cancelPeripheralConnection:(CBPeripheral *)peripheral;
+- (void)cancelPeripheralConnectionWithUUID:(NSString *)UUIDString;
 
 /**
  进行打印
@@ -71,6 +72,7 @@
  @param result 结果回调
  */
 - (void)sendPrintData:(NSData *)data completion:(JWPrintResultBlock)result;
+- (void)sendTscPrintData:(NSData *)data completion:(JWPrintResultBlock)result;
 
 
 @end

@@ -25,7 +25,7 @@ typedef NS_ENUM(NSInteger, JWScanStage) {
  @param peripherals 蓝牙外设列表
  @param rssis 蓝牙信号强度
  */
-typedef void(^JWScanPerpheralsSuccess)(NSArray<CBPeripheral *> *peripherals,NSArray<NSNumber *> *rssis);
+typedef void(^JWScanPerpheralsSuccess)(NSDictionary *peripherals,NSArray<NSNumber *> *rssis);
 
 /**
  扫描失败的block

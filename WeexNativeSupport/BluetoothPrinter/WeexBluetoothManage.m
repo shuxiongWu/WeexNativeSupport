@@ -29,6 +29,12 @@ static WeexBluetoothManage * manage = nil;
 @property (nonatomic, assign)   NSInteger                    writeCount;               // 写入次数
 @property (nonatomic, assign)   NSInteger                    responseCount;            //  返回次数
 
+
+/// 数据源
+@property (nonatomic, strong) NSMutableDictionary<NSString *, CBPeripheral *> *peripheralsDicts;
+/// 返回给weex的字典
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *resultPeripherals;
+
 @end
 
 @implementation WeexBluetoothManage
@@ -97,31 +103,14 @@ static WeexBluetoothManage * manage = nil;
     if (peripheral.name.length <= 0) {
         return ;
     }
-//    NSData *data = [advertisementData objectForKey:@"kCBAdvDataManufacturerData"];
-//    NSString *mac = [[NSString alloc] initWithData:data encoding:kCFStringEncodingUTF8];
-//    mac = [mac stringByReplacingOccurrencesOfString:@" " withString:@""];
     
-    if (_peripherals.count == 0) {
-        [_peripherals addObject:peripheral];
-        [_rssis addObject:RSSI];
-    } else {
-        __block BOOL isExist = NO;
-        //去除相同设备  UUIDString  是每个外设的唯一标识
-        [_peripherals enumerateObjectsUsingBlock:^(CBPeripheral *   _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            CBPeripheral *per = [_peripherals objectAtIndex:idx];
-            if ([per.identifier.UUIDString isEqualToString:peripheral.identifier.UUIDString]) {
-                isExist = YES;
-                [_peripherals replaceObjectAtIndex:idx withObject:peripheral];
-                [_rssis replaceObjectAtIndex:idx withObject:RSSI];
-            }
-        }];
-        if (!isExist) {
-            [_peripherals addObject:peripheral];
-            [_rssis addObject:RSSI];
-        }
-    }
+    /// 数据源
+    [self.peripheralsDicts setObject:peripheral forKey:peripheral.identifier.UUIDString];
+    /// 给weex的数据源
+    [self.resultPeripherals setObject:peripheral.name forKey:peripheral.identifier.UUIDString];
+    
     if (_scanPerpheralSuccess) {
-        _scanPerpheralSuccess(_peripherals,_rssis);
+        _scanPerpheralSuccess(self.resultPeripherals,_rssis);
     }
     
     if (_autoConnect) {
@@ -133,11 +122,15 @@ static WeexBluetoothManage * manage = nil;
     }
 }
 #pragma mark - 连接外设 Medthod
-- (void)connectPeripheral:(CBPeripheral *)peripheral completion:(JWConnectPeripheralCompletion)completion{
+- (void)connectPeripheral:(NSString *)UUIDString completion:(JWConnectPeripheralCompletion)completion{
     _connectCompletion = completion;
     if (_connectedPerpheral) {
         
         [self cancelPeripheralConnection:_connectedPerpheral];
+    }
+    CBPeripheral *peripheral = self.peripheralsDicts[UUIDString];
+    if (!peripheral) {
+        return;
     }
     [self connectPeripheral:peripheral];
 }
@@ -166,9 +159,23 @@ static WeexBluetoothManage * manage = nil;
     
     [_centralManager cancelPeripheralConnection:peripheral];
     _connectedPerpheral = nil;
-    //取消连接 清楚可打印输入
+    //取消连接 清除可打印输入
     [_printeChatactersArray removeAllObjects];
 }
+- (void)cancelPeripheralConnectionWithUUID:(NSString *)UUIDString {
+    CBPeripheral *peripheral = self.peripheralsDicts[UUIDString];
+    if (!peripheral) {
+        return;
+    }
+    //去除次自动连接
+    RemoveLastConnectionPeripheral_UUID();
+    
+    [_centralManager cancelPeripheralConnection:peripheral];
+    _connectedPerpheral = nil;
+    //取消连接 清除可打印输入
+    [_printeChatactersArray removeAllObjects];
+}
+
 - (void)stopScanPeripheral{
     [_centralManager stopScan];
 }
@@ -314,6 +321,24 @@ static WeexBluetoothManage * manage = nil;
     }
 }
 
+- (void)sendTscPrintData:(NSData *)data completion:(JWPrintResultBlock)result {
+    
+    if (!self.connectedPerpheral) {
+        if (result) {
+            result(NO,_connectedPerpheral,@"未连接蓝牙设备");
+        }
+        return;
+    }
+    if (self.printeChatactersArray.count == 0) {
+        if (result) {
+            result(NO,_connectedPerpheral,@"该蓝牙设备不支持写入数据");
+        }
+        return;
+    }
+    NSDictionary *dict = [_printeChatactersArray lastObject];
+    [self.connectedPerpheral writeValue:data forCharacteristic:dict[@"character"] type:CBCharacteristicWriteWithResponse];
+}
+
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error{
     if (!_printResult) {
         return;
@@ -349,6 +374,19 @@ static WeexBluetoothManage * manage = nil;
     }
     return _printeChatactersArray;
 }
+- (NSMutableDictionary *)peripheralsDicts {
+    if (!_peripheralsDicts) {
+        _peripheralsDicts = [NSMutableDictionary new];
+    }
+    return _peripheralsDicts;
+}
+- (NSMutableDictionary<NSString *,NSString *> *)resultPeripherals {
+    if (!_resultPeripherals) {
+        _resultPeripherals = [NSMutableDictionary new];
+    }
+    return _resultPeripherals;
+}
+
 
 NSString * GetLastConnectionPeripheral_UUID(){
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];

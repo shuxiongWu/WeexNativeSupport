@@ -75,7 +75,7 @@
  @param index 蓝牙列表下标
  @param callBack 连接回调
  */
-- (void)connectPeripheral:(NSInteger)index callBack:(WXModuleKeepAliveCallback)callBack;
+- (void)connectPeripheral:(NSString *)UUIDString callBack:(WXModuleKeepAliveCallback)callBack;
 
 /**
  蓝牙打印
@@ -85,6 +85,29 @@
  */
 - (void)bluetoothPrinte:(id)dict callBack:(WXModuleKeepAliveCallback)callBack;
 
+
+/**
+ 蓝牙打印 TSC指令
+
+ @param dataArray 需要打印的数据
+ @param callBack 回调
+ */
+- (void)bluetoothPrinteUseTsc:(NSString *)dataString callBack:(WXModuleKeepAliveCallback)callBack;
+
+/**
+ 断开蓝牙连接
+
+ @param UUIDString UUIDString
+ */
+- (void)disconnectPeripheral:(NSString *)UUIDString;
+
+
+/**
+ 获取当前连接的蓝牙
+
+ @param callback 回调
+ */
+- (void)getConnectedPeripheral:(WXModuleKeepAliveCallback)callback;
 
 /**
  二维码扫描
