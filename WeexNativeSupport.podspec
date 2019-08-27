@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.6.97'
+s.version      = '1.6.98'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -12,6 +12,7 @@ s.source_files = 'WeexNativeSupport/**/*.{h,m}'
 
 
 s.vendored_libraries = 'WeexNativeSupport/BluetoothPrinter/libGSDK.a'
+s.pod_target_xcconfig = { 'VALID_ARCHS' => 'arm64 armv7 armv7s x86_64' }
 
 s.dependency 'SVProgressHUD'
 s.dependency 'SSZipArchive'
