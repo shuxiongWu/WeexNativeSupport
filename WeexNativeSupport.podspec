@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.6.99'
+s.version      = '1.7.0'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -11,7 +11,7 @@ s.resources    = "WeexNativeSupport/HXPhotoPicker/HXPhotoPicker.bundle"
 s.source_files = 'WeexNativeSupport/**/*.{h,m}'
 
 s.xcconfig = {
-    'VALID_ARCHS' =>  'arm64 x86_64',
+    'VALID_ARCHS' =>  'arm64 armv7',
   }
 s.vendored_libraries = 'WeexNativeSupport/BluetoothPrinter/libGSDK.a'
 
