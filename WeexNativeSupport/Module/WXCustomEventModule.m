@@ -63,13 +63,6 @@ WX_EXPORT_METHOD(@selector(call:))
 //二维码扫描
 WX_EXPORT_METHOD(@selector(scanQR:))
 
-////蓝牙管理类相关api
-WX_EXPORT_METHOD(@selector(beginScanPerpheral:))            //扫描
-WX_EXPORT_METHOD(@selector(autoConnectLastPeripheral:))     //自动连接
-WX_EXPORT_METHOD(@selector(connectPeripheral:callBack:))    //手动连接
-WX_EXPORT_METHOD(@selector(bluetoothPrinte:callBack:))      //蓝牙打印
-WX_EXPORT_METHOD(@selector(bluetoothPrinteUsingTscCommand:callBack:))      //TSC蓝牙打印
-WX_EXPORT_METHOD(@selector(getConnectedPeripheral:))
 
 //WIFI相关api
 WX_EXPORT_METHOD(@selector(getSSIDInfo:))
@@ -260,32 +253,6 @@ WX_EXPORT_METHOD(@selector(writeReviews:))
     callBack([[NSUserDefaults standardUserDefaults] valueForKey:key],YES);
 }
 
-#pragma mark -- 开始扫描
-- (void)beginScanPerpheral:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage beginScanPerpheral:callBack];
-}
-
-#pragma mark -- 自动连接蓝牙
-- (void)autoConnectLastPeripheral:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage autoConnectLastPeripheral:callBack];
-}
-
-#pragma mark -- 手动连接
-- (void)connectPeripheral:(NSString *)UUIDString callBack:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage connectPeripheral:UUIDString callBack:callBack];
-}
-
-#pragma mark -- 蓝牙打印小票
-- (void)bluetoothPrinte:(id)dict callBack:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage bluetoothPrinte:dict callBack:callBack];
-}
-- (void)bluetoothPrinteUsingTscCommand:(id)dict callBack:(WXModuleKeepAliveCallback)callBack{
-    [self.nativeManage bluetoothPrinteUseTsc:dict callBack:callBack];
-}
-
-- (void)getConnectedPeripheral:(WXModuleKeepAliveCallback)callback {
-    [self.nativeManage getConnectedPeripheral:callback];
-}
 
 #pragma mark -- 检查更新
 - (void)checkVersion:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack{
