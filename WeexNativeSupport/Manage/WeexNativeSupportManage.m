@@ -37,8 +37,6 @@
 #import "WeexQRViewController.h"
 #import "WeexPrinter.h"
 #import <AFNetworking.h>
-//#import "TscCommand.h"
-#import "TscCommand.h"
 
 #define scanMaxNumber 3                //扫描蓝牙最大次数
 @interface WeexNativeSupportManage ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
