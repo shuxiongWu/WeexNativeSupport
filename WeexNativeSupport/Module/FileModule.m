@@ -42,14 +42,25 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
         return;
     }
     
+    NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
+    
     NSString *newVersion = data[@"version"]?:@"";
     NSString *hotVersion = @"0";
     NSString *url = data[@"url"];
     
+    NSString *hotupdate_status = data[@"hotupdate_status"];
+    if ([hotupdate_status isEqualToString:@"-1"]) {
+        NSString *resourcePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Resources"];
+        [self clearResourcesAtPath:resourcePath];
+        /// 记录热更新版本号
+        [udf setObject:[[newVersion componentsSeparatedByString:@"."] lastObject] ?: @"0" forKey:@"hotVersion"];
+        [udf synchronize];
+        return;
+    }
+    
     //获取本地软件的版本号 x.x.x
     NSString *localVersion = [[[NSBundle mainBundle]infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     
-    NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
     
     if ([newVersion isKindOfClass:[NSString class]] && [newVersion containsString:@"."]) {
         NSArray *serverVersionArr = [newVersion componentsSeparatedByString:@"."];
@@ -72,6 +83,9 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
                 /// 当前是App Store最新版本，并且没有热更新版本，需要将旧的资源包清除
                 NSString *resourcePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Resources"];
                 [self clearResourcesAtPath:resourcePath];
+                /// 如果用户在没有打开App的情况下直接更新App，也得要清零
+                [udf setObject:@"0" forKey:@"hotVersion"];
+                [udf synchronize];
                 return;
             }
             /// 当前热更新版本号落后
