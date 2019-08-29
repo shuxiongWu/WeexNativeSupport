@@ -49,18 +49,9 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
     NSString *url = data[@"url"];
     
     NSString *hotupdate_status = data[@"hotupdate_status"];
-    if ([hotupdate_status isEqualToString:@"-1"]) {
-        NSString *resourcePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Resources"];
-        [self clearResourcesAtPath:resourcePath];
-        /// 记录热更新版本号
-        [udf setObject:[[newVersion componentsSeparatedByString:@"."] lastObject] ?: @"0" forKey:@"hotVersion"];
-        [udf synchronize];
-        return;
-    }
     
     //获取本地软件的版本号 x.x.x
     NSString *localVersion = [[[NSBundle mainBundle]infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-    
     
     if ([newVersion isKindOfClass:[NSString class]] && [newVersion containsString:@"."]) {
         NSArray *serverVersionArr = [newVersion componentsSeparatedByString:@"."];
@@ -77,11 +68,21 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
         if (isAppStoreEqual) {
             //NSLog(@"isAppStoreEqual = YES");
             /// 只有当App Store版本号和服务器上的版本号一致的时候才进行热更新判断操作
+            /// 文件保存路径
+            NSString *resourcePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Resources"];
+            /// 异常处理
+            if ([hotupdate_status isEqualToString:@"-1"]) {
+                [self clearResourcesAtPath:resourcePath];
+                /// 记录热更新版本号
+                [udf setObject:hotVersion forKey:@"hotVersion"];
+                [udf synchronize];
+                return;
+            }
+            
             NSInteger currentHotVersion = [[udf objectForKey:@"hotVersion"]?:@"0" integerValue];
             NSInteger serverHotVersion = hotVersion.integerValue;
             if (serverHotVersion == 0) {
                 /// 当前是App Store最新版本，并且没有热更新版本，需要将旧的资源包清除
-                NSString *resourcePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Resources"];
                 [self clearResourcesAtPath:resourcePath];
                 /// 如果用户在没有打开App的情况下直接更新App，也得要清零
                 [udf setObject:@"0" forKey:@"hotVersion"];
