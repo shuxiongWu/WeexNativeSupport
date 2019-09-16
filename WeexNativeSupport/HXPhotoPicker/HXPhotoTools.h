@@ -69,6 +69,11 @@
  */
 + (void)savePhotoToCustomAlbumWithName:(NSString *)albumName photo:(UIImage *)photo;
 
++ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
+                                 photo:(UIImage *)photo
+                              location:(CLLocation *)location
+                              complete:(void (^)(HXPhotoModel *model, BOOL success))complete;
+
 + (CLGeocoder *)getDateLocationDetailInformationWithModel:(HXPhotoDateModel *)model completion:(void (^)(CLPlacemark *placemark,HXPhotoDateModel *model))completion;
 
 /**

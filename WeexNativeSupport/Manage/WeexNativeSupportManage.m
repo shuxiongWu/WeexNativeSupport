@@ -329,7 +329,8 @@ static AFHTTPSessionManager *netWorkManager;
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
             NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
-            self.imageCallBack ? self.imageCallBack(base64String, YES) : nil;
+            NSString *fileUrl = model.fileURL.absoluteString;
+            self.imageCallBack ? self.imageCallBack([@{@"base64String":base64String,@"fileUrl":fileUrl} mj_JSONString], YES) : nil;
         } failed:^{
             
         }];
@@ -456,13 +457,17 @@ static AFHTTPSessionManager *netWorkManager;
         if (photoList.count > 0) {
             [self.toolManager getSelectedImageList:photoList requestType:0 success:^(NSArray<UIImage *> *imageList) {
                 NSMutableArray *base64StringArr = [NSMutableArray array];
-                for (UIImage *image in imageList) {
+                NSMutableArray *fileUrlArr = [NSMutableArray array];
+                for (int i = 0; i < imageList.count; ++i) {
                     
+                    UIImage *image = imageList[i];
+                    HXPhotoModel *model = photoList[i];
                     NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
                     [base64StringArr addObject:base64String];
+                    [fileUrlArr addObject:model.fileURL.absoluteString];
                 }
-                
-                self.imageCallBack ? self.imageCallBack([base64StringArr mj_JSONString], YES) : nil;
+                NSDictionary *result = @{@"base64StringArray":base64StringArr,@"fileUrlArray":fileUrlArr};
+                self.imageCallBack ? self.imageCallBack([result mj_JSONString], YES) : nil;
                 [viewController dismissViewControllerAnimated:YES completion:nil];
             } failed:^{
                 
@@ -519,7 +524,7 @@ static AFHTTPSessionManager *netWorkManager;
 - (HXPhotoManager *)manager {
     if (!_manager) {
         _manager = [[HXPhotoManager alloc] initWithType:HXPhotoManagerSelectedTypePhoto];
-        _manager.configuration.saveSystemAblum = NO;
+        _manager.configuration.saveSystemAblum = YES;
         _manager.configuration.openCamera = NO;
         _manager.configuration.themeColor = [UIColor blackColor];
     }

@@ -774,6 +774,74 @@
         });
     }];
 }
++ (void)savePhotoToCustomAlbumWithName:(NSString *)albumName
+                                 photo:(UIImage *)photo
+                              location:(CLLocation *)location
+                              complete:(void (^)(HXPhotoModel *model, BOOL success))complete {
+    if (!photo) {
+        if (complete) {
+            complete(nil, NO);
+        }
+        return;
+    }
+    // 判断授权状态
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        if (status != PHAuthorizationStatusAuthorized) return;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!iOS9_Later) {
+                UIImage *tempImage = photo;
+                UIImageWriteToSavedPhotosAlbum(tempImage, nil, nil, nil);
+                if (complete) {
+                    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithImage:tempImage];
+                    photoModel.creationDate = [NSDate date];
+                    photoModel.location = location;
+                    complete(photoModel, YES);
+                }
+                return;
+            }
+            NSError *error = nil;
+            // 保存相片到相机胶卷
+            __block PHObjectPlaceholder *createdAsset = nil;
+            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                PHAssetCreationRequest *creationRequest = [PHAssetCreationRequest creationRequestForAssetFromImage:photo];
+                creationRequest.creationDate = [NSDate date];
+                creationRequest.location = location;
+                createdAsset = creationRequest.placeholderForCreatedAsset;
+            } error:&error];
+            
+            if (error) {
+                if (complete) {
+                    complete(nil, NO);
+                }
+                if (showLog) NSSLog(@"保存失败");
+                return;
+            }else {
+                if (complete && createdAsset.localIdentifier) {
+                    HXPhotoModel *photoModel = [HXPhotoModel photoModelWithPHAsset:[[PHAsset fetchAssetsWithLocalIdentifiers:@[createdAsset.localIdentifier] options:nil] firstObject]];
+                    photoModel.creationDate = [NSDate date];
+                    complete(photoModel, YES);
+                }
+            }
+            
+            // 拿到自定义的相册对象
+            PHAssetCollection *collection = [self createCollection:albumName];
+            if (collection == nil) {
+                if (showLog) NSSLog(@"创建自定义相册失败");
+                return;
+            }
+            
+            [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+                [[PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection] insertAssets:@[createdAsset] atIndexes:[NSIndexSet indexSetWithIndex:0]];
+            } error:&error];
+            
+            if (error) {
+                if (showLog) NSSLog(@"保存自定义相册失败");
+            } else {
+                if (showLog) NSSLog(@"保存自定义相册成功");
+            }
+        });
+    }];
+}
 // 创建自己要创建的自定义相册
 + (PHAssetCollection * )createCollection:(NSString *)albumName {
     NSString * title = [NSBundle mainBundle].infoDictionary[(NSString *)kCFBundleNameKey];

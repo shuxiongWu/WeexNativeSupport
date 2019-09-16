@@ -277,7 +277,16 @@
     [self.cameraController stopSession]; 
     if (self.manager.configuration.saveSystemAblum) {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto];
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto location:self.location complete:^(HXPhotoModel *model, BOOL success) {
+                if ([self.delegate respondsToSelector:@selector(customCameraViewController:didDone:)]) {
+                    [self.delegate customCameraViewController:self didDone:model];
+                }
+                if (self.doneBlock) {
+                    self.doneBlock(model, self);
+                }
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+            return;
         }else {
             [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:model.videoURL];
         }

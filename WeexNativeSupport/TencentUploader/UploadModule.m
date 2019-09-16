@@ -34,9 +34,22 @@ static NSString *tencentCloudTmpData = @"tencentCloudTmpData";
 @synthesize weexInstance;
 
 WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
+WX_EXPORT_METHOD(@selector(uploadImage:callback:))
 
 + (void)load {
     [WXSDKEngine registerModule:@"TencentCloud" withClass:[UploadModule class]];
+}
+
+- (void)uploadImage:(id)params callback:(WXModuleKeepAliveCallback)callback {
+    
+    if ([params isKindOfClass:[NSString class]]) {
+        params = [params mj_JSONObject];
+    }
+    /// 保存临时签名信息
+    NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
+    [udf setObject:params[@"data"] forKey:tencentCloudTmpData];
+    [udf synchronize];
+    [self _uploadImage:params[@"fileUrl"] callback:callback];
 }
 
 - (void)uploadVideo:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack {
@@ -152,6 +165,55 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
     [weexInstance.viewController presentViewController:cameraVC animated:YES completion:nil];
 }
 
+- (void)_uploadImage:(NSString *)fileUrl callback:(WXModuleKeepAliveCallback)callback {
+    
+    NSDictionary *tmpData = [[NSUserDefaults standardUserDefaults] objectForKey:tencentCloudTmpData];
+    QCloudCOSXMLUploadObjectRequest *upload = [QCloudCOSXMLUploadObjectRequest new];
+    upload.body = [NSURL URLWithString:fileUrl];
+    upload.bucket = tmpData[@"Bucket"] ?: @"";
+    upload.object = [NSString stringWithFormat:@"%@%@.jpg",tmpData[@"Path"] ?: @"",[UploadModule getTimestamp]];
+    
+    NSDate *beforeUploadDate = [NSDate date];
+    NSString *fileSizeDescription =  [(NSURL*)upload.body fileSizeWithUnit];
+    double fileSizeSmallerThan1024 = [(NSURL*)upload.body fileSizeSmallerThan1024];
+    NSString *fileSizeCount = [(NSURL*)upload.body fileSizeCount];
+    NSString *object = upload.object;
+    
+    [upload setFinishBlock:^(QCloudUploadObjectResult *result, NSError *error) {
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (error) {
+                
+                if (callback) {
+                    NSDictionary *result = @{@"code":@(1),@"message":@"上传失败",@"fileUrl":fileUrl,@"data":@{}};
+                    callback([result mj_JSONString],NO);
+                }
+            } else {
+                NSDate *afterUploadDate = [NSDate date];
+                NSTimeInterval uploadTime = [afterUploadDate timeIntervalSinceDate:beforeUploadDate];
+                NSMutableString *resultImformationString = [[NSMutableString alloc] init];
+                [resultImformationString appendFormat:@"上传耗时:%.1f 秒\n\n",uploadTime];
+                [resultImformationString appendFormat:@"文件大小: %@\n\n",fileSizeDescription];
+                [resultImformationString appendFormat:@"上传速度:%.2f %@/s\n\n",fileSizeSmallerThan1024/uploadTime,fileSizeCount];
+                [resultImformationString appendFormat:@"下载链接:%@\n\n",result.location];
+                
+                if (result.__originHTTPURLResponse__) {
+                    [resultImformationString appendFormat:@"返回HTTP头部:\n%@\n",result.__originHTTPURLResponse__.allHeaderFields];
+                }
+                
+                if (result.__originHTTPResponseData__) {
+                    [resultImformationString appendFormat:@"返回HTTP Body内容:\n%@\n",[[NSString alloc] initWithData:result.__originHTTPResponseData__ encoding:NSUTF8StringEncoding]];
+                }
+                if (callback) {
+                    NSDictionary *resultDic = @{@"code":@(0),@"message":@"上传成功",@"fileUrl":fileUrl,@"data":@{@"imageUrl":object,@"fullImageUrl":result.location}};
+                    callback([resultDic mj_JSONString],YES);
+                }
+                
+            }
+        });
+    }];
+    [[QCloudCOSTransferMangerService defaultCOSTransferManager] UploadObject:upload];
+}
 
 /// 上传到腾讯云
 - (void)uploadFile:(NSURL *)url callBack:(WXKeepAliveCallback)callBack {
@@ -181,6 +243,11 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
         dispatch_async(dispatch_get_main_queue(), ^{
             
             [SVProgressHUD dismiss];
+            //删除沙盒文件
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            if ([fileManager fileExistsAtPath:url.absoluteString]) {
+                [fileManager removeItemAtPath:url.absoluteString error:nil];
+            }
             
             if (error) {
                 
@@ -188,9 +255,6 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
                     NSDictionary *result = @{@"code":@(1), @"message":@"上传失败",@"data":@{}};
                     callBack([result mj_JSONString],NO);
                 }
-                //                [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-                NSLog(@"\n=====================================%@",error.localizedDescription);
-                //                [SVProgressHUD showErrorWithStatus:error.localizedDescription];
             } else {
                 NSDate *afterUploadDate = [NSDate date];
                 NSTimeInterval uploadTime = [afterUploadDate timeIntervalSinceDate:beforeUploadDate];
@@ -208,8 +272,8 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
                     [resultImformationString appendFormat:@"返回HTTP Body内容:\n%@\n",[[NSString alloc] initWithData:result.__originHTTPResponseData__ encoding:NSUTF8StringEncoding]];
                 }
                 
-                NSLog(@"\n\n\nobject = %@",object);
-                NSLog(@"\n\n\n%@\n\n\n",resultImformationString);
+//                NSLog(@"\n\n\nobject = %@",object);
+//                NSLog(@"\n\n\n%@\n\n\n",resultImformationString);
                 
                 if (callBack) {
                     //                    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
@@ -217,13 +281,8 @@ WX_EXPORT_METHOD(@selector(uploadVideo:callBack:))
                     //                    [SVProgressHUD showSuccessWithStatus:@"上传至腾讯云成功，下载地址已添加到剪切板，复制至网页查看"];
                     
                     NSDictionary *resultDic = @{@"code":@(0), @"message":@"上传成功",@"data":@{@"videoUrl":object,@"fullVideoUrl":result.location,@"image":base64String}};
-//                    NSLog(@"\n\n\n\nresult = %@",result);
                     callBack([resultDic mj_JSONString],YES);
-                } else {
-                    //                    [SVProgressHUD showErrorWithStatus:@"callback没有调用"];
-                    //                    NSLog(@"===============================================callback没有调用");
                 }
-                
             }
         });
     }];

@@ -48,7 +48,10 @@ WX_EXPORT_METHOD(@selector(setUpdateInfo:))
     NSString *hotVersion = @"0";
     NSString *url = data[@"url"];
     
-    NSString *hotupdate_status = data[@"hotupdate_status"];
+    NSString *hotupdate_status = @"0";
+    if (data[@"hotupdate_status"] && [data[@"hotupdate_status"] isKindOfClass:[NSString class]]) {
+        hotupdate_status = data[@"hotupdate_status"];
+    }
     
     //获取本地软件的版本号 x.x.x
     NSString *localVersion = [[[NSBundle mainBundle]infoDictionary] objectForKey:@"CFBundleShortVersionString"];
