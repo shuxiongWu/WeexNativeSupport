@@ -47,7 +47,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     }
     /// 保存临时签名信息
     NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
-    [udf setObject:params[@"data"] forKey:tencentCloudTmpData];
+    [udf setObject:params[@"tempSignatureData"] forKey:tencentCloudTmpData];
     [udf synchronize];
     if (params[@"fileUrl"] && [params[@"fileUrl"] length] > 0) {
         [self _uploadImage:params[@"fileUrl"] callback:callback];
