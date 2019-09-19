@@ -49,7 +49,25 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
     [udf setObject:params[@"data"] forKey:tencentCloudTmpData];
     [udf synchronize];
-    [self _uploadImage:params[@"fileUrl"] callback:callback];
+    if (params[@"fileUrl"] && [params[@"fileUrl"] count]) {
+        [self _uploadImage:params[@"fileUrl"] callback:callback];
+    } else if (params[@"base64String"] && [params[@"base64String"] count]) {
+        NSString *fileUrl = [self saveToSandbox:params[@"base64String"]];
+        if (fileUrl) {
+//            NSLog(@"保存成功");
+            [self _uploadImage:fileUrl callback:callback];
+        } else {
+//            NSLog(@"保存失败");
+            if (callback) {
+                callback([@{@"code":@"1",@"message":@"图片裁剪失败"} mj_JSONString],YES);
+            }
+        }
+    } else {
+        if (callback) {
+            callback([@{@"code":@"1",@"message":@"参数缺失：图片"} mj_JSONString],YES);
+        }
+    }
+    
 }
 
 - (void)uploadVideo:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack {
@@ -182,6 +200,11 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     [upload setFinishBlock:^(QCloudUploadObjectResult *result, NSError *error) {
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            
+            if ([[NSFileManager defaultManager] fileExistsAtPath:fileUrl]) {
+                [[NSFileManager defaultManager] removeItemAtPath:fileUrl error:nil];
+            }
+            
             if (error) {
                 
                 if (callback) {
@@ -357,6 +380,25 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
          
      }];
     
+}
+
+/// 存储图片到沙盒
+- (NSString *)saveToSandbox:(NSString *)base64String {
+    UIImage *image = [UIImage imageWithData:[[NSData alloc] initWithBase64EncodedString:base64String options:NSDataBase64DecodingIgnoreUnknownCharacters]];
+    
+    NSString *savePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/images"];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:savePath]) {
+        [fileManager createDirectoryAtPath:savePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    NSString *fileName = [NSString stringWithFormat:@"%@.jpg",[UploadModule getTimestamp]];
+    NSString *filePath = [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/images/%@",fileName]];
+    
+    if ([UIImageJPEGRepresentation(image,1.0) writeToFile:filePath atomically:YES]) {
+        return fileName;
+    } else {
+        return nil;
+    }
 }
 
 + (NSString *)getTimestamp {

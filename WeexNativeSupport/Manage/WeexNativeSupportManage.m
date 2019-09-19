@@ -329,7 +329,7 @@ static AFHTTPSessionManager *netWorkManager;
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
             NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
-            NSString *fileUrl = model.fileURL.absoluteString;
+            NSString *fileUrl = model.fileURL ? model.fileURL.absoluteString : @"";
             self.imageCallBack ? self.imageCallBack([@{@"base64String":base64String,@"fileUrl":fileUrl} mj_JSONString], YES) : nil;
         } failed:^{
             
@@ -464,7 +464,7 @@ static AFHTTPSessionManager *netWorkManager;
                     HXPhotoModel *model = photoList[i];
                     NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
                     [base64StringArr addObject:base64String];
-                    [fileUrlArr addObject:model.fileURL.absoluteString];
+                    [fileUrlArr addObject:model.fileURL ? model.fileURL.absoluteString : @""];
                 }
                 NSDictionary *result = @{@"base64StringArray":base64StringArr,@"fileUrlArray":fileUrlArr};
                 self.imageCallBack ? self.imageCallBack([result mj_JSONString], YES) : nil;
