@@ -49,9 +49,9 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
     [udf setObject:params[@"data"] forKey:tencentCloudTmpData];
     [udf synchronize];
-    if (params[@"fileUrl"] && [params[@"fileUrl"] count]) {
+    if (params[@"fileUrl"] && [params[@"fileUrl"] length] > 0) {
         [self _uploadImage:params[@"fileUrl"] callback:callback];
-    } else if (params[@"base64String"] && [params[@"base64String"] count]) {
+    } else if (params[@"base64String"] && [params[@"base64String"] length] > 0) {
         NSString *fileUrl = [self saveToSandbox:params[@"base64String"]];
         if (fileUrl) {
 //            NSLog(@"保存成功");
@@ -395,7 +395,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     NSString *filePath = [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/images/%@",fileName]];
     
     if ([UIImageJPEGRepresentation(image,1.0) writeToFile:filePath atomically:YES]) {
-        return fileName;
+        return filePath;
     } else {
         return nil;
     }
