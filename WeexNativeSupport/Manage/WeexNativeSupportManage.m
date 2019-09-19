@@ -307,6 +307,7 @@ static AFHTTPSessionManager *netWorkManager;
     self.imageCallBack = callBack;
     self.manager.configuration.singleSelected = YES;
     self.manager.configuration.singleJumpEdit = [parame[@"edit"] boolValue];            //是否可以裁剪
+    self.manager.configuration.photoCanEdit = [parame[@"edit"] boolValue];
     if([parame[@"edit"] boolValue]){
         self.manager.configuration.movableCropBox = [parame[@"movableCropBox"] boolValue];  //是否可移动的裁剪框
         self.manager.configuration.movableCropBoxEditSize = [parame[@"movableCropBoxEditSize"] boolValue];;  //可移动的裁剪框是否可以编辑大小
