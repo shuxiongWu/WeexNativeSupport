@@ -143,7 +143,10 @@
     [alert addAction:cancel];
     [alert addAction:settings];
     
-    [self presentViewController:alert animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+    
 }
 #pragma mark 使用相机设备受限
 -(void)showAuthorizationRestricted {

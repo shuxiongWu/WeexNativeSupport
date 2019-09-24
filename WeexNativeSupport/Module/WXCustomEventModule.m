@@ -382,8 +382,11 @@ WX_EXPORT_METHOD(@selector(writeReviews:))
             [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:array[idx]] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
                 
             } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-                __block ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
-                [lib writeImageToSavedPhotosAlbum:image.CGImage metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
+                //保存图片到【相机胶卷】
+                /// 异步执行修改操作
+                [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                    [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+                } completionHandler:^(BOOL success, NSError * _Nullable error) {
                     if (error) {
                         fail = YES;
                     }
@@ -401,8 +404,10 @@ WX_EXPORT_METHOD(@selector(writeReviews:))
         }else {//base64图片字符串
             NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:urlString options:(NSDataBase64DecodingIgnoreUnknownCharacters)];
             UIImage *decodedImage = [UIImage imageWithData: decodeData];
-            __block ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
-            [lib writeImageToSavedPhotosAlbum:decodedImage.CGImage metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
+            
+            [[PHPhotoLibrary sharedPhotoLibrary]performChanges:^{
+                [PHAssetChangeRequest creationRequestForAssetFromImage:decodedImage];
+            } completionHandler:^(BOOL success, NSError * _Nullable error) {
                 if (error) {
                     fail = YES;
                 }

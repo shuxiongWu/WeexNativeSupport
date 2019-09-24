@@ -41,7 +41,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor grayColor];
-    [self.locationManager startUpdatingLocation];
+    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+        [self.locationManager startUpdatingLocation];
+    }
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
     if (self.manager.configuration.videoMaximumDuration > self.manager.configuration.videoMaxDuration) {
         self.manager.configuration.videoMaximumDuration = self.manager.configuration.videoMaxDuration;
@@ -171,7 +173,7 @@
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-    AVCaptureConnection *previewLayerConnection = [(AVCaptureVideoPreviewLayer *)self.previewView.layer connection]; 
+    AVCaptureConnection *previewLayerConnection = [(AVCaptureVideoPreviewLayer *)self.previewView.layer connection];
     if ([previewLayerConnection isVideoOrientationSupported])
         [previewLayerConnection setVideoOrientation:(AVCaptureVideoOrientation)[[UIApplication sharedApplication] statusBarOrientation]];
 }
@@ -188,9 +190,11 @@
     [super viewDidDisappear:animated];
     [self stopTimer];
     [self.cameraController stopSession];
-} 
+}
 - (void)dealloc {
-    [self.locationManager stopUpdatingLocation];
+    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+        [self.locationManager stopUpdatingLocation];
+    }
     if (showLog) NSSLog(@"dealloc");
 }
 - (void)cancelClick:(UIButton *)button {
@@ -274,19 +278,10 @@
     }
     [self stopTimer];
     [self.cameraController stopMontionUpdate];
-    [self.cameraController stopSession]; 
+    [self.cameraController stopSession];
     if (self.manager.configuration.saveSystemAblum) {
         if (model.type == HXPhotoModelMediaTypeCameraPhoto) {
-            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto location:self.location complete:^(HXPhotoModel *model, BOOL success) {
-                if ([self.delegate respondsToSelector:@selector(customCameraViewController:didDone:)]) {
-                    [self.delegate customCameraViewController:self didDone:model];
-                }
-                if (self.doneBlock) {
-                    self.doneBlock(model, self);
-                }
-                [self dismissViewControllerAnimated:YES completion:nil];
-            }];
-            return;
+            [HXPhotoTools savePhotoToCustomAlbumWithName:self.manager.configuration.customAlbumName photo:model.thumbPhoto];
         }else {
             [HXPhotoTools saveVideoToCustomAlbumWithName:self.manager.configuration.customAlbumName videoURL:model.videoURL];
         }
@@ -618,8 +613,8 @@
     }
     else if(error.code == kCLErrorDenied) {
         if (showLog) NSSLog(@"定位失败，定位权限的问题");
-        [self.locationManager stopUpdatingLocation];
-        self.locationManager = nil;
+//        [self.locationManager stopUpdatingLocation];
+//        self.locationManager = nil;
     }
 }
 @end

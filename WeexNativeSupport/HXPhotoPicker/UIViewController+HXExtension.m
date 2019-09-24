@@ -16,6 +16,7 @@
     vc.manager = manager;
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
+    nav.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:nav animated:YES completion:nil];
 }
 
@@ -27,31 +28,38 @@
     vc.delegate = (id)self;
     HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
     nav.supportRotation = manager.configuration.supportRotation;
+    nav.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager delegate:(id)delegate {
-    HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
-    vc.delegate = delegate ? delegate : (id)self;
-    vc.manager = manager;
-    vc.isOutside = YES;
-    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-    nav.isCamera = YES;
-    nav.supportRotation = manager.configuration.supportRotation;
-    [self presentViewController:nav animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
+        vc.delegate = delegate ? delegate : (id)self;
+        vc.manager = manager;
+        vc.isOutside = YES;
+        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+        nav.isCamera = YES;
+        nav.supportRotation = manager.configuration.supportRotation;
+        nav.modalPresentationStyle = UIModalPresentationFullScreen;
+        [self presentViewController:nav animated:YES completion:nil];
+    });
 }
 
 - (void)hx_presentCustomCameraViewControllerWithManager:(HXPhotoManager *)manager done:(HXCustomCameraViewControllerDidDoneBlock)done cancel:(HXCustomCameraViewControllerDidCancelBlock)cancel {
-    HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
-    vc.doneBlock = done;
-    vc.cancelBlock = cancel;
-    vc.manager = manager;
-    vc.isOutside = YES;
-    vc.delegate = (id)self;
-    HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
-    nav.isCamera = YES;
-    nav.supportRotation = manager.configuration.supportRotation;
-    [self presentViewController:nav animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        HXCustomCameraViewController *vc = [[HXCustomCameraViewController alloc] init];
+        vc.doneBlock = done;
+        vc.cancelBlock = cancel;
+        vc.manager = manager;
+        vc.isOutside = YES;
+        vc.delegate = (id)self;
+        HXCustomNavigationController *nav = [[HXCustomNavigationController alloc] initWithRootViewController:vc];
+        nav.isCamera = YES;
+        nav.supportRotation = manager.configuration.supportRotation;
+        nav.modalPresentationStyle = UIModalPresentationFullScreen;
+        [self presentViewController:nav animated:YES completion:nil];
+    });
 }
 
 - (BOOL)navigationBarWhetherSetupBackground {

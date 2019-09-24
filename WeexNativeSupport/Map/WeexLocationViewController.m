@@ -269,23 +269,23 @@
     
 }
 
--(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-    if (scrollView.contentOffset.y > 0) {
-        [UIView animateWithDuration:0.4 animations:^{
-            self.mapView.mj_y = self.mapView_y - 60;
-            self.tableView.mj_y = self.tableView_y - 120;
-            self.tableView.mj_h = self.tableView_h + 120;
-            self.againLocation.mj_y = 120;
-        }];
-    }else{
-        [UIView animateWithDuration:0.4 animations:^{
-            self.mapView.mj_y = self.mapView_y;
-            self.tableView.mj_y = self.tableView_y;
-            self.tableView.mj_h = self.tableView_h;
-            self.againLocation.mj_y = 180;
-        }];
-    }
-}
+//-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+//    if (scrollView.contentOffset.y > 0) {
+//        [UIView animateWithDuration:0.4 animations:^{
+//            self.mapView.mj_y = self.mapView_y - 60;
+//            self.tableView.mj_y = self.tableView_y - 120;
+//            self.tableView.mj_h = self.tableView_h + 120;
+//            self.againLocation.mj_y = 120;
+//        }];
+//    }else{
+//        [UIView animateWithDuration:0.4 animations:^{
+//            self.mapView.mj_y = self.mapView_y;
+//            self.tableView.mj_y = self.tableView_y;
+//            self.tableView.mj_h = self.tableView_h;
+//            self.againLocation.mj_y = 180;
+//        }];
+//    }
+//}
 
 #pragma mark --UITableViewDelegate,UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
