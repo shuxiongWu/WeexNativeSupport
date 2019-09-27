@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -14,7 +13,6 @@
                 <outlet property="mapView" destination="zZX-rF-mvO" id="BDC-26-Bn3"/>
                 <outlet property="navViewHeight" destination="oWL-o8-Kbu" id="g25-3P-tqc"/>
                 <outlet property="searchBar" destination="kCw-wM-zgF" id="ble-TP-pXg"/>
-                <outlet property="searchDisplayController" destination="Y1h-Mb-2i8" id="GVV-qw-sk2"/>
                 <outlet property="tableView" destination="BHN-6Z-az4" id="7Yi-3v-wKx"/>
                 <outlet property="view" destination="iN0-l3-epB" id="MHo-5B-GuO"/>
             </connections>
@@ -28,7 +26,7 @@
                     <rect key="frame" x="0.0" y="109" width="375" height="240"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="common_annotation" translatesAutoresizingMaskIntoConstraints="NO" id="7sA-Ho-CIr">
-                            <rect key="frame" x="167" y="82" width="40" height="40"/>
+                            <rect key="frame" x="167.5" y="82" width="40" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="40" id="FCD-zE-gKi"/>
                                 <constraint firstAttribute="height" constant="40" id="YGY-GU-SLf"/>
@@ -112,14 +110,6 @@
             </constraints>
             <point key="canvasLocation" x="25.5" y="51.5"/>
         </view>
-        <searchDisplayController id="Y1h-Mb-2i8">
-            <connections>
-                <outlet property="delegate" destination="-1" id="OZp-Mc-MvI"/>
-                <outlet property="searchContentsController" destination="-1" id="FNc-v7-XY6"/>
-                <outlet property="searchResultsDataSource" destination="-1" id="aHx-zT-W7t"/>
-                <outlet property="searchResultsDelegate" destination="-1" id="eoc-mI-y9S"/>
-            </connections>
-        </searchDisplayController>
     </objects>
     <resources>
         <image name="common_annotation" width="38" height="38"/>
