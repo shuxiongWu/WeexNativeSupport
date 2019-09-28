@@ -59,7 +59,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
         } else {
 //            NSLog(@"保存失败");
             if (callback) {
-                callback([@{@"code":@"1",@"message":@"图片裁剪失败"} mj_JSONString],YES);
+                callback([@{@"code":@"1",@"message":@"图片保存失败"} mj_JSONString],YES);
             }
         }
     } else {
@@ -200,11 +200,12 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     [upload setFinishBlock:^(QCloudUploadObjectResult *result, NSError *error) {
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            
-            if ([[NSFileManager defaultManager] fileExistsAtPath:fileUrl]) {
-                [[NSFileManager defaultManager] removeItemAtPath:fileUrl error:nil];
+            if (fileUrl.length > 7) {
+                NSString *filePath = [fileUrl substringFromIndex:7];
+                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+                    [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                }
             }
-            
             if (error) {
                 
                 if (callback) {
@@ -395,7 +396,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     NSString *filePath = [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/images/%@",fileName]];
     
     if ([UIImageJPEGRepresentation(image,1.0) writeToFile:filePath atomically:YES]) {
-        return filePath;
+        return [NSString stringWithFormat:@"file://%@",filePath];
     } else {
         return nil;
     }
