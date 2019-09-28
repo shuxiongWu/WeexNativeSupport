@@ -21,8 +21,9 @@ WX_EXPORT_METHOD(@selector(dismissWithParams:))
 - (void)presentWithParams:(NSDictionary *)params{
     UIViewController *demo = [[WXDemoViewController alloc] init];
     ((WXDemoViewController *)demo).url = [NSURL URLWithString:params[@"url"]];
-    demo.modalPresentationStyle = UIModalPresentationFullScreen;
-    [weexInstance.viewController presentViewController:[[WXRootViewController alloc] initWithRootViewController:demo] animated:[params[@"animate"] boolValue] ?: NO completion:nil];
+    WXRootViewController *root = [[WXRootViewController alloc] initWithRootViewController:demo];
+    root.modalPresentationStyle = UIModalPresentationFullScreen;
+    [weexInstance.viewController presentViewController:root animated:[params[@"animate"] boolValue] ?: NO completion:nil];
 }
 
 - (void)dismissWithParams:(NSDictionary *)params {
