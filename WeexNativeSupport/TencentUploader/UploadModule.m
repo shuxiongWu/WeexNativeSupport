@@ -49,22 +49,15 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
     [udf setObject:params[@"tempSignatureData"] forKey:tencentCloudTmpData];
     [udf synchronize];
-    if (params[@"fileUrl"] && [params[@"fileUrl"] length] > 0) {
-        [self _uploadImage:params[@"fileUrl"] callback:callback];
-    } else if (params[@"base64String"] && [params[@"base64String"] length] > 0) {
-        NSString *fileUrl = [self saveToSandbox:params[@"base64String"]];
-        if (fileUrl) {
+    
+    NSString *fileUrl = [self saveToSandbox:params[@"base64String"] fileUrl:params[@"fileUrl"]];
+    if (fileUrl) {
 //            NSLog(@"保存成功");
-            [self _uploadImage:fileUrl callback:callback];
-        } else {
-//            NSLog(@"保存失败");
-            if (callback) {
-                callback([@{@"code":@"1",@"message":@"图片保存失败"} mj_JSONString],YES);
-            }
-        }
+        [self _uploadImage:fileUrl callback:callback];
     } else {
+//            NSLog(@"保存失败");
         if (callback) {
-            callback([@{@"code":@"1",@"message":@"参数缺失：图片"} mj_JSONString],YES);
+            callback([@{@"code":@"1",@"message":@"图片保存失败"} mj_JSONString],YES);
         }
     }
     
@@ -384,9 +377,18 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
 }
 
 /// 存储图片到沙盒
-- (NSString *)saveToSandbox:(NSString *)base64String {
-    UIImage *image = [UIImage imageWithData:[[NSData alloc] initWithBase64EncodedString:base64String options:NSDataBase64DecodingIgnoreUnknownCharacters]];
+- (NSString *)saveToSandbox:(NSString *)base64String fileUrl:(NSString *)fileUrl {
+    UIImage *ori_image;
+    if (base64String) {
+        ori_image = [UIImage imageWithData:[[NSData alloc] initWithBase64EncodedString:base64String options:NSDataBase64DecodingIgnoreUnknownCharacters]];
+    } else if (fileUrl) {
+        ori_image = [UIImage imageWithContentsOfFile:fileUrl];
+    } else {
+        // 没有else的啦
+        return nil;
+    }
     
+    UIImage *image = [self zipImageWithImage:ori_image];
     NSString *savePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/images"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:savePath]) {
@@ -415,6 +417,66 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     return timeSp;
     
 }
+
+/**
+ 压图片质量
+ @param image image
+ @return Data
+ */
+- (UIImage *)zipImageWithImage:(UIImage *)image
+{
+    if (!image) {
+        return nil;
+    }
+    CGFloat maxFileSize = 100*1024;
+    CGFloat compression = 0.9f;
+    NSData *compressedData = UIImageJPEGRepresentation(image, compression);
+    while ([compressedData length] > maxFileSize) {
+        compression *= 0.9;
+        compressedData = UIImageJPEGRepresentation([self compressImage:image newWidth:image.size.width*compression], compression);
+    }
+    UIImage *result = [UIImage imageWithData:compressedData];
+    return result;
+}
+
+/**
+ *  等比缩放本图片大小
+ *
+ *  @param newImageWidth 缩放后图片宽度，像素为单位
+ *
+ *  @return self-->(image)
+ */
+- (UIImage *)compressImage:(UIImage *)image newWidth:(CGFloat)newImageWidth
+{
+    if (!image) return nil;
+    float imageWidth = image.size.width;
+    float imageHeight = image.size.height;
+    float width = newImageWidth;
+    float height = image.size.height/(image.size.width/width);
+    
+    float widthScale = imageWidth /width;
+    float heightScale = imageHeight /height;
+    
+    // 创建一个bitmap的context
+    // 并把它设置成为当前正在使用的context
+    UIGraphicsBeginImageContext(CGSizeMake(width, height));
+    
+    if (widthScale > heightScale) {
+        [image drawInRect:CGRectMake(0, 0, imageWidth /heightScale , height)];
+    }
+    else {
+        [image drawInRect:CGRectMake(0, 0, width , imageHeight /widthScale)];
+    }
+    
+    // 从当前context中创建一个改变大小后的图片
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    // 使当前的context出堆栈
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+    
+}
+
 
 /// 获取视频第一帧
 - (UIImage*)getVideoPreViewImage:(NSURL *)path {
