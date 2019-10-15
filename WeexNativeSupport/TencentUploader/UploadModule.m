@@ -45,6 +45,23 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     if ([params isKindOfClass:[NSString class]]) {
         params = [params mj_JSONObject];
     }
+    
+    NSMutableDictionary *mdic = [[NSMutableDictionary alloc] initWithDictionary:params[@"tempSignatureData"]];
+    
+    // 腾讯云工单结果：这种方式后去临时签名，会有一层缓存，只要秘钥没过期，就会一直用该临时秘钥，建议您需要用秘钥的时候，直接在signatrue去申请，不用这里的栅栏机制
+    
+    // ExpiredTime
+    // 在ExpiredTime有效期内只会调用一次脚手架的签名；这时候如果后台存储桶发生改变并且重新签名，而这里没有调用脚手架重新签名（用的旧签名），就会导致403错误
+    // TODO: 暂时的处理方法
+    // 验证了一下，这里修改ExpiredTime暂时来说并不会对使用有什么影响
+    NSInteger ExpiredTime = [[UploadModule getTimestamp] integerValue] + 5;
+    [mdic setObject:[NSString stringWithFormat:@"%ld",ExpiredTime] forKey:@"ExpiredTime"];
+    
+    /// 保存临时签名信息
+    NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
+    [udf setObject:mdic forKey:tencentCloudTmpData];
+    [udf synchronize];
+    
     /// 保存临时签名信息
     NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
     [udf setObject:params[@"tempSignatureData"] forKey:tencentCloudTmpData];

@@ -113,10 +113,46 @@ WX_EXPORT_METHOD(@selector(openSettings))
 //撰写评论
 WX_EXPORT_METHOD(@selector(writeReviews:))
 
+//复制字符串到剪切板
+WX_EXPORT_METHOD(@selector(copyStringToPasteboard:))
+WX_EXPORT_METHOD(@selector(copyStringsToPasteboard:))
+
+//获取剪切板的字符串
+WX_EXPORT_METHOD(@selector(getPasteboardString:))
+WX_EXPORT_METHOD(@selector(getPasteboardStrings:))
+
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
 }
 
+- (void)copyStringToPasteboard:(NSString *)text {
+    if (![text isKindOfClass:[NSString class]]) {
+        return;
+    }
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    pasteboard.string = text;
+}
+
+- (void)copyStringsToPasteboard:(NSArray *)array {
+    if (![array isKindOfClass:[NSArray class]]) {
+        return;
+    }
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    pasteboard.strings = array;
+}
+
+- (void)getPasteboardString:(WXModuleKeepAliveCallback)callback {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    if (callback) {
+        callback(pasteboard.string, YES);
+    }
+}
+- (void)getPasteboardStrings:(WXModuleKeepAliveCallback)callback {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    if (callback) {
+        callback(pasteboard.strings, YES);
+    }
+}
 
 #pragma mark -- 撰写评论
 - (void)writeReviews:(NSString *)appId {
