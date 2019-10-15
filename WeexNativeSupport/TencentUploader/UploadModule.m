@@ -59,7 +59,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     
     /// 保存临时签名信息
     NSUserDefaults *udf = [NSUserDefaults standardUserDefaults];
-    [udf setObject:params[@"tempSignatureData"] forKey:tencentCloudTmpData];
+    [udf setObject:mdic forKey:tencentCloudTmpData];
     [udf synchronize];
     
     NSString *fileUrl = [self saveToSandbox:params[@"base64String"] fileUrl:params[@"fileUrl"]];
