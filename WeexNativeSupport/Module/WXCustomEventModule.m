@@ -27,6 +27,7 @@
 #import <SVProgressHUD.h>
 #import <UserNotifications/UserNotifications.h>
 #import <StoreKit/StoreKit.h>
+#import <MJExtension.h>
 
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()
@@ -133,12 +134,12 @@ WX_EXPORT_METHOD(@selector(getPasteboardStrings:))
     pasteboard.string = text;
 }
 
-- (void)copyStringsToPasteboard:(NSArray *)array {
-    if (![array isKindOfClass:[NSArray class]]) {
-        return;
+- (void)copyStringsToPasteboard:(id)obj {
+    if ([obj isKindOfClass:[NSString class]]) {
+        obj = [obj mj_JSONObject];
     }
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.strings = array;
+    pasteboard.strings = obj;
 }
 
 - (void)getPasteboardString:(WXModuleKeepAliveCallback)callback {
@@ -150,7 +151,7 @@ WX_EXPORT_METHOD(@selector(getPasteboardStrings:))
 - (void)getPasteboardStrings:(WXModuleKeepAliveCallback)callback {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     if (callback) {
-        callback(pasteboard.strings, YES);
+        callback([pasteboard.strings mj_JSONString], YES);
     }
 }
 
