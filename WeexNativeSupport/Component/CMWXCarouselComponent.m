@@ -121,4 +121,10 @@
                                              }];
 }
 
+- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index {
+    [self fireEvent:@"didSelectIndex" params:@{
+        @"index":[NSString stringWithFormat:@"%ld",index];
+                                            }];
+}
+
 @end
