@@ -358,6 +358,11 @@
     [self.locationManager setLocatingWithReGeocode:YES];
 }
 
+//尚未请求定位权限
+- (void)amapLocationManager:(AMapLocationManager *)manager doRequireLocationAuth:(CLLocationManager *)locationManager {
+    [locationManager requestWhenInUseAuthorization];
+}
+
 - (void)amapLocationManager:(AMapLocationManager *)manager didUpdateLocation:(CLLocation *)location reGeocode:(AMapLocationReGeocode *)reGeocode
 {
     WeexAddressModel *model = [[WeexAddressModel alloc] init];
