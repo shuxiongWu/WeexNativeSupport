@@ -24,6 +24,7 @@
 @property (nonatomic, assign) iCarouselType carouseType;  //展现类型
 @property (nonatomic, assign) NSInteger currentIndex;     //当前展示第几个
 @property (nonatomic, copy) NSString *placeholder;  //占位图
+@property (nonatomic, assign, getter = isPagingEnabled) BOOL pagingEnabled;
 
 @end
 
@@ -47,6 +48,7 @@
 - (void)setAttributes {
     self.carousel.type = self.carouseType;
     self.currentIndex = self.currentIndex;
+    self.carousel.pagingEnabled = self.isPagingEnabled;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance {
@@ -62,6 +64,9 @@
         }
         if (attributes[@"placeholder"]) {
             _placeholder = attributes[@"placeholder"];
+        }
+        if (attributes[@"pagingEnabled"]) {
+            _pagingEnabled = [WXConvert BOOL:attributes[@"pagingEnabled"]];
         }
     }
     return self;
