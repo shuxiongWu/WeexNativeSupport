@@ -34,6 +34,7 @@
 
 @property (nonatomic, strong) WeexNativeSupportManage *nativeManage;                                      //weex原生支持管理类
 @property (nonatomic, copy) WXModuleKeepAliveCallback sanqrCallBack;
+@property (nonatomic, copy) WXModuleKeepAliveCallback downloadImageCallback;
 @property (nonatomic, strong) WeexQRViewController *scanQRCtl;
 @end
 
@@ -122,8 +123,42 @@ WX_EXPORT_METHOD(@selector(copyStringsToPasteboard:))
 WX_EXPORT_METHOD(@selector(getPasteboardString:))
 WX_EXPORT_METHOD(@selector(getPasteboardStrings:))
 
+//下载网络图片到相册
+WX_EXPORT_METHOD(@selector(downloadImageWithUrl:callback:))
+
+
 + (void)load{
     [WXSDKEngine registerModule:@"event" withClass:[WXCustomEventModule class]];
+}
+
+//下载网络图片到相册
+- (void)downloadImageWithUrl:(NSString *)urlString callback:(WXModuleKeepAliveCallback)callback {
+    if (!urlString || ![urlString isKindOfClass:[NSString class]]) {
+        if (callback) {
+            callback([@{@"code":@"1",@"message":@"参数错误"} mj_JSONString],YES);
+        }
+        return;
+    }
+    NSData *data = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:urlString]];
+    UIImage *image = [UIImage imageWithData:data];
+    if (!image) {
+        if (callback) {
+            callback([@{@"code":@"1",@"message":@"无法下载，请检查图片url"} mj_JSONString],YES);
+        }
+    }
+    self.downloadImageCallback = callback;
+    UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+}
+// 下载结果
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+//    NSLog(@"image = %@, error = %@, contextInfo = %@", image, error, contextInfo);
+    if (self.downloadImageCallback) {
+        if (error) {
+            self.downloadImageCallback([@{@"code":@"1",@"message":@"保存到相册失败，请检查是否开启相册权限"} mj_JSONString],YES);
+        } else {
+            self.downloadImageCallback([@{@"code":@"0",@"message":@"保存成功"} mj_JSONString],YES);
+        }
+    }
 }
 
 - (void)copyStringToPasteboard:(NSString *)text {
