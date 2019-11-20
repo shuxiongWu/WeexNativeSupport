@@ -25,7 +25,7 @@
 @property (nonatomic, assign) NSInteger currentIndex;     //当前展示第几个
 @property (nonatomic, copy) NSString *placeholder;  //占位图
 @property (nonatomic, assign, getter = isPagingEnabled) BOOL pagingEnabled;
-
+@property (nonatomic, assign) BOOL clipsToBounds;
 @end
 
 @implementation CMWXCarouselComponent
@@ -42,6 +42,7 @@
 - (void)viewDidLoad {
     self.carousel.delegate = self;
     self.carousel.dataSource = self;
+    self.carousel.clipsToBounds = self.clipsToBounds;
     [self setAttributes];
 }
 
@@ -66,7 +67,10 @@
             _placeholder = attributes[@"placeholder"];
         }
         if (attributes[@"pagingEnabled"]) {
-            _pagingEnabled = [WXConvert BOOL:attributes[@"pagingEnabled"]];
+            _pagingEnabled = attributes[@"pagingEnabled"];
+        }
+        if (attributes[@"clipsToBounds"]) {
+            _clipsToBounds = [WXConvert BOOL:attributes[@"clipsToBounds"]];
         }
     }
     return self;
@@ -125,7 +129,6 @@
                                              @"imgUrl":_urlArray[carousel.currentItemIndex]
                                              }];
 }
-
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index {
     [self fireEvent:@"didSelectIndex" params:@{
         @"index":[NSString stringWithFormat:@"%ld",index]
