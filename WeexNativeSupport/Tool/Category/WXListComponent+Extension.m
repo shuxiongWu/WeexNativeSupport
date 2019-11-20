@@ -12,6 +12,7 @@
 @interface WXListComponent ()<UITableViewDelegate,UITableViewDataSource>
 
 @property (nonatomic, copy) NSString *editType;
+@property (nonatomic, assign) BOOL enlargeDragRange;
 
 @end
 
@@ -35,6 +36,9 @@
     id ret = [self new1_initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (attributes[@"editType"]) {
         self.editType = attributes[@"editType"];
+    }
+    if (attributes[@"enlargeDragRange"]) {
+        self.enlargeDragRange = [WXConvert BOOL:attributes[@"enlargeDragRange"]];
     }
     return ret;
 }
@@ -83,6 +87,22 @@
                                             @"toSection":@(destinationIndexPath.section),
                                             @"toIndex":@(destinationIndexPath.row),
                                             }];
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (tableView.editing && self.enlargeDragRange) {
+        for (UIView * view in cell.subviews) {
+            if ([NSStringFromClass([view class]) rangeOfString: @"UITableViewCellReorderControl"].location != NSNotFound) {
+                for (UIView * subview in view.subviews) {
+                    if ([subview isKindOfClass: [UIImageView class]]) {
+                        
+                        subview.superview.frame = cell.bounds;
+                        ((UIImageView *)subview).image = [UIImage imageNamed:@""];
+                    }
+                }
+            }
+        }
+    }
 }
 
 @end
