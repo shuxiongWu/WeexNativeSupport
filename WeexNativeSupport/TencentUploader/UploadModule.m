@@ -129,8 +129,8 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     
     [weexInstance.viewController hx_presentAlbumListViewControllerWithManager:manager
                                                                          done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
-                                                                             
-                                                                             [SVProgressHUD showWithStatus:@"视频上传中…"];
+                                                                             [SVProgressHUD setMinimumDismissTimeInterval:300];
+                                                                             [SVProgressHUD showWithStatus:@"视频上传中..."];
                                                                              HXPhotoModel *model = [videoList firstObject];
                                                                              if ([model.avAsset isKindOfClass:[AVComposition class]]) {
                                                                                  /// 慢动作视频
@@ -177,6 +177,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     cameraVC.ASSeconds = videoMaxDuration;//设置可录制最长时间
     [cameraVC setTakeBlock:^(id item) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD setMinimumDismissTimeInterval:300];
             [SVProgressHUD showWithStatus:@"视频上传中..."];
         });
         NSURL *videoURL = item;
