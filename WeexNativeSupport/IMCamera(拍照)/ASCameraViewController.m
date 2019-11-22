@@ -85,6 +85,19 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
 
 @implementation ASCameraViewController
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.modalPresentationStyle = UIModalPresentationFullScreen;
+    }
+    return self;
+}
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    self.modalPresentationStyle = UIModalPresentationFullScreen;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
