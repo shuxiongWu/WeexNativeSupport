@@ -16,6 +16,7 @@
 
 @end
 
+static char const * const enlargeDragRangeKey = "enlargeDragRangeKey";
 @implementation WXListComponent (Extension)
 
 - (void)setEditType:(NSString *)editType {
@@ -24,6 +25,16 @@
 
 - (NSString *)editType {
     return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setEnlargeDragRange:(BOOL)enlargeDragRange {
+    NSNumber *boolNumber = [NSNumber numberWithBool:enlargeDragRange];
+    objc_setAssociatedObject(self, enlargeDragRangeKey, boolNumber , OBJC_ASSOCIATION_RETAIN);
+}
+
+- (BOOL)enlargeDragRange {
+    NSNumber *number = objc_getAssociatedObject(self, enlargeDragRangeKey);
+    return [number boolValue];
 }
 
 + (void)load {
