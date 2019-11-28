@@ -24,6 +24,8 @@
 typedef void (^SuccesslBlock)(NSURLSessionDataTask *task, NSDictionary *respone);
 typedef void (^FailureBlock)(NSURLSessionDataTask *task, NSError* error);
 @property (strong, nonatomic) HXPhotoManager *manager;
+// 视频质量
+@property (nonatomic, copy) NSString *videoQuality;
 
 @end
 @implementation CMVideoModule
@@ -49,6 +51,7 @@ static AFHTTPSessionManager *netWorkManager;
 }
 
 - (void)videoRecordingAndUploadWithParams:(NSDictionary *)params callBack:(WXKeepAliveCallback)callBack{
+    self.videoQuality = params[@"videoQuality"] ? : AVAssetExportPresetHighestQuality;
     NSString *bundlePath = [[NSBundle mainBundle]pathForResource: @"HXPhotoPicker"ofType:@"bundle"];
     NSBundle *resourceBundle =[NSBundle bundleWithPath:bundlePath];
     ASCameraViewController *cameraVC = [resourceBundle loadNibNamed:@"ASCameraViewController" owner:self
@@ -62,18 +65,25 @@ static AFHTTPSessionManager *netWorkManager;
         UIImage *preViewImage = [self getVideoPreViewImage:videoURL];
         NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:UIImageJPEGRepresentation(preViewImage, 0.5)];
         [self zipVideoWithInputURL:videoURL completeBlock:^(NSURL * url) {
-            NSData *data = [NSData dataWithContentsOfURL:url];
-            [self uploadVideoTodataBaseWithUrl:params[@"url"] parameters:@{
-                                                                           @"img":base64String
-                                                                           } videoData:data success:^(NSURLSessionDataTask *task, NSDictionary *respone) {
-                if (callBack) {
-                    callBack(respone ,YES);
-                }
-            } failure:^(NSURLSessionDataTask *task, NSError *error) {
+            if (url) {
+                NSData *data = [NSData dataWithContentsOfURL:url];
+                [self uploadVideoTodataBaseWithUrl:params[@"url"] parameters:@{
+                                                                               @"img":base64String
+                                                                               } videoData:data success:^(NSURLSessionDataTask *task, NSDictionary *respone) {
+                    if (callBack) {
+                        callBack(respone ,YES);
+                    }
+                } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                    if (callBack) {
+                        callBack(@{} ,YES);
+                    }
+                }];
+            } else {
                 if (callBack) {
                     callBack(@{} ,YES);
                 }
-            }];
+            }
+            
         }];
     }];
     [weexInstance.viewController presentViewController:cameraVC animated:YES completion:nil];
@@ -212,6 +222,7 @@ typedef void(^ResultPath)(AVURLAsset *avurlAsset,NSString *filePath, NSString *f
 }
 
 - (void)selectVideoFromPhotoAlbumAndUploadWithParams:(NSDictionary *)params callBack:(WXKeepAliveCallback)callBack {
+    self.videoQuality = params[@"videoQuality"] ? : AVAssetExportPresetHighestQuality;
     self.manager.configuration.videoMaxDuration = [params[@"seconds"] integerValue];
     [self.manager clearSelectedList];
     [weexInstance.viewController hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
@@ -302,7 +313,7 @@ typedef void(^ResultPath)(AVURLAsset *avurlAsset,NSString *filePath, NSString *f
     
     AVURLAsset *avAsset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
     
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetMediumQuality];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:self.videoQuality];
     //  NSLog(resultPath);
     exportSession.outputURL = newVideoUrl;
     exportSession.outputFileType = AVFileTypeMPEG4;

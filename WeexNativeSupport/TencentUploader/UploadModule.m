@@ -26,6 +26,8 @@ static NSString *tencentCloudTmpData = @"tencentCloudTmpData";
 @interface UploadModule ()
 
 @property (nonatomic, weak) QCloudCOSXMLUploadObjectRequest *uploadRequest;
+// 视频质量，默认高
+@property (nonatomic, copy) NSString *videoQuality;
 
 @end
 
@@ -45,7 +47,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     if ([params isKindOfClass:[NSString class]]) {
         params = [params mj_JSONObject];
     }
-    
+    self.videoQuality = params[@"videoQuality"] ? : AVAssetExportPresetHighestQuality;
     NSMutableDictionary *mdic = [[NSMutableDictionary alloc] initWithDictionary:params[@"tempSignatureData"]];
     
     // 腾讯云工单结果：这种方式后去临时签名，会有一层缓存，只要秘钥没过期，就会一直用该临时秘钥，建议您需要用秘钥的时候，直接在signatrue去申请，不用这里的栅栏机制
@@ -156,7 +158,14 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
                                                                              
                                                                              [self zipVideoWithInputURL:videoUrl completeBlock:^(NSURL *outputUrl) {
                                                                                  
-                                                                                 [self uploadFile:outputUrl callBack:callBack];
+                                                                                 if (outputUrl) {
+                                                                                     [self uploadFile:outputUrl callBack:callBack];
+                                                                                 } else {
+                                                                                     if (callBack) {
+                                                                                         NSDictionary *result = @{@"code":@(1), @"message":@"视频压缩失败，请检查参数",@"data":@{}};
+                                                                                         callBack([result mj_JSONString],NO);
+                                                                                     }
+                                                                                 }
                                                                              }];
                                                                              
                                                                              
@@ -183,7 +192,14 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
         NSURL *videoURL = item;
         [self zipVideoWithInputURL:videoURL completeBlock:^(NSURL * url) {
             
-            [self uploadFile:url callBack:callBack];
+            if (url) {
+                [self uploadFile:url callBack:callBack];
+            } else {
+                if (callBack) {
+                    NSDictionary *result = @{@"code":@(1), @"message":@"视频压缩失败，请检查参数",@"data":@{}};
+                    callBack([result mj_JSONString],NO);
+                }
+            }
         }];
     }];
     [weexInstance.viewController presentViewController:cameraVC animated:YES completion:nil];
@@ -337,7 +353,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     
     AVURLAsset *avAsset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
     /// 视频压缩等级
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetHighestQuality];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:self.videoQuality];
     //  NSLog(resultPath);
     exportSession.outputURL = newVideoUrl;
     exportSession.outputFileType = AVFileTypeMPEG4;
