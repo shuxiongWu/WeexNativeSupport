@@ -47,7 +47,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     if ([params isKindOfClass:[NSString class]]) {
         params = [params mj_JSONObject];
     }
-    self.videoQuality = params[@"videoQuality"] ? : AVAssetExportPresetHighestQuality;
+    
     NSMutableDictionary *mdic = [[NSMutableDictionary alloc] initWithDictionary:params[@"tempSignatureData"]];
     
     // 腾讯云工单结果：这种方式后去临时签名，会有一层缓存，只要秘钥没过期，就会一直用该临时秘钥，建议您需要用秘钥的时候，直接在signatrue去申请，不用这里的栅栏机制
@@ -100,6 +100,8 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
         }
         return;
     }
+    
+    self.videoQuality = params[@"videoQuality"] ? : AVAssetExportPresetHighestQuality;
     
     NSInteger videoMaxDuration = [params[@"videoMaxDuration"] integerValue];
     /// 保存临时签名信息
