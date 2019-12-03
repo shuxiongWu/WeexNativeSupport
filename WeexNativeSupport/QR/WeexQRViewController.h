@@ -10,4 +10,5 @@
 typedef void(^ScanCallBack)(int code, NSString *msg);
 @interface WeexQRViewController : UIViewController
 @property (nonatomic, copy) ScanCallBack scanCallBack;
+@property (nonatomic, copy) NSString *descriptionString;
 @end

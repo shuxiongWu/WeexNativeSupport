@@ -71,7 +71,7 @@
     descLabel.font = [UIFont systemFontOfSize:14];
     descLabel.textAlignment = NSTextAlignmentCenter;
     descLabel.textColor = [UIColor whiteColor];
-    descLabel.text = @"将二维码放入框内，即可自动扫描";
+    descLabel.text = self.descriptionString ?: @"将二维码放入框内，即可自动扫描";
     [self addSubview:descLabel];
     
 }

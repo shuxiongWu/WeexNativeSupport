@@ -47,6 +47,7 @@
     //[_back setBackgroundImage:[PublicTool wx_imageNamed:@"btn_back"] forState:UIControlStateNormal];
     //构建扫描样式视图
     _scanView = [[WeexScanView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 0)];
+    _scanView.descriptionString = self.descriptionString;
     _scanView.scanRetangleRect = CGRectMake(60, iPhoneX ? 144 : 120, ([UIScreen mainScreen].bounds.size.width - 2 * 60),  ([UIScreen mainScreen].bounds.size.width - 2 * 60));
     _scanView.colorAngle = [UIColor greenColor];
     _scanView.photoframeAngleW = 20;

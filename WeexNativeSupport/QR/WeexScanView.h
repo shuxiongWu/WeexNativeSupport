@@ -14,6 +14,9 @@ typedef void(^WSLFlashSwitchBlock)(BOOL open);
 
 @interface WeexScanView : UIView
 
+// 提示语
+@property (nonatomic, copy) NSString * _Nullable descriptionString;
+
 /**
  点击我的二维码的回调
  */

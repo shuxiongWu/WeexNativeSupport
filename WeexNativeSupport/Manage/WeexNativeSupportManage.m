@@ -265,6 +265,27 @@ static AFHTTPSessionManager *netWorkManager;
     
 }
 
+- (void)scanQR:(id)params callback:(WXModuleKeepAliveCallback)callBack {
+    
+    NSDictionary *decodeParams;
+    if ([params isKindOfClass:NSString.class]) {
+        decodeParams = [params mj_JSONObject];
+    } else if ([params isKindOfClass:NSDictionary.class]) {
+        decodeParams = params;
+    } else {
+        if (callBack) {
+            callBack([@{@"code":@"",@"message":@"参数错误"} mj_JSONString],YES);
+        }
+        return;
+    }
+    if (decodeParams[@"description"]) {
+        self.scanQRCtl.descriptionString = decodeParams[@"description"];
+    }
+    self.sanqrCallBack = callBack;
+    [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.scanQRCtl animated:YES completion:nil];
+    
+}
+
 #pragma mark -- 链接到超盟商家
 - (void)jumpTocmshop:(WXModuleKeepAliveCallback)callBack
 {
