@@ -64,6 +64,7 @@ WX_EXPORT_METHOD(@selector(call:))
 
 //二维码扫描
 WX_EXPORT_METHOD(@selector(scanQR:))
+WX_EXPORT_METHOD(@selector(scanTitleQR:callback:))
 
 
 //WIFI相关api
@@ -309,6 +310,27 @@ WX_EXPORT_METHOD(@selector(downloadImageWithUrl:callback:))
     //[self.nativeManage scanQR:callBack];
     self.sanqrCallBack = callBack;
     [weexInstance.viewController.navigationController pushViewController:self.scanQRCtl animated:YES];
+}
+
+- (void)scanTitleQR:(id)params callback:(WXModuleKeepAliveCallback)callBack {
+    
+    NSDictionary *decodeParams;
+    if ([params isKindOfClass:NSString.class]) {
+        decodeParams = [params mj_JSONObject];
+    } else if ([params isKindOfClass:NSDictionary.class]) {
+        decodeParams = params;
+    } else {
+        if (callBack) {
+            callBack([@{@"code":@"",@"message":@"参数错误"} mj_JSONString],YES);
+        }
+        return;
+    }
+    if (decodeParams[@"description"]) {
+        self.scanQRCtl.descriptionString = decodeParams[@"description"];
+    }
+    self.sanqrCallBack = callBack;
+    [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.scanQRCtl animated:YES completion:nil];
+    
 }
 
 #pragma mark -- 存储数据
