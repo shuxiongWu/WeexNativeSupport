@@ -37,7 +37,7 @@ isiPhoneX;\
 
 
 + (void)load {
-    [WXSDKEngine registerComponent:@"camera" withClass:NSClassFromString(@"CameraComponent")];
+    [WXSDKEngine registerComponent:@"zxing" withClass:NSClassFromString(@"CameraComponent")];
 }
 
 - (void)dealloc {
