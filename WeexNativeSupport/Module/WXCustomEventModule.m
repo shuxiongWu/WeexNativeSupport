@@ -329,7 +329,7 @@ WX_EXPORT_METHOD(@selector(downloadImageWithUrl:callback:))
         self.scanQRCtl.descriptionString = decodeParams[@"description"];
     }
     self.sanqrCallBack = callBack;
-    [[[UIApplication sharedApplication].keyWindow.rootViewController.childViewControllers firstObject] presentViewController:self.scanQRCtl animated:YES completion:nil];
+    [weexInstance.viewController.navigationController pushViewController:self.scanQRCtl animated:YES];
     
 }
 
