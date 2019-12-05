@@ -63,6 +63,10 @@ isiPhoneX;\
     
 }
 
+- (void)viewWillUnload {
+    [self stopCamera];
+}
+
 - (void)applicationWillResignActive {
     NSLog(@"App 退出到后台");
     [self stopCamera];
@@ -139,8 +143,8 @@ isiPhoneX;\
         NSLog(@"扫描结果 %@",scanString);
         [weakSelf.scanTool sessionStopRunning];
         [weakSelf.scanTool openFlashSwitch:NO];
-        [weakSelf fireEvent:@"scanReuslt" params:@{@"code":@"1",@"code_url":scanString}];
-        [[weakSelf currentViewController].navigationController popViewControllerAnimated:YES];
+        [weakSelf fireEvent:@"scanResult" params:@{@"code":@"1",@"code_url":scanString}];
+        [weakSelf.weexInstance.viewController.navigationController popViewControllerAnimated:YES];
     };
     _scanTool.monitorLightBlock = ^(float brightness) {
         //        NSLog(@"环境光感 ： %f",brightness);
@@ -206,10 +210,10 @@ isiPhoneX;\
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请在设置-隐私-相机中允许访问相机" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        [[self currentViewController].navigationController popViewControllerAnimated:YES];
+        [self.weexInstance.viewController.navigationController popViewControllerAnimated:YES];
     }];
     UIAlertAction *settings = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [[self currentViewController].navigationController popViewControllerAnimated:YES];
+        [self.weexInstance.viewController.navigationController popViewControllerAnimated:YES];
         if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
             
             if (@available(iOS 10.0, *)) {
@@ -226,7 +230,7 @@ isiPhoneX;\
     [alert addAction:settings];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[self currentViewController] presentViewController:alert animated:YES completion:nil];
+        [self.weexInstance.viewController presentViewController:alert animated:YES completion:nil];
     });
     
 }
@@ -234,25 +238,10 @@ isiPhoneX;\
 -(void)showAuthorizationRestricted {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相机" message:@"请检查您的手机硬件或设置" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        [[self currentViewController].navigationController popViewControllerAnimated:YES];
+        [self.weexInstance.viewController.navigationController popViewControllerAnimated:YES];
     }];
     [alert addAction:cancel];
-    [[self currentViewController] presentViewController:alert animated:YES completion:nil];
-}
-
-- (UIViewController *)currentViewController {
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    UIViewController *vc = keyWindow.rootViewController;
-    while (vc.presentedViewController) {
-        vc = vc.presentedViewController;
-        
-        if ([vc isKindOfClass:[UINavigationController class]]) {
-            vc = [(UINavigationController *)vc visibleViewController];
-        } else if ([vc isKindOfClass:[UITabBarController class]]) {
-            vc = [(UITabBarController *)vc selectedViewController];
-        }
-    }
-    return vc;
+    [self.weexInstance.viewController presentViewController:alert animated:YES completion:nil];
 }
 
 
