@@ -11,6 +11,7 @@
 @implementation WeexDateHelper
 //将时间戳转化成字符串类型参数type是转化成什么格式的例如yyyy-MM-dd
 + (NSString *)getDateStringWithTimeIntervalString:(NSString *)string withType:(NSString *)type {
+    
     if (!string || string.length != 10) {
         return @"暂无";
     }

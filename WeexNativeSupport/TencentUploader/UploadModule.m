@@ -269,7 +269,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     
     /// 获取视频封面图
     UIImage *preViewImage = [self getVideoPreViewImage:url];
-    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:preViewImage toByte:1024*1024]];
+    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:preViewImage toByte:500*1024]];
     
     NSDictionary *tmpData = [[NSUserDefaults standardUserDefaults] objectForKey:tencentCloudTmpData];
     
@@ -457,20 +457,20 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
  */
 - (UIImage *)zipImageWithImage:(UIImage *)image
 {
-    // 在拿到图片的时候好像就已经进行过压缩处理了，所以这里其实是多余的。但是怕有地方没处理，所以还是留着吧。
     if (!image) {
         return nil;
     }
-    CGFloat maxFileSize = 1024*1024;
-    CGFloat compression = 1.0f;
-    NSData *compressedData = UIImageJPEGRepresentation(image, compression);
-    
-//    double oriDataLength = [compressedData length] * 1.0;
-    while ([compressedData length] > maxFileSize) {
-        compression *= 0.9;
-        compressedData = UIImageJPEGRepresentation([self compressImage:image newWidth:image.size.width*compression], compression);
-    }
-//    NSData *data = [self compressImageQuality:image toByte:1024*1024];
+//    CGFloat maxFileSize = 500*1024;
+//    CGFloat compression = 1.0f;
+//    NSData *compressedData = UIImageJPEGRepresentation(image, compression);
+//
+////    double oriDataLength = [compressedData length] * 1.0;
+//    while ([compressedData length] > maxFileSize) {
+//        compression *= 0.9;
+//        compressedData = UIImageJPEGRepresentation([self compressImage:image newWidth:image.size.width*compression], compression);
+//    }
+    // 压缩下来大概有1.5M左右，前提是选照片的时候要选原图，不然拿到高清图在那压也没用
+    NSData *compressedData = [self compressImageQuality:image toByte:500*1024];
     // 计算大小
 //    double dataLength = [compressedData length] * 1.0;
 //    NSArray *typeArray = @[@"bytes",@"KB",@"MB",@"GB",@"TB",@"PB", @"EB",@"ZB",@"YB"];
