@@ -459,7 +459,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     if (!image) {
         return nil;
     }
-    CGFloat maxFileSize = 100*1024;
+    CGFloat maxFileSize = 1000*1024;
     CGFloat compression = 0.9f;
     NSData *compressedData = UIImageJPEGRepresentation(image, compression);
     while ([compressedData length] > maxFileSize) {
