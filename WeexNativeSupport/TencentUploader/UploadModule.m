@@ -252,6 +252,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
                 if (result.__originHTTPResponseData__) {
                     [resultImformationString appendFormat:@"返回HTTP Body内容:\n%@\n",[[NSString alloc] initWithData:result.__originHTTPResponseData__ encoding:NSUTF8StringEncoding]];
                 }
+                NSLog(@"%@",resultImformationString);
                 if (callback) {
                     NSDictionary *resultDic = @{@"code":@(0),@"message":@"上传成功",@"fileUrl":fileUrl,@"data":@{@"imageUrl":object,@"fullImageUrl":result.location}};
                     callback([resultDic mj_JSONString],YES);
@@ -268,7 +269,7 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
     
     /// 获取视频封面图
     UIImage *preViewImage = [self getVideoPreViewImage:url];
-    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:preViewImage toByte:102400]];
+    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:preViewImage toByte:1024*1024]];
     
     NSDictionary *tmpData = [[NSUserDefaults standardUserDefaults] objectForKey:tencentCloudTmpData];
     
@@ -456,16 +457,37 @@ WX_EXPORT_METHOD(@selector(uploadImage:callback:))
  */
 - (UIImage *)zipImageWithImage:(UIImage *)image
 {
+    // 在拿到图片的时候好像就已经进行过压缩处理了，所以这里其实是多余的。但是怕有地方没处理，所以还是留着吧。
     if (!image) {
         return nil;
     }
     CGFloat maxFileSize = 1024*1024;
-    CGFloat compression = 0.9f;
+    CGFloat compression = 1.0f;
     NSData *compressedData = UIImageJPEGRepresentation(image, compression);
+    
+//    double oriDataLength = [compressedData length] * 1.0;
     while ([compressedData length] > maxFileSize) {
         compression *= 0.9;
         compressedData = UIImageJPEGRepresentation([self compressImage:image newWidth:image.size.width*compression], compression);
     }
+//    NSData *data = [self compressImageQuality:image toByte:1024*1024];
+    // 计算大小
+//    double dataLength = [compressedData length] * 1.0;
+//    NSArray *typeArray = @[@"bytes",@"KB",@"MB",@"GB",@"TB",@"PB", @"EB",@"ZB",@"YB"];
+//    NSInteger index = 0;
+//    while (dataLength > 1024) {
+//        dataLength /= 1024.0;
+//        index ++;
+//    }
+//    NSInteger oriIndex = 0;
+//    while (oriDataLength > 1024) {
+//        oriDataLength /= 1024.0;
+//        oriIndex ++;
+//    }
+//
+//    NSLog(@"oriImage大小 = %.3f %@",oriDataLength,typeArray[index]);
+//    NSLog(@"image大小 = %.3f %@",dataLength,typeArray[index]);
+    
     UIImage *result = [UIImage imageWithData:compressedData];
     return result;
 }

@@ -329,7 +329,7 @@ static AFHTTPSessionManager *netWorkManager;
     [topRootViewController hx_presentCustomCameraViewControllerWithManager:self.manager done:^(HXPhotoModel *model, HXCustomCameraViewController *viewController) {
         [self.toolManager getSelectedImageList:@[model] success:^(NSArray<UIImage *> *imageList) {
             UIImage *image = [imageList firstObject];
-            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
+            NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:1024*1024]];
             NSString *fileUrl = model.fileURL ? model.fileURL.absoluteString : @"";
             self.imageCallBack ? self.imageCallBack([@{@"base64String":base64String,@"fileUrl":fileUrl} mj_JSONString], YES) : nil;
         } failed:^{
@@ -463,7 +463,7 @@ static AFHTTPSessionManager *netWorkManager;
                     
                     UIImage *image = imageList[i];
                     HXPhotoModel *model = photoList[i];
-                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:102400]];
+                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:1024*1024]];
                     [base64StringArr addObject:base64String];
                     [fileUrlArr addObject:model.fileURL ? model.fileURL.absoluteString : @""];
                 }
