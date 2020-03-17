@@ -442,6 +442,9 @@ static AFHTTPSessionManager *netWorkManager;
             self.manager.configuration.movableCropBoxCustomRatio = CGPointMake([params[@"movableCropBoxCustomRatio"] floatValue], 1);  // 可移动裁剪框的比例 (w,h)
         }
     }
+    if ([params[@"clearSelectedList"] boolValue]) {
+        [self.manager clearSelectedList];
+    }
     [self selectPhoto];
 }
 
