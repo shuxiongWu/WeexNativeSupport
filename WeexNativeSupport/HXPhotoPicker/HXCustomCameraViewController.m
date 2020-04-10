@@ -41,9 +41,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor grayColor];
-    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
-        [self.locationManager startUpdatingLocation];
-    }
+//    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+//        [self.locationManager startUpdatingLocation];
+//    }
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.cancelBtn];
     if (self.manager.configuration.videoMaximumDuration > self.manager.configuration.videoMaxDuration) {
         self.manager.configuration.videoMaximumDuration = self.manager.configuration.videoMaxDuration;
@@ -192,9 +192,9 @@
     [self.cameraController stopSession];
 }
 - (void)dealloc {
-    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
-        [self.locationManager stopUpdatingLocation];
-    }
+//    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+//        [self.locationManager stopUpdatingLocation];
+//    }
     if (showLog) NSSLog(@"dealloc");
 }
 - (void)cancelClick:(UIButton *)button {
