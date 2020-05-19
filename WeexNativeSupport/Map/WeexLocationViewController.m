@@ -34,6 +34,8 @@
 @property (nonatomic, assign) CGFloat tableView_h;
 @property (nonatomic, weak) UIButton *againLocation;
 @property (nonatomic, assign) UIStatusBarStyle barStyle;
+@property (nonatomic, copy) NSString *province;
+@property (nonatomic, copy) NSString *city;
 @end
 
 @implementation WeexLocationViewController
@@ -218,12 +220,19 @@
     if (_searchBar.text.length == 0) {
         //        [SVProgressHUD showInfoWithStatus:@"请输入搜索关键字"];
     } else {
-        
-        AMapInputTipsSearchRequest *tips = [[AMapInputTipsSearchRequest alloc] init];
-        tips.keywords = _searchBar.text;
-        //tips.city     = @"北京";
-        //   tips.cityLimit = YES; 是否限制城市
-        [self.search AMapInputTipsSearch:tips];
+        AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
+        request.keywords            = _searchBar.text;
+        request.city                = self.city ?:@"";
+        //        request.types               = info[@"types"] ?:@"";
+        request.requireExtension    = YES;
+        /*  搜索SDK 3.2.0 中新增加的功能，只搜索本城市的POI。*/
+        //        request.cityLimit           = [info[@"cityLimit"] ?:@"1" boolValue];
+        request.cityLimit           = YES;
+        //    request.requireSubPOIs      = info[@""] ?:@"";
+        // 按距离排序
+        request.sortrule = 0;
+        request.offset = 50;
+        [self.search AMapPOIKeywordsSearch:request];
     }
 }
 
@@ -381,6 +390,8 @@
     
     if (reGeocode)
     {
+        self.province = reGeocode.province;
+        self.city = reGeocode.city;
         model.title = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
         model.subTitle = [NSString stringWithFormat:@"%@(%@%@)",reGeocode.POIName,reGeocode.street,reGeocode.number];
         if ([_dataSrouce count] > 0) {
