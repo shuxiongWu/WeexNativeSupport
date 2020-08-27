@@ -63,7 +63,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
             callBack(netWorkStatus,YES);
         }
     }];
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 
@@ -78,7 +78,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
     if (callBack) {
         callBack(@(bol),YES);
     }
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 /**
@@ -92,7 +92,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
     if (callBack) {
         callBack(@(bol),YES);
     }
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 /**
@@ -106,7 +106,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
     if (callBack) {
         callBack(@(bol),YES);
     }
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 #pragma mark ------------------取消网络请求---------------------
@@ -117,7 +117,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
 - (void)cancelAllRequest {
 
     [WYNetworkManage cancelAllRequest];
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 
@@ -129,7 +129,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
 - (void)cancelRequestWithURL:(NSString *)URL {
 
     [WYNetworkManage cancelRequestWithURL:URL];
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 #pragma mark ------------------日志控制---------------------
@@ -145,7 +145,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
     }else {
         [WYNetworkManage closeLog];
     }
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 #pragma mark ------------------HTTP请求---------------------
@@ -258,7 +258,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
             }];
         }
     }
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 #pragma mark ------------------公共参数设置----------------------
@@ -274,7 +274,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
     } else if ([serializer isEqualToString:@"HTTP"]) {
         [WYNetworkManage setRequestSerializer:WYRequestSerializerHTTP];
     }
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 /**
@@ -289,7 +289,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
     } else if ([serializer isEqualToString:@"HTTP"]) {
         [WYNetworkManage setResponseSerializer:WYResponseSerializerHTTP];
     }
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 /**
@@ -300,7 +300,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
 - (void)setRequestTimeoutInterval:(NSString *)time {
 
     [WYNetworkManage setRequestTimeoutInterval:[time doubleValue]];
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 /// 设置请求头
@@ -310,7 +310,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
     [allKeys enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [WYNetworkManage setValue:dict[allKeys[idx]] forHTTPHeaderField:allKeys[idx]];
     }];
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 /**
@@ -321,7 +321,7 @@ WX_EXPORT_METHOD(@selector(openNetworkActivityIndicator:))
 - (void)openNetworkActivityIndicator:(NSString *)open {
 
     [WYNetworkManage openNetworkActivityIndicator:[open boolValue]];
-    NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
+    // NSAssert(NO, @"请导入WYNetworkManager后再使用此功能");
 }
 
 #pragma mark ------------------json转字符串---------------------
