@@ -14,7 +14,7 @@
 #import <MapKit/MapKit.h>
 #import <MAMapKit/MAMapKit.h>
 #import "WeexCurrentLocationTableViewCell.h"
-#import <UIView+MJExtension.h>
+#import <MJExtension/MJExtension.h>
 #import <MJRefresh/MJRefresh.h>
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "WeexAddressModel.h"
