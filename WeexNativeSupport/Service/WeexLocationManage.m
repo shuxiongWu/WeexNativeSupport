@@ -7,7 +7,7 @@
 //
 
 #import "WeexLocationManage.h"
-#import <MJExtension.h>
+#import <MJExtension/MJExtension.h>
 #import "CMLocationTransform.h"
 
 @interface WeexLocationManage ()<CLLocationManagerDelegate,UIAlertViewDelegate>{//添加代理协议 CLLocationManagerDelegate

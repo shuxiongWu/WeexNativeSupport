@@ -9,7 +9,7 @@
 #import "CMWXContactsModule.h"
 #import <Contacts/Contacts.h>
 #import <AddressBook/AddressBook.h>
-#import <MJExtension.h>
+#import <MJExtension/MJExtension.h>
 
 @implementation CMWXContactsModule
 

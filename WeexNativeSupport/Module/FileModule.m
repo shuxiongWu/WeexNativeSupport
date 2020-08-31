@@ -7,8 +7,8 @@
 //
 
 #import "FileModule.h"
-#import <AFNetworking.h>
-#import <SSZipArchive.h>
+#import <AFNetworking/AFNetworking.h>
+#import <SSZipArchive/SSZipArchive.h>
 
 @implementation FileModule
 WX_EXPORT_METHOD(@selector(getJsPath:callback:))

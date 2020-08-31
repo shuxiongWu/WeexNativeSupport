@@ -9,7 +9,7 @@
 #import "UploadModule.h"
 #import <WeexSDK/WeexSDK.h>
 #import "HXPhotoPicker.h"
-#import <SVProgressHUD.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 
 #import <QCloudCOSXML/QCloudCOSXMLTransfer.h>
 #import <QCloudCore/QCloudCore.h>
@@ -17,7 +17,7 @@
 #import "NSURL+FileExtension.h"
 #import "WeexEncriptionHelper.h"
 #import "ASCameraViewController.h"
-#import <MJExtension.h>
+#import <MJExtension/MJExtension.h>
 
 
 /// 保存腾讯云存储临时签名信息

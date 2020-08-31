@@ -7,7 +7,7 @@
 //
 
 #import "WeexBaseService.h"
-#import <SVProgressHUD.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 @implementation WeexBaseService
     //获取版本信息
 + (void)getAppVersionWithUrl:(NSString *)url

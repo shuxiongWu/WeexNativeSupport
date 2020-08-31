@@ -6,7 +6,7 @@
 
 #import "WXScrollerComponent+Extension.h"
 #import <objc/runtime.h>
-#import <MJRefresh.h>
+#import <MJRefresh/MJRefresh.h>
 
 /*
  前端在dom中加上事件，原生判断有refresh和loading事件，绑定下拉刷新控件，使用fireEvent调用前端的函数

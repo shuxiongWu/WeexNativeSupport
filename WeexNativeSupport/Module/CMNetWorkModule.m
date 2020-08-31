@@ -10,7 +10,7 @@
 #import <WeexSDK/WXExceptionUtils.h>
 #import <WeexSDK/WeexSDK.h>
 #import <WeexSDK/WXUtility.h>
-#import <WYNetworkManage.h>
+#import <WYNetworkManager/WYNetworkManage.h>
 
 @implementation CMNetWorkModule
 

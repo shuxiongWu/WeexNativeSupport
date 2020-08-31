@@ -7,7 +7,7 @@
 //
 
 #import "WeexBaseNetworkingService.h"
-#import <MJExtension.h>
+#import <MJExtension/MJExtension.h>
 //#import "CMJFUUID.h"
 //#import "CMJFManager.h"
 //#import "CMJFLoginVO.h"

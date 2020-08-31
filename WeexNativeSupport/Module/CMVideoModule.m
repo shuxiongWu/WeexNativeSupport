@@ -15,9 +15,9 @@
 #import <AVFoundation/AVFoundation.h>
 #import "WeexEncriptionHelper.h"
 #import "HXPhotoPicker.h"
-#import <AFNetworking.h>
-#import <MJExtension.h>
-#import <SVProgressHUD.h>
+#import <AFNetworking/AFNetworking.h>
+#import <MJExtension/MJExtension.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 
 #define Timeout 30
 @interface CMVideoModule ()<HXAlbumListViewControllerDelegate>

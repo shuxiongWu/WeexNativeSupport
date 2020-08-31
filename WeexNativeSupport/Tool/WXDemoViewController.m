@@ -12,7 +12,7 @@
 #import <WeexSDK/WXUtility.h>
 #import <WeexSDK/WXDebugTool.h>
 #import <WeexSDK/WXSDKManager.h>
-#import <AFNetworkReachabilityManager.h>
+#import <AFNetworking/AFNetworkReachabilityManager.h>
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;

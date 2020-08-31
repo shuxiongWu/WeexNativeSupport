@@ -7,7 +7,7 @@
 //
 
 #import "ASCameraUtility.h"
-#import <SVProgressHUD.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @implementation ASCameraUtility
 

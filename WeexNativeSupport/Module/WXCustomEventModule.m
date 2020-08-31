@@ -24,10 +24,10 @@
 #endif
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <Photos/Photos.h>
-#import <SVProgressHUD.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 #import <UserNotifications/UserNotifications.h>
 #import <StoreKit/StoreKit.h>
-#import <MJExtension.h>
+#import <MJExtension/MJExtension.h>
 
 //#import "WXDemoViewController.h"
 @interface WXCustomEventModule ()

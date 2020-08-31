@@ -7,7 +7,7 @@
 //
 
 #import "CMWXProgressHUDModule.h"
-#import <SVProgressHUD.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 #import <WeexSDK/WeexSDK.h>
 @interface CMWXProgressHUDModule ()
 

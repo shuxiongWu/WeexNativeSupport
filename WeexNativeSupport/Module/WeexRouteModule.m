@@ -9,7 +9,7 @@
 #import "WeexRouteModule.h"
 #import <WeexSDK/WeexSDK.h>
 #import "WXDemoViewController.h"
-#import <WXRootViewController.h>
+#import <WeexSDK/WeexSDK.h>
 @implementation WeexRouteModule
 @synthesize weexInstance;
 WX_EXPORT_METHOD(@selector(presentWithParams:))

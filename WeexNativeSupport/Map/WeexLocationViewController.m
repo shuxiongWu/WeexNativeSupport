@@ -15,8 +15,8 @@
 #import <MAMapKit/MAMapKit.h>
 #import "WeexCurrentLocationTableViewCell.h"
 #import <UIView+MJExtension.h>
-#import <MJRefresh.h>
-#import <SVProgressHUD.h>
+#import <MJRefresh/MJRefresh.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 #import "WeexAddressModel.h"
 #import "WeexPublicTool.h"
 @interface WeexLocationViewController ()<AMapLocationManagerDelegate,AMapSearchDelegate,MAMapViewDelegate,UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate,UIAlertViewDelegate>

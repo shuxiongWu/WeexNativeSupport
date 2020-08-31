@@ -9,7 +9,7 @@
 #import "HXDatePhotoEditViewController.h"
 #import "UIImage+HXExtension.h"
 #import "UIButton+HXExtension.h"
-#import <MJExtension.h>
+#import <MJExtension/MJExtension.h>
 @interface HXDatePhotoEditViewController ()<HXDatePhotoEditBottomViewDelegate>
 @property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) HXDatePhotoEditBottomView *bottomView;

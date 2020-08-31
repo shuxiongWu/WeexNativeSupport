@@ -10,7 +10,7 @@
 #import "WeexBaseService.h"
 #import "WeexShareItem.h"
 #import "UIImage+WeexScaleImage.h"
-#import <SVProgressHUD.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 #if __has_include(<SDWebImage/SDWebImageManager.h>)
 #import <SDWebImage/SDWebImageManager.h>
 #elif __has_include("SDWebImageManager.h")
@@ -28,13 +28,13 @@
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <Photos/Photos.h>
 #import "WeexDateHelper.h"
-#import <MJExtension.h>
+#import <MJExtension/MJExtension.h>
 #import "HXPhotoPicker.h"
 #import "WeexEncriptionHelper.h"
 #import "UIImage+WeexCompress.h"
 #import "WeexLocationManage.h"
 #import "WeexQRViewController.h"
-#import <AFNetworking.h>
+#import <AFNetworking/AFNetworking.h>
 
 #define scanMaxNumber 3                //扫描蓝牙最大次数
 @interface WeexNativeSupportManage ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>

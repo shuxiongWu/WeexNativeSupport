@@ -10,8 +10,8 @@
 #define WeexNativeSupport_h
 
 #import "WeexMacrosAndConstants.h"
-#import <SVProgressHUD.h>
-#import <AFNetworking.h>
+#import <SVProgressHUD/SVProgressHUD.h>
+#import <AFNetworking/AFNetworking.h>
 #import <CocoaLumberjack/CocoaLumberjack.h>
 #import "WeexNativeSupport.h"
 #import "WeexNativeSupportManage.h"
