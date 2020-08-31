@@ -23,7 +23,7 @@ s.dependency 'MJRefresh'
 s.dependency 'AMapSearch-NO-IDFA'
 s.dependency 'AMapLocation-NO-IDFA'
 s.dependency 'AMap3DMap-NO-IDFA'
-s.dependency 'WYNetworkManager'
+s.dependency 'WYNetworkManager', '0.1.1'
 s.dependency 'QCloudCOSXML/Transfer'
 s.requires_arc = true
 
