@@ -370,7 +370,7 @@ typedef void(^ResultPath)(AVURLAsset *avurlAsset,NSString *filePath, NSString *f
     
     NSString *url = [NSString stringWithFormat:@"%@?file=""",urlString];
     self.netWorkManager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    [self.netWorkManager POST:url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+    [self.netWorkManager POST:url parameters:params headers:nil constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         //使用日期生成视频名称
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";

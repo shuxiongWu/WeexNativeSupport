@@ -87,7 +87,7 @@ static WeexBaseNetworkingService *manager;
     jsonString = [WeexEncriptionHelper HloveyRC4:jsonString key:CKJFEncriptionSecurityKey];
     
     NSDictionary *bodyDic = @{@"iOS_key":jsonString};
-    [manager POST:httpPath parameters:bodyDic progress:^(NSProgress * _Nonnull uploadProgress) {
+    [manager POST:httpPath parameters:bodyDic headers:nil progress:^(NSProgress * _Nonnull uploadProgress) {
         
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         //NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
