@@ -14,7 +14,7 @@ s.static_framework = true
 s.dependency 'SVProgressHUD'
 s.dependency 'SSZipArchive'
 s.dependency 'MJExtension'
-s.dependency 'AFNetworking'
+s.dependency 'AFNetworking', '4.0.1'
 s.dependency 'CocoaLumberjack'
 s.dependency 'WeexSDK'
 s.dependency 'SocketRocket'
