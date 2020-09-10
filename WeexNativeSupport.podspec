@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.8.43'
+s.version      = '1.9.0'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -16,7 +16,7 @@ s.dependency 'SSZipArchive'
 s.dependency 'MJExtension'
 s.dependency 'AFNetworking', '4.0.1'
 s.dependency 'CocoaLumberjack'
-s.dependency 'WeexSDK'
+s.dependency 'WeexSDK', :git => 'https://gitee.com/chen93/incubator-weex.git'
 s.dependency 'SocketRocket'
 s.dependency 'WeexPluginLoader'
 s.dependency 'MJRefresh'

@@ -298,10 +298,11 @@ WX_EXPORT_METHOD(@selector(downloadImageWithUrl:callback:))
 
 #pragma mark -- 打电话
 -(void)call:(NSString*)num{
-    NSMutableString *str=[[NSMutableString alloc] initWithFormat:@"tel:%@",num];
-    UIWebView *callWebview = [[UIWebView alloc] init];
-    [callWebview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:str]]];
-    [weexInstance.viewController.view addSubview:callWebview];
+    if (@available(iOS 10.0, *)) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel:%@",num]] options:@{} completionHandler:nil];
+    } else {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel:%@",num]]];
+    }
 }
 
 #pragma mark -- 二维码扫描
