@@ -14,7 +14,7 @@
 #import <WeexSDK/WXSDKManager.h>
 #import <AFNetworking/AFNetworkReachabilityManager.h>
 
-@interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
+@interface WXDemoViewController () <UIScrollViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;
 @property (nonatomic, strong) UIView *weexView;
 
