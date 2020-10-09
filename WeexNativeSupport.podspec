@@ -10,6 +10,7 @@ s.source       = {:git => 'https://github.com/shuxiongWu/WeexNativeSupport.git',
 s.resources    = "WeexNativeSupport/HXPhotoPicker/HXPhotoPicker.bundle"
 s.source_files = 'WeexNativeSupport/**/*.{h,m}'
 s.static_framework = true
+s.pod_target_xcconfig = { 'VALID_ARCHS' => 'arm64' }
 
 s.dependency 'SVProgressHUD'
 s.dependency 'SSZipArchive'
