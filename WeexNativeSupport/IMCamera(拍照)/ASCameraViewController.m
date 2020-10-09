@@ -374,7 +374,9 @@ typedef void(^PropertyChangeBlock)(AVCaptureDevice *captureDevice);
                 [[NSFileManager defaultManager] removeItemAtURL:self.saveVideoUrl error:nil];
             }
             //预览图层和视频方向保持一致
-            connection.videoOrientation = [self.previewLayer connection].videoOrientation;
+            if ([connection isVideoOrientationSupported]) {
+                connection.videoOrientation = [self.previewLayer connection].videoOrientation;
+            }
             NSString *outputFielPath = [NSTemporaryDirectory() stringByAppendingString:@"myMovie.mov"];
             NSLog(@"save path is :%@",outputFielPath);
             NSURL *fileUrl = [NSURL fileURLWithPath:outputFielPath];
