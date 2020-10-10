@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = 'WeexNativeSupport'
-s.version      = '1.9.3'
+s.version      = '1.9.4'
 s.summary      = 'weex原生支持'
 s.homepage     = 'https://github.com/shuxiongWu/WeexNativeSupport.git'
 s.license      = { :type => "MIT", :file => "LICENSE" }
@@ -10,7 +10,7 @@ s.source       = {:git => 'https://github.com/shuxiongWu/WeexNativeSupport.git',
 s.resources    = "WeexNativeSupport/HXPhotoPicker/HXPhotoPicker.bundle"
 s.source_files = 'WeexNativeSupport/**/*.{h,m}'
 s.static_framework = true
-s.pod_target_xcconfig = { 'VALID_ARCHS' => 'arm64' }
+#s.pod_target_xcconfig = { 'VALID_ARCHS' => 'arm64' }
 
 s.dependency 'SVProgressHUD'
 s.dependency 'SSZipArchive'
