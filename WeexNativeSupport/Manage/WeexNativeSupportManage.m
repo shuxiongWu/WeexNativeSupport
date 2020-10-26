@@ -35,6 +35,7 @@
 #import "WeexLocationManage.h"
 #import "WeexQRViewController.h"
 #import <AFNetworking/AFNetworking.h>
+#import <Photos/Photos.h>
 
 #define scanMaxNumber 3                //扫描蓝牙最大次数
 @interface WeexNativeSupportManage ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,HXAlbumListViewControllerDelegate>
@@ -427,8 +428,47 @@ static AFHTTPSessionManager *netWorkManager;
     [self selectPhoto];
 }
 
-//建议使用新的api
-- (void)selectPhotoFromPhotoAlbum:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack {
+- (void)showPhotoLibraryAuthNotDetermined:(NSDictionary *)params callback:(WXModuleKeepAliveCallback)callBack {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        if (status == PHAuthorizationStatusAuthorized) {
+            [self getAlbumModelList:params callback:callBack];
+        } else {
+            [self showPhotoLibraryAuthDenied];
+        }
+    }];
+}
+/// 无照片权限
+- (void)showPhotoLibraryAuthDenied {
+    UIViewController *topRootViewController = [[UIApplication  sharedApplication] keyWindow].rootViewController;
+    // 在这里加一个这个样式的循环
+    while (topRootViewController.presentedViewController)
+    {
+        // 这里固定写法
+        topRootViewController = topRootViewController.presentedViewController;
+    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"无法访问相册"
+                                                                       message:@"可能无法使用此功能，请前往\"设置-隐私-照片\"开启相册访问权限"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]]) {
+                
+                if (@available(iOS 10.0, *)) {
+                    
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:nil];
+                } else {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+            }
+        }];
+        [alert addAction:cancel];
+        [alert addAction:action];
+        [topRootViewController presentViewController:alert animated:YES completion:nil];
+    });
+    
+}
+- (void)getAlbumModelList:(NSDictionary *)params callback:(WXModuleKeepAliveCallback)callBack {
     self.manager.configuration.singleJumpEdit = NO;
     self.imageCallBack = callBack;
     if([params[@"num"] integerValue] > 1){
@@ -448,39 +488,57 @@ static AFHTTPSessionManager *netWorkManager;
     [self selectPhoto];
 }
 
-- (void)selectPhoto{
-    UIViewController *topRootViewController = [[UIApplication  sharedApplication] keyWindow].rootViewController;
+
+//建议使用新的api
+- (void)selectPhotoFromPhotoAlbum:(NSDictionary *)params callBack:(WXModuleKeepAliveCallback)callBack {
     
-    // 在这里加一个这个样式的循环
-    while (topRootViewController.presentedViewController)
-    {
-        // 这里固定写法
-        topRootViewController = topRootViewController.presentedViewController;
+    
+    switch ([PHPhotoLibrary authorizationStatus]) {
+        case PHAuthorizationStatusNotDetermined: [self showPhotoLibraryAuthNotDetermined:params callback:callBack]; break;
+        case PHAuthorizationStatusAuthorized:[self getAlbumModelList:params callback:callBack]; break;
+        case PHAuthorizationStatusRestricted: [self showAuthorizationRestricted]; return;
+        case PHAuthorizationStatusDenied: [self showPhotoLibraryAuthDenied]; return;
+            
+        default:
+            break;
     }
-    [topRootViewController hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
-        if (photoList.count > 0) {
-            [self.toolManager getSelectedImageList:photoList requestType:HXDatePhotoToolManagerRequestTypeOriginal success:^(NSArray<UIImage *> *imageList) {
-                NSMutableArray *base64StringArr = [NSMutableArray array];
-                NSMutableArray *fileUrlArr = [NSMutableArray array];
-                for (int i = 0; i < imageList.count; ++i) {
-                    
-                    UIImage *image = imageList[i];
-                    HXPhotoModel *model = photoList[i];
-                    NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:500*1024]];
-                    [base64StringArr addObject:base64String];
-                    [fileUrlArr addObject:model.fileURL ? model.fileURL.absoluteString : @""];
-                }
-                NSDictionary *result = @{@"base64StringArray":base64StringArr,@"fileUrlArray":fileUrlArr};
-                self.imageCallBack ? self.imageCallBack([result mj_JSONString], YES) : nil;
-                [viewController dismissViewControllerAnimated:YES completion:nil];
-            } failed:^{
-                
-            }];
-            NSSLog(@"%lu张图片",(unsigned long)photoList.count);
-        }
-    } cancel:^(HXAlbumListViewController *viewController) {
+}
+
+- (void)selectPhoto{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIViewController *topRootViewController = [[UIApplication  sharedApplication] keyWindow].rootViewController;
         
-    }];
+        // 在这里加一个这个样式的循环
+        while (topRootViewController.presentedViewController)
+        {
+            // 这里固定写法
+            topRootViewController = topRootViewController.presentedViewController;
+        }
+        [topRootViewController hx_presentAlbumListViewControllerWithManager:self.manager done:^(NSArray<HXPhotoModel *> *allList, NSArray<HXPhotoModel *> *photoList, NSArray<HXPhotoModel *> *videoList, NSArray<UIImage *> *imageList, BOOL original, HXAlbumListViewController *viewController) {
+            if (photoList.count > 0) {
+                [self.toolManager getSelectedImageList:photoList requestType:HXDatePhotoToolManagerRequestTypeOriginal success:^(NSArray<UIImage *> *imageList) {
+                    NSMutableArray *base64StringArr = [NSMutableArray array];
+                    NSMutableArray *fileUrlArr = [NSMutableArray array];
+                    for (int i = 0; i < imageList.count; ++i) {
+                        
+                        UIImage *image = imageList[i];
+                        HXPhotoModel *model = photoList[i];
+                        NSString *base64String = [WeexEncriptionHelper encodeBase64WithData:[self compressImageQuality:image toByte:500*1024]];
+                        [base64StringArr addObject:base64String];
+                        [fileUrlArr addObject:model.fileURL ? model.fileURL.absoluteString : @""];
+                    }
+                    NSDictionary *result = @{@"base64StringArray":base64StringArr,@"fileUrlArray":fileUrlArr};
+                    self.imageCallBack ? self.imageCallBack([result mj_JSONString], YES) : nil;
+                    [viewController dismissViewControllerAnimated:YES completion:nil];
+                } failed:^{
+                    
+                }];
+                NSSLog(@"%lu张图片",(unsigned long)photoList.count);
+            }
+        } cancel:^(HXAlbumListViewController *viewController) {
+            
+        }];
+    });
 }
 
 - (NSData *)compressImageQuality:(UIImage *)image toByte:(NSInteger)maxLength {
